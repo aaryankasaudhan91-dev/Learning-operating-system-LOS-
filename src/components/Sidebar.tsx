@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Home, Compass, Shield, Rocket, Activity, Sliders, LogOut, BookOpen } from 'lucide-react';
+import { Home, Compass, Shield, Rocket, Activity, Sliders, LogOut, BookOpen, Lock } from 'lucide-react';
 import { AppView } from '../types';
 import { AppLogo } from './AppLogo';
 
@@ -85,37 +85,46 @@ export default function Sidebar({
 
               <button
                 onClick={() => setView('map')}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group opacity-60 ${
                   currentView === 'map'
                     ? 'bg-secondary-container/20 text-secondary border-r-4 border-plasma-violet'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
               >
-                <Activity className="w-4 h-4 text-electric-cyan group-hover:scale-110 transition-transform" />
+                <div className="relative">
+                  <Activity className="w-4 h-4 text-electric-cyan group-hover:scale-110 transition-transform" />
+                  <Lock className="absolute -top-2 -right-2 w-2.5 h-2.5 text-on-surface-variant" />
+                </div>
                 <span>Cognitive Map</span>
               </button>
 
               <button
                 onClick={() => setView('chamber')}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group opacity-60 ${
                   currentView === 'chamber'
                     ? 'bg-secondary-container/20 text-secondary border-r-4 border-plasma-violet'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
               >
-                <Compass className="w-4 h-4 text-synapse-green group-hover:rotate-45 transition-transform" />
+                <div className="relative">
+                  <Compass className="w-4 h-4 text-synapse-green group-hover:rotate-45 transition-transform" />
+                  <Lock className="absolute -top-2 -right-2 w-2.5 h-2.5 text-on-surface-variant" />
+                </div>
                 <span>Focus Mode</span>
               </button>
 
               <button
                 onClick={() => setView('sos')}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group opacity-60 ${
                   currentView === 'sos'
                     ? 'bg-secondary-container/20 text-secondary border-r-4 border-plasma-violet'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
               >
-                <Sliders className="w-4 h-4 text-red-400 group-hover:rotate-90 transition-transform" />
+                <div className="relative">
+                  <Sliders className="w-4 h-4 text-red-400 group-hover:rotate-90 transition-transform" />
+                  <Lock className="absolute -top-2 -right-2 w-2.5 h-2.5 text-on-surface-variant" />
+                </div>
                 <span>SOS Panel</span>
               </button>
             </>
@@ -135,25 +144,31 @@ export default function Sidebar({
 
               <button
                 onClick={() => setView('insights')}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group opacity-60 ${
                   currentView === 'insights'
                     ? 'bg-secondary-container/20 text-secondary border-r-4 border-plasma-violet'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
               >
-                <Sliders className="w-4 h-4 text-plasma-violet group-hover:rotate-90 transition-transform" />
+                <div className="relative">
+                  <Sliders className="w-4 h-4 text-plasma-violet group-hover:rotate-90 transition-transform" />
+                  <Lock className="absolute -top-2 -right-2 w-2.5 h-2.5 text-on-surface-variant" />
+                </div>
                 <span>Seat Matrix</span>
               </button>
 
               <button
                 onClick={() => setView('cohort')}
-                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group ${
+                className={`flex items-center gap-4 px-4 py-3 rounded-xl text-sm font-medium transition-all group opacity-60 ${
                   currentView === 'cohort'
                     ? 'bg-secondary-container/20 text-secondary border-r-4 border-plasma-violet'
                     : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
               >
-                <Activity className="w-4 h-4 text-electric-cyan group-hover:scale-110 transition-transform" />
+                <div className="relative">
+                  <Activity className="w-4 h-4 text-electric-cyan group-hover:scale-110 transition-transform" />
+                  <Lock className="absolute -top-2 -right-2 w-2.5 h-2.5 text-on-surface-variant" />
+                </div>
                 <span>Cohort Telemetry</span>
               </button>
             </>

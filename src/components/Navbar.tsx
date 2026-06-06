@@ -4,7 +4,7 @@
  */
 
 import React from 'react';
-import { Sparkles, Brain, GraduationCap, Compass, ShieldAlert, Sliders, LogOut } from 'lucide-react';
+import { Sparkles, Brain, GraduationCap, Compass, ShieldAlert, Sliders, LogOut, Lock } from 'lucide-react';
 import { AppView } from '../types';
 import { AppLogo } from './AppLogo';
 
@@ -64,32 +64,35 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setView('map')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 opacity-60 ${
                   currentView === 'map'
                     ? 'bg-gradient-to-r from-electric-cyan/20 to-plasma-violet/20 text-electric-cyan shadow-sm border border-electric-cyan/30'
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
+                <Lock className="w-3 h-3" />
                 Cognitive Map
               </button>
               <button
                 onClick={() => setView('chamber')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 opacity-60 ${
                   currentView === 'chamber'
                     ? 'bg-gradient-to-r from-electric-cyan/20 to-plasma-violet/20 text-electric-cyan shadow-sm border border-electric-cyan/30'
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
+                <Lock className="w-3 h-3" />
                 Focus Chamber
               </button>
               <button
                 onClick={() => setView('sos')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 opacity-60 ${
                   currentView === 'sos'
                     ? 'bg-red-500/20 text-error border border-red-500/35'
                     : 'text-on-surface-variant hover:text-error'
                 }`}
               >
+                <Lock className="w-3 h-3" />
                 SOS Toolkit
               </button>
             </>
@@ -107,22 +110,24 @@ export default function Navbar({
               </button>
               <button
                 onClick={() => setView('insights')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 opacity-60 ${
                   currentView === 'insights'
                     ? 'bg-gradient-to-r from-electric-cyan/20 to-plasma-violet/20 text-electric-cyan shadow-sm border border-electric-cyan/30'
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
+                <Lock className="w-3 h-3" />
                 Seat Matrix
               </button>
               <button
                 onClick={() => setView('cohort')}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-2 ${
+                className={`px-4 py-2 rounded-full text-sm font-medium transition-all flex items-center gap-1.5 opacity-60 ${
                   currentView === 'cohort'
                     ? 'bg-gradient-to-r from-electric-cyan/20 to-plasma-violet/20 text-electric-cyan shadow-sm border border-electric-cyan/30'
                     : 'text-on-surface-variant hover:text-on-surface'
                 }`}
               >
+                <Lock className="w-3 h-3" />
                 Cohort Telemetry
                 {activeAlertCount > 0 && (
                   <span className="w-2 h-2 rounded-full bg-red-400 animate-pulse" />
