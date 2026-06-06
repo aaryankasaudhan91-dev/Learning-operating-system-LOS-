@@ -1,0 +1,6 @@
+{
+  "project_name": "Course Design_ CBSE & NEP 2020 Framework",
+  "seeding_required": true,
+  "under_construction_scope": "all_except_courses_and_profile",
+  "target_grades": ["1", "2", "3", "6", "8", "10", "11", "12"]
+}

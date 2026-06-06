@@ -1,0 +1,80 @@
+{
+  "courses": [
+    {
+      "id": "c1-eng",
+      "classLevel": "Class 1",
+      "subject": "English",
+      "title": "Class 1 English (Marigold)",
+      "description": "Foundational literacy focusing on phonetic awareness and basic sentence construction.",
+      "order": 1
+    },
+    {
+      "id": "c1-math",
+      "classLevel": "Class 1",
+      "subject": "Mathematics",
+      "title": "Class 1 Mathematics (Math-Magic)",
+      "description": "Foundational numeracy using the CPA approach (Concrete-Pictorial-Abstract).",
+      "order": 2
+    }
+  ],
+  "modules": [
+    {
+      "id": "m1-eng-t1",
+      "courseId": "c1-eng",
+      "term": "Term 1 (April – August)",
+      "title": "Foundational Basics",
+      "learningObjectives": [
+        "Listening/Speaking: Greet teachers/peers, recite short poems with actions, follow 1-2 step instructions, and introduce oneself.",
+        "Reading: Recognize all letters (A-Z, a-z) and their phonetic sounds. Read basic 2-letter and 3-letter CVC (Consonant-Vowel-Consonant) words.",
+        "Writing: Master pre-writing strokes (standing, sleeping, slanting lines, curves). Write uppercase and lowercase letters independently with correct formation."
+      ],
+      "order": 1
+    },
+    {
+      "id": "m1-math-t1",
+      "courseId": "c1-math",
+      "term": "Term 1 (April – August)",
+      "title": "Spatial Sense & Early Numeracy",
+      "learningObjectives": [
+        "Spatial Understanding: Differentiate between sizes, positions, and spatial relationships (top/bottom, inside/outside, above/below, near/far).",
+        "Number Sense (1 to 9): Count objects reliably up to 9. Read and write numerals 1-9. Understand the concept of 'zero'.",
+        "Shapes: Identify and sort basic 2D shapes (circle, square, triangle, rectangle) and 3D objects (rolling vs. sliding)."
+      ],
+      "order": 1
+    }
+  ],
+  "lessons": [
+    {
+      "id": "l1-eng-t1-apr",
+      "moduleId": "m1-eng-t1",
+      "month": "April",
+      "theme": "Myself",
+      "topic": "Naming Words (Nouns - self, family)",
+      "learningOutcome": "Students will be able to identify and name common objects and family members.",
+      "instructionalFlow": [
+        { "step": "Introduction", "duration": "5 mins", "activity": "Warm-up activity. Play 'Simon Says' using basic action words." },
+        { "step": "Main Teaching", "duration": "15 mins", "activity": "Read the poem 'A Happy Child' aloud with expressions. Point out naming words." },
+        { "step": "Student Engagement", "duration": "15 mins", "activity": "Action Charades: Call students to pick a flashcard and enact it." },
+        { "step": "Wrap-up", "duration": "5 mins", "activity": "Quick recap. Ask students to tell the class one thing they do after a bath." }
+      ],
+      "resources": ["Alphabet charts", "Sight word walls", "Flashcards"],
+      "order": 1
+    },
+    {
+      "id": "l1-math-t1-apr",
+      "moduleId": "m1-math-t1",
+      "month": "April",
+      "theme": "Shapes and Space",
+      "topic": "Sorting, Matching, Spatial Vocabulary",
+      "learningOutcome": "Students understand concepts like 'Inside', 'Outside', 'Big', 'Small'.",
+      "instructionalFlow": [
+        { "step": "Introduction", "duration": "5 mins", "activity": "Warm-up (e.g., counting-down song)." },
+        { "step": "Main Teaching", "duration": "15 mins", "activity": "Concrete Phase: Use physical objects (e.g., apples in a basket) to demonstrate concepts." },
+        { "step": "Student Engagement", "duration": "15 mins", "activity": "Pictorial Phase: Worksheets or drawing tasks to reinforce the concept." },
+        { "step": "Wrap-up", "duration": "5 mins", "activity": "Quick checks (e.g., holding up fingers)." }
+      ],
+      "resources": ["Abacus", "Unifix cubes", "Foam shapes"],
+      "order": 1
+    }
+  ]
+}

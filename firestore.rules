@@ -1,0 +1,106 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // Global Safety Net
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isValidId(id) { 
+      return id is string && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$'); 
+    }
+    
+    function isSignedIn() { 
+      return request.auth != null; 
+    }
+    
+    function incoming() { 
+      return request.resource.data; 
+    }
+    
+    function existing() { 
+      return resource.data; 
+    }
+
+    // Validation helper for User Profile
+    function isValidUser(data) {
+      return data.keys().hasAll(['uid', 'fullName', 'email', 'role', 'specialty', 'preferredLanguage', 'createdAt'])
+        && data.keys().size() == 7
+        && data.uid is string && data.uid.size() <= 128
+        && data.fullName is string && data.fullName.size() <= 128
+        && data.email is string && data.email.size() <= 128
+        && data.role is string && (data.role == 'student' || data.role == 'mentor')
+        && data.specialty is string && data.specialty.size() <= 128
+        && data.preferredLanguage is string && data.preferredLanguage.size() <= 128;
+    }
+
+    function isValidTask(data) {
+      return data.keys().hasAll(['teacherId', 'teacherName', 'assignedTo', 'title', 'status', 'createdAt'])
+        && data.teacherId is string
+        && data.teacherName is string
+        && data.assignedTo is string
+        && data.title is string && data.title.size() <= 128
+        && data.status in ['pending', 'in-progress', 'completed']
+        && (!data.keys().contains('description') || (data.description is string && data.description.size() <= 1000))
+        && (!data.keys().contains('dueDate') || data.dueDate is string);
+    }
+
+    function isValidPeerFeedback(data) {
+      return data.keys().hasAll(['id', 'toUserId', 'message', 'badgeType', 'isAnonymized', 'timestamp'])
+        && data.id is string
+        && data.toUserId is string
+        && data.message is string && data.message.size() <= 500
+        && data.badgeType in ['helpful', 'focus', 'creative', 'logic']
+        && data.isAnonymized is bool;
+    }
+
+    function isValidAudioNote(data) {
+      return data.keys().hasAll(['id', 'studentId', 'mentorName', 'audioUrl', 'duration', 'timestamp'])
+        && data.id is string
+        && data.studentId is string
+        && data.mentorName is string
+        && data.audioUrl is string
+        && data.duration is string;
+    }
+
+    match /users/{userId} {
+      allow get: if isSignedIn() && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor');
+      allow create: if isSignedIn() 
+                    && request.auth.uid == userId
+                    && isValidId(userId)
+                    && isValidUser(incoming())
+                    && incoming().uid == request.auth.uid;
+      allow update: if isSignedIn() 
+                    && (request.auth.uid == userId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor')
+                    && isValidId(userId)
+                    && incoming().uid == existing().uid
+                    && incoming().createdAt == existing().createdAt;
+      allow delete: if false;
+    }
+
+    match /tasks/{taskId} {
+      allow list: if isSignedIn();
+      allow get: if isSignedIn();
+      allow create: if isSignedIn() && isValidId(taskId) && isValidTask(incoming()) && incoming().teacherId == request.auth.uid;
+      allow update: if isSignedIn() && isValidId(taskId) && (
+        // Teacher updating anything
+        (existing().teacherId == request.auth.uid && isValidTask(incoming())) ||
+        // Student updating status only
+        (incoming().diff(existing()).affectedKeys().hasOnly(['status']) && (existing().assignedTo == 'all' || existing().assignedTo == request.auth.uid))
+      );
+      allow delete: if isSignedIn() && existing().teacherId == request.auth.uid;
+    }
+
+    match /peerFeedback/{feedbackId} {
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && isValidPeerFeedback(incoming());
+      allow read: if isSignedIn() && (request.auth.uid == resource.data.toUserId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor');
+    }
+
+    match /audioNotes/{noteId} {
+      allow list: if isSignedIn();
+      allow create: if isSignedIn() && get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor' && isValidAudioNote(incoming());
+      allow read: if isSignedIn() && (request.auth.uid == resource.data.studentId || get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'mentor');
+    }
+  }
+}

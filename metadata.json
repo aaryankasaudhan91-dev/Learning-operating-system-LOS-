@@ -1,0 +1,6 @@
+{
+  "name": "Learning Operating System",
+  "description": "An ethereal double-sided operating system of the mind, balancing student focus, cognitive telemetry, and instructor interventions.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

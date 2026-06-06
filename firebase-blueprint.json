@@ -1,0 +1,204 @@
+{
+  "entities": {
+    "user": {
+      "title": "User Profile",
+      "description": "User profile containing identity metadata, role specialization, and preferred language",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Unique authentication user ID"
+        },
+        "fullName": {
+          "type": "string",
+          "description": "First and last name of the user"
+        },
+        "email": {
+          "type": "string",
+          "description": "Email address of the user profile"
+        },
+        "role": {
+          "type": "string",
+          "description": "User tier, either student or mentor"
+        },
+        "specialty": {
+          "type": "string",
+          "description": "Primary cognitive focus or cohort specialization"
+        },
+        "preferredLanguage": {
+          "type": "string",
+          "description": "Preferred translation layer language"
+        },
+        "focusStreak": {
+          "type": "integer",
+          "description": "Consecutive days meeting deep focus goals"
+        },
+        "lastFocusDate": {
+          "type": "string",
+          "format": "date",
+          "description": "Last date the focus goal was achieved"
+        },
+        "achievements": {
+          "type": "array",
+          "description": "Awarded digital badges",
+          "items": {
+            "type": "object",
+            "properties": {
+              "id": { "type": "string" },
+              "type": { "type": "string" },
+              "title": { "type": "string" },
+              "dateAwarded": { "type": "string" }
+            }
+          }
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Timestamp indicating profile creation time"
+        }
+      },
+      "required": [
+        "uid",
+        "fullName",
+        "email",
+        "role",
+        "specialty",
+        "preferredLanguage",
+        "createdAt"
+      ]
+    },
+    "task": {
+      "title": "Homework Task",
+      "description": "Educational tasks and homework assigned by mentors to students",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "teacherId": { "type": "string" },
+        "teacherName": { "type": "string" },
+        "assignedTo": { "type": "string" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "dueDate": { "type": "string" },
+        "status": {
+          "type": "string",
+          "enum": ["pending", "in-progress", "completed"]
+        },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "teacherId", "assignedTo", "title", "status", "createdAt"]
+    },
+    "peerFeedback": {
+      "title": "Peer Insight Feedback",
+      "description": "Anonymized peer feedback and badges",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "toUserId": { "type": "string" },
+        "message": { "type": "string" },
+        "badgeType": { "type": "string" },
+        "isAnonymized": { "type": "boolean" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "toUserId", "badgeType", "timestamp"]
+    },
+    "audioNote": {
+      "title": "Mentor Audio Note",
+      "description": "Mentor voice feedback snippets",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "studentId": { "type": "string" },
+        "mentorName": { "type": "string" },
+        "audioUrl": { "type": "string" },
+        "duration": { "type": "string" },
+        "timestamp": { "type": "string", "format": "date-time" }
+      },
+      "required": ["id", "studentId", "audioUrl", "timestamp"]
+    },
+    "course": {
+      "title": "Educational Course",
+      "description": "Top-level course container for a specific class and subject",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "classLevel": { "type": "string", "description": "e.g., Class 1, Class 2" },
+        "subject": { "type": "string", "description": "e.g., English, Mathematics" },
+        "title": { "type": "string" },
+        "description": { "type": "string" },
+        "order": { "type": "integer" }
+      },
+      "required": ["id", "classLevel", "subject", "title"]
+    },
+    "module": {
+      "title": "Course Module/Term",
+      "description": "A term or thematic module within a course",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "courseId": { "type": "string" },
+        "term": { "type": "string", "description": "e.g., Term 1, April - August" },
+        "title": { "type": "string" },
+        "learningObjectives": { "type": "array", "items": { "type": "string" } },
+        "order": { "type": "integer" }
+      },
+      "required": ["id", "courseId", "term", "title"]
+    },
+    "lesson": {
+      "title": "Course Lesson/Topic",
+      "description": "A specific lesson plan or topic within a module",
+      "type": "object",
+      "properties": {
+        "id": { "type": "string" },
+        "moduleId": { "type": "string" },
+        "month": { "type": "string" },
+        "theme": { "type": "string" },
+        "topic": { "type": "string" },
+        "learningOutcome": { "type": "string" },
+        "instructionalFlow": { 
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "step": { "type": "string" },
+              "duration": { "type": "string" },
+              "activity": { "type": "string" }
+            }
+          }
+        },
+        "resources": { "type": "array", "items": { "type": "string" } },
+        "order": { "type": "integer" }
+      },
+      "required": ["id", "moduleId", "topic"]
+    }
+  },
+  "firestore": {
+    "users/{userId}": {
+      "schema": "user",
+      "description": "User collections mapped by authenticated user ID with secure identity controls"
+    },
+    "tasks/{taskId}": {
+      "schema": "task",
+      "description": "Collection of tasks assigned to students by mentors"
+    },
+    "peerFeedback/{feedbackId}": {
+      "schema": "peerFeedback",
+      "description": "Collection of peer feedback entries"
+    },
+    "audioNotes/{noteId}": {
+      "schema": "audioNote",
+      "description": "Collection of mentor audio notes"
+    },
+    "courses/{courseId}": {
+      "schema": "course",
+      "description": "Collection of educational courses"
+    },
+    "courses/{courseId}/modules/{moduleId}": {
+      "schema": "module",
+      "description": "Sub-collection of modules for a course"
+    },
+    "courses/{courseId}/modules/{moduleId}/lessons/{lessonId}": {
+      "schema": "lesson",
+      "description": "Sub-collection of lessons for a module"
+    }
+  }
+}
