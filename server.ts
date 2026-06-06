@@ -1,4 +1,5 @@
-import "dotenv/config";
+import dotenv from "dotenv";
+dotenv.config({ override: true });
 import express from "express";
 import path from "path";
 import { createServer as createViteServer } from "vite";
@@ -37,13 +38,41 @@ const taskSchema = new mongoose.Schema({
 
 export const TaskModel = mongoose.model('Task', taskSchema);
 
-const courseSchema = new mongoose.Schema({}, { strict: false });
+const courseSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  classLevel: String,
+  subject: String,
+  title: String,
+  description: String,
+  order: Number
+}, { strict: false });
 export const CourseModel = mongoose.model('Course', courseSchema);
 
-const moduleSchema = new mongoose.Schema({}, { strict: false });
+const moduleSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  courseId: String,
+  term: String,
+  title: String,
+  learningObjectives: [String],
+  order: Number
+}, { strict: false });
 export const ModuleModel = mongoose.model('Module', moduleSchema);
 
-const lessonSchema = new mongoose.Schema({}, { strict: false });
+const lessonSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  moduleId: String,
+  month: String,
+  theme: String,
+  topic: String,
+  learningOutcome: String,
+  instructionalFlow: [{
+    step: String,
+    duration: String,
+    activity: String
+  }],
+  resources: [String],
+  order: Number
+}, { strict: false });
 export const LessonModel = mongoose.model('Lesson', lessonSchema);
 
 async function startServer() {
