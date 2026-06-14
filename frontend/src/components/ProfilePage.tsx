@@ -6,9 +6,10 @@ interface ProfilePageProps {
   setView: (view: AppView) => void;
   userRole: 'student' | 'mentor';
   userName?: string;
+  userProfile?: any;
 }
 
-export default function ProfilePage({ setView, userRole, userName }: ProfilePageProps) {
+export default function ProfilePage({ setView, userRole, userName, userProfile }: ProfilePageProps) {
   const [activeTab, setActiveTab] = useState<'profile' | 'security' | 'preferences'>('profile');
 
   return (
@@ -95,6 +96,19 @@ export default function ProfilePage({ setView, userRole, userName }: ProfilePage
                       className="w-full bg-void-black/50 border border-glass-stroke p-3 rounded-lg text-on-surface focus:outline-none focus:border-electric-cyan transition-colors"
                     />
                   </div>
+
+                  {userRole === 'student' && userProfile?.academicInfo?.className && (
+                    <div className="space-y-1">
+                      <label className="text-xs text-on-surface-variant font-mono uppercase tracking-wider">Assigned Class</label>
+                      <input 
+                        type="text" 
+                        value={userProfile.academicInfo.className.toString().includes('Class') ? userProfile.academicInfo.className : `Class ${userProfile.academicInfo.className}`}
+                        disabled
+                        className="w-full bg-void-black/30 border border-glass-stroke p-3 rounded-lg text-on-surface-variant cursor-not-allowed opacity-60"
+                      />
+                      <p className="text-[10px] text-electric-cyan/70 font-mono mt-1">Class assignment is locked post-registration.</p>
+                    </div>
+                  )}
                   
                   <div className="space-y-1">
                     <label className="text-xs text-on-surface-variant font-mono uppercase tracking-wider">Dialect Preset</label>

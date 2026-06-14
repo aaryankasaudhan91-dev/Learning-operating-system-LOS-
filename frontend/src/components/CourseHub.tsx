@@ -5,8 +5,8 @@
 
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
-import { 
-  BookOpen, Video, FileText, PlayCircle, Clock, 
+import {
+  BookOpen, Video, FileText, PlayCircle, Clock,
   ChevronRight, Construction, Lock, ArrowLeft,
   Search, Book, GraduationCap, Target, ListChecks,
   Lightbulb, Activity, Layers, Download
@@ -20,7 +20,7 @@ type HubView = 'selection' | 'details' | 'lesson';
 export default function CourseHub() {
   const { profile } = useFirebase();
   const [view, setView] = useState<HubView>('selection');
-  
+
   // Selection State
   const [courses, setCourses] = useState<Course[]>([]);
   const [selectedClass, setSelectedClass] = useState<string | null>(null);
@@ -29,21 +29,50 @@ export default function CourseHub() {
   const [selectedModule, setSelectedModule] = useState<CourseModule | null>(null);
   const [lessons, setLessons] = useState<Lesson[]>([]);
   const [selectedLesson, setSelectedLesson] = useState<Lesson | null>(null);
-  
+
   const [loading, setLoading] = useState(true);
 
   // Available Classes from Blueprint
-  const classes = ["Class 1", "Class 2", "Class 3", "Class 6", "Class 8", "Class 10", "Class 11", "Class 12"];
+  const allClasses = ["Class 1", "Class 2", "Class 3", "Class 6", "Class 8", "Class 10", "Class 11", "Class 12"];
+
+  // Helper to normalize class name
+  const getUserClassName = () => {
+    const cls = profile?.academicInfo?.className;
+    if (!cls) return null;
+    return cls.toString().includes('Class') ? cls : `Class ${cls}`;
+  };
+
+  const userClass = getUserClassName();
+
+  // Filter classes based on role
+  const classes = profile?.role === 'student' 
+    ? (userClass ? [userClass] : [])
+    : allClasses;
 
   useEffect(() => {
     const fetchCourses = async () => {
       setLoading(true);
       const data = await dbService.getCourses();
-      setCourses(data);
+      
+      // Strictly limit the courses state to only the student's assigned class
+      const allowedCourses = profile?.role === 'student' 
+        ? data.filter(c => c.classLevel === userClass)
+        : data;
+        
+      setCourses(allowedCourses);
       setLoading(false);
     };
-    fetchCourses();
-  }, []);
+    
+    if (profile) {
+      fetchCourses();
+    }
+  }, [profile]);
+
+  useEffect(() => {
+    if (classes.length === 1 && !selectedClass) {
+      setSelectedClass(classes[0]);
+    }
+  }, [classes, selectedClass]);
 
   const handleClassSelect = (cls: string) => {
     setSelectedClass(cls);
@@ -65,7 +94,7 @@ export default function CourseHub() {
     setView('lesson');
   };
 
-  const filteredCourses = selectedClass 
+  const filteredCourses = selectedClass
     ? courses.filter(c => c.classLevel === selectedClass)
     : [];
 
@@ -77,11 +106,10 @@ export default function CourseHub() {
           <button
             key={cls}
             onClick={() => handleClassSelect(cls)}
-            className={`px-6 py-2.5 rounded-full font-sans font-bold text-[10px] uppercase tracking-widest transition-all border ${
-              selectedClass === cls 
-                ? 'bg-plasma-violet border-plasma-violet text-white shadow-lg shadow-plasma-violet/20' 
-                : 'bg-white/5 border-glass-stroke text-on-surface-variant hover:border-plasma-violet/40 hover:text-on-surface'
-            }`}
+            className={`px-6 py-2.5 rounded-full font-sans font-bold text-[10px] uppercase tracking-widest transition-all border ${selectedClass === cls
+              ? 'bg-plasma-violet border-plasma-violet text-white shadow-lg shadow-plasma-violet/20'
+              : 'bg-white/5 border-glass-stroke text-on-surface-variant hover:border-plasma-violet/40 hover:text-on-surface'
+              }`}
           >
             {cls}
           </button>
@@ -137,7 +165,7 @@ export default function CourseHub() {
 
   const renderDetails = () => (
     <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
-      <button 
+      <button
         onClick={() => setView('selection')}
         className="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors group mb-6"
       >
@@ -161,7 +189,10 @@ export default function CourseHub() {
           </h2>
         </div>
         <div className="flex gap-4">
-          <button className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-glass-stroke text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all">
+          <button
+            onClick={() => alert(`Downloading Syllabus PDF for ${selectedCourse?.title}...`)}
+            className="flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white/5 border border-glass-stroke text-[10px] font-bold uppercase tracking-widest hover:bg-white/10 transition-all"
+          >
             <Download className="w-3.5 h-3.5" />
             Full Syllabus PDF
           </button>
@@ -184,7 +215,7 @@ export default function CourseHub() {
                   <Target className="w-5 h-5 text-plasma-violet" />
                 </div>
               </div>
-              
+
               <div className="p-6 space-y-6">
                 <div>
                   <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-on-surface-variant mb-4">
@@ -201,9 +232,9 @@ export default function CourseHub() {
                   </ul>
                 </div>
 
-                <ModuleLessonList 
-                  courseId={selectedCourse!.id} 
-                  moduleId={module.id} 
+                <ModuleLessonList
+                  courseId={selectedCourse!.id}
+                  moduleId={module.id}
                   onLessonSelect={(lesson) => handleLessonSelect(module, lesson)}
                 />
               </div>
@@ -248,7 +279,7 @@ export default function CourseHub() {
               </div>
             </div>
           </div>
-          
+
           <div className="glass-panel border border-glass-stroke rounded-2xl p-6 bg-gradient-to-br from-plasma-violet/5 to-transparent">
             <h4 className="text-[10px] font-bold uppercase tracking-widest text-white mb-4">Recommended Resources</h4>
             <div className="space-y-3">
@@ -269,7 +300,7 @@ export default function CourseHub() {
 
   const renderLesson = () => (
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-500">
-      <button 
+      <button
         onClick={() => setView('details')}
         className="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors group"
       >
@@ -280,7 +311,7 @@ export default function CourseHub() {
       <div className="glass-panel border border-glass-stroke rounded-3xl overflow-hidden">
         <div className="bg-white/5 p-8 md:p-12 border-b border-glass-stroke relative overflow-hidden">
           <div className="absolute top-0 right-0 w-64 h-64 bg-plasma-violet/10 blur-[100px] -mr-32 -mt-32" />
-          
+
           <div className="relative z-10">
             <div className="flex items-center gap-3 mb-6">
               <span className="px-3 py-1 rounded bg-plasma-violet/20 border border-plasma-violet/40 text-[10px] font-bold text-plasma-violet uppercase tracking-widest">
@@ -292,11 +323,11 @@ export default function CourseHub() {
                 </span>
               )}
             </div>
-            
+
             <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 italic">
               {selectedLesson?.topic}
             </h1>
-            
+
             {selectedLesson?.theme && (
               <p className="text-lg text-plasma-violet font-sans font-bold uppercase tracking-[0.2em]">
                 Theme: {selectedLesson.theme}
@@ -323,7 +354,7 @@ export default function CourseHub() {
               <Activity className="w-4 h-4" />
               Instructional Flow (40-Minute Period)
             </h4>
-            
+
             <div className="space-y-4">
               {selectedLesson?.instructionalFlow.map((step, idx) => (
                 <div key={idx} className="flex gap-6 group">

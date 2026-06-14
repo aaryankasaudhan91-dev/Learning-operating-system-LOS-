@@ -14,6 +14,9 @@ import SettingsPage from './components/SettingsPage';
 import HelpChatBot from './components/HelpChatBot';
 import CourseHub from './components/CourseHub';
 import UnderConstruction from './components/UnderConstruction';
+import CognitiveMap from './components/CognitiveMap';
+import FocusChamber from './components/FocusChamber';
+import SOSToolkit from './components/SOSToolkit';
 import { AppView, StudentSeat, InterventionAlert, SynthesisTask } from './types';
 import SplashScreen from './components/SplashScreen';
 import { Sparkles, MessageSquare, Check, X, ShieldAlert, Heart, Loader2 } from 'lucide-react';
@@ -251,11 +254,21 @@ export default function App() {
           )}
 
           {currentView === 'map' && (
-            <UnderConstruction setView={setView} featureName="Cognitive Map" />
+            <CognitiveMap 
+              setView={setView}
+              tasks={tasks}
+              setTasks={setTasks}
+              cognitiveLoad={cognitiveLoad}
+              setCognitiveLoad={setCognitiveLoad}
+              onSosClick={() => setView('sos')}
+            />
           )}
 
           {currentView === 'chamber' && (
-            <UnderConstruction setView={setView} featureName="Focus Chamber" />
+            <FocusChamber 
+              setView={setView}
+              setCognitiveLoad={setCognitiveLoad}
+            />
           )}
 
           {currentView === 'insights' && (
@@ -267,7 +280,12 @@ export default function App() {
           )}
 
           {currentView === 'sos' && (
-            <UnderConstruction setView={setView} featureName="SOS Toolkit" />
+            <SOSToolkit 
+              setView={setView}
+              cognitiveLoad={cognitiveLoad}
+              setCognitiveLoad={setCognitiveLoad}
+              addNotification={addNotification}
+            />
           )}
 
           {currentView === 'profile' && (
@@ -275,6 +293,7 @@ export default function App() {
               setView={setView}
               userRole={userRole}
               userName={userProfile?.fullName}
+              userProfile={userProfile}
             />
           )}
 
