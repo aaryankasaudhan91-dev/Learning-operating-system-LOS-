@@ -165,9 +165,7 @@ export default function Sidebar({
       <div className="px-4 flex flex-col gap-2 mt-auto">
           <button 
             onClick={onLogout || (() => {
-              if (confirm("Execute Cognitive Dissociation Sync (Logout)? Your local session will be securely sealed.")) {
-                setView('landing');
-              }
+              setView('landing');
             })}
             className="flex items-center justify-center gap-2 w-full py-2.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-colors mt-2 text-sm font-semibold"
             title="Logout Session"

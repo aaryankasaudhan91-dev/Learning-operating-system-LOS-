@@ -179,16 +179,12 @@ export default function App() {
   }, []);
 
   const handleLogout = async () => {
-    if (confirm("Execute Cognitive Dissociation Sync (Logout)? Your local session will be securely sealed.")) {
-      try {
-        await signOut(auth);
-        setView('landing');
-        if (activeNotification) {
-          setActiveNotification("Session securely logged out.");
-        }
-      } catch (err) {
-        console.error("Logout anomaly:", err);
-      }
+    try {
+      await signOut(auth);
+      setView('landing');
+      addNotification("Session securely logged out.");
+    } catch (err) {
+      console.error("Logout anomaly:", err);
     }
   };
 
