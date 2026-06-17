@@ -1,36 +1,25 @@
-/**
- * @license
- * SPDX-License-Identifier: Apache-2.0
- */
-
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
-  ZoomIn, ZoomOut, Database, Code, Network, Lock, HelpCircle, 
+  Database, Code, Network, Lock, HelpCircle, 
   BrainCircuit, LayoutGrid, Check, Play, Pause, Plus, AlertCircle,
-  ClipboardCheck, Flame, Shield, Trophy, Smile, Bell, SplitSquareHorizontal, Users, Map, BatteryLow, Clock, Zap,
+  ClipboardCheck, Flame, Shield, Trophy, SplitSquareHorizontal, Users, Map, BatteryLow, Clock,
   Radio, X
 } from 'lucide-react';
 import { useFirebase } from './FirebaseProvider';
 
-// New specialized component for animated streak
 const DeepFocusStreak = ({ streak, bestStreak }: { streak: number, bestStreak: number }) => {
   const isNewRecord = streak > 0 && streak >= bestStreak;
 
   return (
-    <div 
-      className="relative overflow-hidden group/streak bg-gradient-to-br from-orange-500/10 to-transparent p-4 rounded-xl border border-orange-500/20 flex items-center justify-between cursor-pointer hover:border-orange-500/40 transition-all"
-    >
+    <div className="relative overflow-hidden group/streak bg-gradient-to-br from-orange-500/10 to-transparent p-4 rounded-xl border border-orange-500/20 flex items-center justify-between cursor-pointer hover:border-orange-500/40 transition-all">
       <div className="absolute -right-4 -bottom-4 opacity-5 group-hover/streak:rotate-12 group-hover/streak:scale-125 transition-transform duration-700">
         <Flame className="w-20 h-20 text-orange-500" />
       </div>
       
       <div className="flex items-center gap-4 relative z-10">
         <motion.div 
-          animate={isNewRecord ? { 
-            scale: [1, 1.2, 1],
-            rotate: [0, 10, -10, 0]
-          } : {}}
+          animate={isNewRecord ? { scale: [1, 1.2, 1], rotate: [0, 10, -10, 0] } : {}}
           transition={{ repeat: Infinity, duration: 2 }}
           className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-500/30 group-hover/streak:scale-110 transition-transform"
         >
@@ -81,7 +70,8 @@ const DeepFocusStreak = ({ streak, bestStreak }: { streak: number, bestStreak: n
     </div>
   );
 };
-import { SynthesisTask, AppView, PeerFeedback, AudioNote, AchievementBadge } from '../types';
+
+import { SynthesisTask, AppView } from '../types';
 import StudentTaskBoard from './StudentTaskBoard';
 import AchievementGallery from './AchievementGallery';
 import PeerInsight from './PeerInsight';
@@ -106,17 +96,11 @@ export default function CognitiveMap({
   onSosClick
 }: CognitiveMapProps) {
   const { profile } = useFirebase();
-  const [zoomLevel, setZoomLevel] = useState<number>(100);
   const [selectedNode, setSelectedNode] = useState<string | null>('Graph Theory');
   const [newTaskTitle, setNewTaskTitle] = useState('');
   const [flowTimerActive, setFlowTimerActive] = useState(true);
   const [flowTime, setFlowTime] = useState<string>('01:45:22');
   const [activeRightTab, setActiveRightTab] = useState<'focus' | 'homework' | 'social'>('focus');
-
-  // New states for Features
-  const [moodModalOpen, setMoodModalOpen] = useState(true);
-  const [spacedRepetitionPrompt, setSpacedRepetitionPrompt] = useState(true);
-  const [foggPrompt, setFoggPrompt] = useState(true);
   const [activeBroadcastPrompt, setActiveBroadcastPrompt] = useState<string | null>(null);
   const [lowMotivationMode, setLowMotivationMode] = useState(false);
 
@@ -130,34 +114,25 @@ export default function CognitiveMap({
             setActiveBroadcastPrompt(data.text);
           }
         }
-      } catch (err) {
-        console.error("Error fetching latest broadcast prompt:", err);
-      }
+      } catch (err) {}
     };
     fetchLatestPrompt();
-    // Poll every 10 seconds to keep it updated dynamically
     const interval = setInterval(fetchLatestPrompt, 10000);
     return () => clearInterval(interval);
   }, []);
 
-  // Node helper coordinates (with scale)
-  const baseNodes = [
-    { id: 'ds', name: 'Data Structures', icon: Database, color: 'text-electric-cyan', border: 'border-electric-cyan', bg: 'shadow-[0_0_30px_rgba(0,229,255,0.4)]', x: 260, y: 310, status: 'Mastered' },
-    { id: 'algo', name: 'Algorithms I', icon: Code, color: 'text-plasma-violet', border: 'border-plasma-violet', bg: 'shadow-[0_0_20px_rgba(112,0,255,0.2)]', x: 120, y: 360, status: 'Unlocked' },
-    { id: 'graph', name: 'Graph Theory', icon: BrainCircuit, color: 'text-synapse-green', border: 'border-synapse-green', bg: 'shadow-[0_0_40px_rgba(0,255,163,0.3)]', x: 200, y: 110, status: 'Active (65% Synced)', isLearning: true, progress: 65 },
-    { id: 'ml', name: 'Machine Learning', icon: Lock, color: 'text-outline', border: 'border-outline-variant', bg: '', x: 420, y: 220, status: 'Locked', locked: true }
+  const roadmapNodes = [
+    { id: 'ds', name: 'Data Structures', icon: Database, status: 'Mastered', color: 'bg-synapse-green/20 text-synapse-green border-synapse-green' },
+    { id: 'algo', name: 'Algorithms I', icon: Code, status: 'Mastered', color: 'bg-synapse-green/20 text-synapse-green border-synapse-green' },
+    { id: 'graph', name: 'Graph Theory', icon: BrainCircuit, status: 'Active (65%)', color: 'bg-electric-cyan/20 text-electric-cyan border-electric-cyan', isLearning: true, progress: 65 },
+    { id: 'ml', name: 'Machine Learning', icon: Lock, status: 'Locked', color: 'bg-void-black text-on-surface-variant border-glass-stroke opacity-60', locked: true },
+    { id: 'ai', name: 'Artificial Intelligence', icon: Lock, status: 'Locked', color: 'bg-void-black text-on-surface-variant border-glass-stroke opacity-60', locked: true }
   ];
 
-  // Adjust zoom handlers
-  const handleZoomIn = () => setZoomLevel(prev => Math.min(prev + 15, 140));
-  const handleZoomOut = () => setZoomLevel(prev => Math.max(prev - 15, 70));
-
-  // Toggle checklist tasks
   const handleToggleTask = (taskId: string) => {
     setTasks(prev => prev.map(task => {
       if (task.id === taskId) {
         const nextState = !task.completed;
-        // Adjust load based on completed activities
         setCognitiveLoad(load => {
           const delta = nextState ? -8 : 8;
           return Math.max(Math.min(load + delta, 98), 20);
@@ -168,7 +143,6 @@ export default function CognitiveMap({
     }));
   };
 
-  // Add a custom focus / revision targets
   const handleAddTask = (e: React.FormEvent) => {
     e.preventDefault();
     if (!newTaskTitle.trim()) return;
@@ -182,11 +156,6 @@ export default function CognitiveMap({
     setTasks(prev => [...prev, newTask]);
     setCognitiveLoad(prev => Math.min(prev + 6, 95));
     setNewTaskTitle('');
-  };
-
-  // Click on active node to increase progress simulation
-  const handleSyncAttempt = () => {
-    alert("Synthesizing Graph Theory Node...\nSynapse alignment: +5%\nKeep completing Active Synthesis tasks to free up memory load.");
   };
 
   return (
@@ -210,52 +179,17 @@ export default function CognitiveMap({
           </button>
         </div>
       )}
-      
-      {/* Feature 2: Emotional State and Mood Check-Ins */}
-      {moodModalOpen && (
-        <div className="fixed inset-0 z-[100] flex items-center justify-center bg-void-black/80 backdrop-blur-md">
-          <div className="bg-surface-container border border-glass-stroke rounded-xl p-8 max-w-sm text-center">
-            <Smile className="w-12 h-12 text-yellow-400 mx-auto mb-4" />
-            <h3 className="text-xl font-bold text-white mb-2">How are you feeling today?</h3>
-            <div className="flex gap-4 justify-center mt-6">
-              <button onClick={() => { setMoodModalOpen(false); setLowMotivationMode(true); }} className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20">Tired</button>
-              <button onClick={() => setMoodModalOpen(false)} className="px-4 py-2 bg-white/10 rounded-lg hover:bg-white/20">Neutral</button>
-              <button onClick={() => setMoodModalOpen(false)} className="px-4 py-2 bg-yellow-400 text-black font-bold rounded-lg hover:bg-yellow-500">Energized</button>
-            </div>
-          </div>
-        </div>
-      )}
 
-      {/* Feature 3: Spaced Repetition Micro-Scheduling */}
-      {spacedRepetitionPrompt && !moodModalOpen && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-synapse-green/20 border border-synapse-green text-synapse-green px-6 py-3 rounded-xl flex items-center gap-3 backdrop-blur-md">
-          <Bell className="w-5 h-5" />
-          <span className="font-bold">Memory decay detected! Quick 2-min review on Graph Theory?</span>
-          <button onClick={() => setSpacedRepetitionPrompt(false)} className="ml-4 bg-synapse-green text-black px-3 py-1 rounded font-bold hover:bg-white">Review Now</button>
-        </div>
-      )}
-
-      {/* Feature 20: Fogg Behavior Model Activation Prompts */}
-      {foggPrompt && !moodModalOpen && !spacedRepetitionPrompt && (
-        <div className="absolute bottom-10 right-10 z-50 bg-plasma-violet/20 border border-plasma-violet text-white px-6 py-3 rounded-xl flex items-center gap-3 backdrop-blur-md">
-          <Zap className="w-5 h-5 text-plasma-violet" />
-          <span className="font-bold">You're 5 points away from your goal - unlock it with this 2-min quiz!</span>
-          <button onClick={() => setFoggPrompt(false)} className="bg-plasma-violet px-3 py-1 rounded font-bold hover:bg-plasma-violet/80">Start Quiz</button>
-        </div>
-      )}
-
-      {/* LEFT CANVAS: Interactive SVG Node Graph */}
+      {/* LEFT CANVAS: Linear Roadmap */}
       <section className="flex-[2] glass-panel rounded-2xl border border-glass-stroke relative overflow-hidden flex flex-col glow-cyan h-[650px] xl:h-auto">
         <div className="p-6 border-b border-glass-stroke flex justify-between items-center z-10 bg-void-black/40 backdrop-blur-md">
           <div>
-            {/* Feature 8: Gamified Skill-Tree Progression Maps */}
             <h2 className="font-sans font-bold text-xl text-on-surface flex items-center gap-2">
-              <Map className="w-5 h-5 text-electric-cyan" /> Gamified Skill-Tree Progression Map
+              <Map className="w-5 h-5 text-electric-cyan" /> Academic Journey
             </h2>
-            <p className="text-xs text-on-surface-variant font-medium">System Architecture Mastery (Personalized Grid)</p>
+            <p className="text-xs text-on-surface-variant font-medium">Your linear mastery roadmap</p>
           </div>
           <div className="flex gap-4 items-center">
-            {/* Feature 18: Low-Motivation Adaptive Workloads */}
             <button 
               onClick={() => setLowMotivationMode(!lowMotivationMode)}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors ${lowMotivationMode ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'bg-white/5 border-glass-stroke text-on-surface-variant hover:text-white'}`}
@@ -263,80 +197,28 @@ export default function CognitiveMap({
               <BatteryLow className="w-4 h-4" />
               Low Energy Mode
             </button>
-            <button 
-              onClick={handleZoomIn} 
-              className="p-2 rounded-full bg-white/5 border border-glass-stroke hover:bg-white/10 text-on-surface hover:text-electric-cyan transition-colors"
-              title="Zoom In"
-            >
-              <ZoomIn className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={handleZoomOut} 
-              className="p-2 rounded-full bg-white/5 border border-glass-stroke hover:bg-white/10 text-on-surface hover:text-electric-cyan transition-colors"
-              title="Zoom Out"
-            >
-              <ZoomOut className="w-4 h-4" />
-            </button>
           </div>
         </div>
 
-        {/* Neural Network Draggable Space */}
-        <div className="flex-1 relative w-full h-full cursor-grab overflow-hidden">
-          {/* Decorative Dot Matrix Background */}
-          <div 
-            className="absolute inset-0 opacity-15" 
-            style={{ 
-              backgroundImage: 'radial-gradient(rgba(225, 226, 231, 0.45) 1px, transparent 1px)', 
-              backgroundSize: '40px 40px',
-              transform: `scale(${zoomLevel / 100})`,
-              transition: 'transform 0.4s cubic-bezier(0.16, 1, 0.3, 1)'
-            }} 
-          />
-
-          {/* SVG Connection Lines */}
-          <svg className="absolute inset-0 w-full h-full pointer-events-none z-0">
-            {/* Draw quadratic curves between mapping coordinates */}
-            <path 
-              className="stroke-electric-cyan/70 stroke-[2.5]" 
-              d="M 260,310 Q 190,335 120,360" 
-              fill="none" 
-              style={{ strokeDasharray: '4 4' }}
-            />
-            <path 
-              className="stroke-synapse-green stroke-[3] drop-shadow-[0_0_6px_#00ffa3] animate-pulse" 
-              d="M 260,310 Q 230,210 200,110" 
-              fill="none" 
-            />
-            <path 
-              className="stroke-outline-variant/40 stroke-[2]" 
-              d="M 260,310 Q 340,265 420,220" 
-              fill="none" 
-            />
-          </svg>
-
-          {/* Render Nodes with scale */}
-          <div 
-            className="absolute inset-0 transition-transform duration-300"
-            style={{ transform: `scale(${zoomLevel / 100})`, transformOrigin: 'center' }}
-          >
-            {baseNodes.map((node) => {
-              const IconComp = node.icon;
+        {/* Linear Path Scroller */}
+        <div className="flex-1 overflow-y-auto w-full relative py-12 custom-scrollbar">
+          {/* Main vertical track line */}
+          <div className="absolute top-12 bottom-12 w-1 bg-glass-stroke left-1/2 -translate-x-1/2" />
+          
+          <div className="flex flex-col items-center gap-16 relative z-10">
+            {roadmapNodes.map((node, i) => {
               const isSelected = selectedNode === node.name;
-
               return (
-                <div
-                  key={node.id}
+                <div 
+                  key={node.id} 
+                  className="relative group flex flex-col items-center cursor-pointer"
                   onClick={() => !node.locked && setSelectedNode(node.name)}
-                  className={`absolute z-10 transition-all duration-300 transform -translate-x-1/2 -translate-y-1/2 group cursor-pointer`}
-                  style={{ top: `${node.y}px`, left: `${node.x}px` }}
                 >
-                  <div className={`relative flex items-center justify-center rounded-full bg-void-black border-2 ${node.border} ${node.bg} ${
-                    isSelected ? 'scale-115 ring-4 ring-electric-cyan/20' : 'hover:scale-110'
-                  } ${node.isLearning ? 'w-20 h-20 pulse-indicator' : 'w-16 h-16'}`}>
+                  {/* The Node Icon */}
+                  <div className={`w-20 h-20 rounded-full border-[3px] flex items-center justify-center transition-all bg-void-black ${node.color} ${isSelected ? 'scale-110 shadow-[0_0_30px_rgba(0,229,255,0.3)] ring-4 ring-electric-cyan/20' : 'hover:scale-105'}`}>
+                    <node.icon className="w-8 h-8" />
                     
-                    <IconComp className={`w-7 h-7 ${node.color}`} />
-
-                    {/* Progress Ring for Active Learning Node */}
+                    {/* Progress Circle for active node */}
                     {node.isLearning && (
                       <svg className="absolute inset-0 w-full h-full -rotate-90 pointer-events-none">
                         <circle cx="40" cy="40" fill="none" r="38" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
@@ -345,7 +227,7 @@ export default function CognitiveMap({
                           cy="40" 
                           fill="none" 
                           r="38" 
-                          stroke="#00ffa3" 
+                          stroke="#00e5ff" 
                           strokeWidth="3.5" 
                           strokeDasharray="238" 
                           strokeDashoffset={238 - (238 * (node.progress || 0)) / 100}
@@ -354,12 +236,10 @@ export default function CognitiveMap({
                     )}
                   </div>
 
-                  {/* Bubble labels indicating completion stats */}
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 mt-3 text-center whitespace-nowrap bg-void-black/80 px-2 py-1 rounded-md border border-glass-stroke backdrop-blur-md opacity-80 group-hover:opacity-100 transition-opacity">
-                    <p className="font-mono text-[11px] font-semibold text-on-surface">{node.name}</p>
-                    <p className={`font-sans text-[9px] uppercase tracking-wider font-extrabold ${
-                      node.status === 'Mastered' ? 'text-electric-cyan' : node.isLearning ? 'text-synapse-green animate-pulse' : 'text-on-surface-variant'
-                    }`}>
+                  {/* Title and Status Label */}
+                  <div className={`mt-4 text-center px-4 py-2 rounded-xl border border-glass-stroke backdrop-blur-md transition-all ${isSelected ? 'bg-electric-cyan/10 border-electric-cyan/50' : 'bg-void-black/80'}`}>
+                    <p className="font-bold text-sm text-on-surface group-hover:text-electric-cyan transition-colors">{node.name}</p>
+                    <p className={`text-[10px] uppercase font-mono mt-0.5 font-bold tracking-wider ${node.isLearning ? 'text-electric-cyan animate-pulse' : 'text-on-surface-variant'}`}>
                       {node.status}
                     </p>
                   </div>
@@ -367,86 +247,70 @@ export default function CognitiveMap({
               );
             })}
           </div>
+        </div>
 
-          {/* Detailed Selected Diagnostics Overlay Card */}
-          {selectedNode && (
-            <div className="absolute bottom-6 left-6 max-w-sm glass-panel p-5 rounded-xl border border-glass-stroke z-20 backdrop-blur-xl animate-[fadeIn_0.5s_ease-out]">
-              <div className="flex justify-between items-start mb-2 group">
-                <h4 className="font-sans font-bold text-base text-electric-cyan flex items-center gap-2">
-                  <BrainCircuit className="w-5 h-5 text-synapse-green" />
-                  {selectedNode} Diagnostics
-                </h4>
+        {/* Detailed Selected Diagnostics Overlay Card */}
+        {selectedNode && (
+          <div className="absolute bottom-6 left-6 max-w-sm glass-panel p-5 rounded-xl border border-glass-stroke z-20 backdrop-blur-xl animate-[fadeIn_0.5s_ease-out]">
+            <div className="flex justify-between items-start mb-2 group">
+              <h4 className="font-sans font-bold text-base text-electric-cyan flex items-center gap-2">
+                <BrainCircuit className="w-5 h-5 text-synapse-green" />
+                {selectedNode} Diagnostics
+              </h4>
+              <button 
+                onClick={() => setSelectedNode(null)} 
+                className="text-on-surface-variant hover:text-white text-xs font-semibold px-2 py-0.5 rounded bg-white/5 border border-glass-stroke"
+              >
+                Clear
+              </button>
+            </div>
+            <p className="text-xs text-on-surface-variant leading-relaxed mb-4">
+              {selectedNode === 'Graph Theory' 
+                ? 'Currently tracing connections in Dijkstra Map theory. Completed review loops: 4/6. Synchronize synaptic integrity by practicing active synthesis tasks.'
+                : selectedNode === 'Data Structures' 
+                ? 'Completed module. Verified Mastery index score: 98.2%. Linked nodes: Graph Theory.'
+                : 'All baseline structural modules analyzed successfully.'}
+            </p>
+            {selectedNode === 'Graph Theory' && (
+              <div className="flex flex-col gap-2">
                 <button 
-                  onClick={() => setSelectedNode(null)} 
-                  className="text-on-surface-variant hover:text-white text-xs font-semibold px-2 py-0.5 rounded bg-white/5 border border-glass-stroke"
+                  onClick={() => alert("Synthesizing Node...")}
+                  className="w-full py-2 rounded-lg bg-synapse-green/20 hover:bg-synapse-green/30 border border-synapse-green/40 text-synapse-green font-mono text-xs font-semibold tracking-wide transition-all uppercase flex items-center justify-center gap-1.5"
                 >
-                  Clear Selection
+                  <Network className="w-3.5 h-3.5" />
+                  Attempt Manual Synapse Sync (+5%)
                 </button>
               </div>
-              <p className="text-xs text-on-surface-variant leading-relaxed mb-4">
-                {selectedNode === 'Graph Theory' 
-                  ? 'Currently tracing connections in Dijkstra Map theory. Completed review loops: 4/6. Synchronize synaptic integrity by practicing active synthesis tasks.'
-                  : selectedNode === 'Data Structures' 
-                  ? 'Completed module. Verified Mastery index score: 98.2%. Linked nodes: Graph Theory. Data persistence safely indexed with local Bhashini support.'
-                  : 'All baseline structural modules analyzed successfully.'}
-              </p>
-              {selectedNode === 'Graph Theory' && (
-                <div className="flex flex-col gap-2">
-                  <button 
-                    onClick={handleSyncAttempt}
-                    className="w-full py-2 rounded-lg bg-synapse-green/20 hover:bg-synapse-green/30 border border-synapse-green/40 text-synapse-green font-mono text-xs font-semibold tracking-wide transition-all uppercase flex items-center justify-center gap-1.5"
-                  >
-                    <Network className="w-3.5 h-3.5" />
-                    Attempt Manual Synapse Sync (+5%)
-                  </button>
-                  {/* Feature 16: Mastery-Based Knowledge Graph Routing */}
-                  <button 
-                    onClick={() => alert("Routing backward to Data Structures to fix foundational gap...")}
-                    className="w-full py-2 rounded-lg bg-plasma-violet/20 hover:bg-plasma-violet/30 border border-plasma-violet/40 text-plasma-violet font-mono text-xs font-semibold tracking-wide transition-all uppercase flex items-center justify-center gap-1.5"
-                  >
-                    <ZoomOut className="w-3.5 h-3.5" />
-                    Route to Missing Foundational Concept
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* RIGHT TELEMETRY & TASKS COLUMN */}
       <aside className="flex-1 flex flex-col gap-4 max-w-md w-full scroll-smooth">
-        
-        {/* TAB NAVIGATION FOR SIDEBAR */}
         <div className="flex bg-void-black/40 rounded-2xl p-1 border border-glass-stroke">
           <button 
             onClick={() => setActiveRightTab('focus')}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-              activeRightTab === 'focus' 
-                ? 'bg-plasma-violet text-white shadow-lg shadow-plasma-violet/20' 
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+              activeRightTab === 'focus' ? 'bg-plasma-violet text-white shadow-lg shadow-plasma-violet/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
             }`}
           >
             <BrainCircuit className="w-3.5 h-3.5" />
-            Focus Diagnostics
+            Focus
           </button>
           <button 
             onClick={() => setActiveRightTab('homework')}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-              activeRightTab === 'homework' 
-                ? 'bg-synapse-green text-void-black shadow-lg shadow-synapse-green/20' 
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+              activeRightTab === 'homework' ? 'bg-synapse-green text-void-black shadow-lg shadow-synapse-green/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
             }`}
           >
             <ClipboardCheck className="w-3.5 h-3.5" />
-            Mentor Homework
+            Homework
           </button>
           <button 
             onClick={() => setActiveRightTab('social')}
             className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all ${
-              activeRightTab === 'social' 
-                ? 'bg-electric-cyan text-void-black shadow-lg shadow-electric-cyan/20' 
-                : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+              activeRightTab === 'social' ? 'bg-electric-cyan text-void-black shadow-lg shadow-electric-cyan/20' : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
             }`}
           >
             <Shield className="w-3.5 h-3.5" />
@@ -456,7 +320,7 @@ export default function CognitiveMap({
 
         {activeRightTab === 'focus' ? (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-            {/* Memory Load and focus status telemetry */}
+            {/* Memory Load */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke glow-violet flex flex-col gap-6">
               <div className="flex justify-between items-center">
                 <h3 className="font-sans font-bold text-lg text-on-surface flex items-center gap-2">
@@ -464,168 +328,89 @@ export default function CognitiveMap({
                   Cognitive Telemetry
                 </h3>
                 <span className="font-mono text-[10px] text-synapse-green bg-synapse-green/10 border border-synapse-green/30 px-2 py-0.5 rounded-full uppercase font-bold">
-                  Realtime Sync Active
+                  Realtime Sync
                 </span>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                {/* Metric Card 1: Memory load */}
                 <div className="bg-void-black/50 rounded-xl p-4 border border-glass-stroke flex flex-col">
-                  <p className="font-sans text-[11px] uppercase tracking-wider text-on-surface-variant mb-1 font-bold">
-                    Memory Load
-                  </p>
+                  <p className="font-sans text-[11px] uppercase tracking-wider text-on-surface-variant mb-1 font-bold">Memory Load</p>
                   <div className="flex items-end gap-1 mt-1">
-                    <span className="text-4xl font-sans font-extrabold text-electric-cyan tracking-tight">
-                      {cognitiveLoad}
-                    </span>
+                    <span className="text-4xl font-sans font-extrabold text-electric-cyan tracking-tight">{cognitiveLoad}</span>
                     <span className="font-mono text-xs text-on-surface-variant mb-1">%</span>
                   </div>
                   <div className="w-full bg-surface-container h-1.5 mt-3 rounded-full overflow-hidden">
                     <div 
-                      className={`h-full transition-all duration-500 rounded-full ${
-                        cognitiveLoad > 75 
-                          ? 'bg-red-400' 
-                          : cognitiveLoad > 55 
-                          ? 'bg-yellow-400' 
-                          : 'bg-electric-cyan'
-                      }`}
+                      className={`h-full transition-all duration-500 rounded-full ${cognitiveLoad > 75 ? 'bg-red-400' : cognitiveLoad > 55 ? 'bg-yellow-400' : 'bg-electric-cyan'}`}
                       style={{ width: `${cognitiveLoad}%` }} 
                     />
                   </div>
                 </div>
 
-                {/* Metric Card 2: State quality */}
                 <div className="bg-void-black/50 rounded-xl p-4 border border-glass-stroke flex flex-col justify-between">
-                  <p className="font-sans text-[11px] uppercase tracking-wider text-on-surface-variant mb-1 font-bold">
-                    Focus State
-                  </p>
+                  <p className="font-sans text-[11px] uppercase tracking-wider text-on-surface-variant mb-1 font-bold">Focus State</p>
                   <div className="flex items-center gap-3 mt-2">
                     <div className="w-10 h-10 rounded-full bg-synapse-green/20 flex items-center justify-center shadow-lg shadow-synapse-green/10 pulse-indicator">
                       <BrainCircuit className="w-5 h-5 text-synapse-green" />
                     </div>
-                    <span className="font-sans text-sm font-bold text-on-surface">
-                      {cognitiveLoad > 80 ? 'Heavy Load' : 'Optimal'}
-                    </span>
+                    <span className="font-sans text-sm font-bold text-on-surface">{cognitiveLoad > 80 ? 'Heavy Load' : 'Optimal'}</span>
                   </div>
                 </div>
               </div>
 
-              {/* FOCUS STREAK COMPONENT */}
               <DeepFocusStreak streak={profile?.focusStreak || 0} bestStreak={profile?.bestFocusStreak || 0} />
+              <DailyMilestone currentMinutes={profile?.todayFocusMinutes || 0} goalMinutes={profile?.dailyFocusGoal || 120} />
 
-              {/* DAILY MILESTONE COMPONENT */}
-              <DailyMilestone 
-                currentMinutes={profile?.todayFocusMinutes || 0} 
-                goalMinutes={profile?.dailyFocusGoal || 120} 
-              />
-
-              {/* Interactive flow timer status bar */}
               <div className="bg-gradient-to-br from-white/5 to-transparent rounded-xl p-4 border border-glass-stroke flex justify-between items-center transition-all hover:bg-white/10">
                 <div>
-                  <p className="font-sans text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">
-                    Current Flow Session
-                  </p>
-                  <p className="font-mono text-2xl font-bold text-plasma-violet mt-1 tracking-tight">
-                    {flowTime}
-                  </p>
+                  <p className="font-sans text-[11px] uppercase tracking-wider text-on-surface-variant font-bold">Current Flow Session</p>
+                  <p className="font-mono text-2xl font-bold text-plasma-violet mt-1 tracking-tight">{flowTime}</p>
                 </div>
                 <button 
-                  onClick={() => {
-                    setFlowTimerActive(!flowTimerActive);
-                    alert(flowTimerActive ? 'Flow Session paused.' : 'Flow Session resumed! Breathe deeply.');
-                  }}
+                  onClick={() => setFlowTimerActive(!flowTimerActive)}
                   className="p-3 rounded-full bg-plasma-violet/15 text-plasma-violet hover:bg-plasma-violet/25 hover:scale-105 active:scale-95 transition-all mb-0.5 border border-plasma-violet/30"
                 >
-                  {flowTimerActive ? (
-                    <Pause className="w-5 h-5 fill-plasma-violet" />
-                  ) : (
-                    <Play className="w-5 h-5 fill-plasma-violet ml-0.5" />
-                  )}
+                  {flowTimerActive ? <Pause className="w-5 h-5 fill-plasma-violet" /> : <Play className="w-5 h-5 fill-plasma-violet ml-0.5" />}
                 </button>
               </div>
-              </div>
-              
-              {/* Feature 10: Focus-Window Time Optimization */}
-              <div className="bg-electric-cyan/10 border border-electric-cyan/30 rounded-xl p-4 flex items-center gap-3">
-                <Clock className="w-6 h-6 text-electric-cyan" />
-                <div>
-                  <p className="font-bold text-electric-cyan text-sm">Focus-Window Optimization</p>
-                  <p className="text-xs text-electric-cyan/70">Your peak focus time is 10:00 AM. Hardest topics are scheduled then!</p>
-                </div>
-              </div>
+            </div>
 
-            {/* ACTIVE SYNAPSIS / MINI TODO LIST COMPONENT */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke flex-1 flex flex-col min-h-[350px]">
               <div className="flex justify-between items-center mb-4">
                 <h3 className="font-sans font-bold text-lg text-on-surface flex items-center gap-2">
                   <Check className="w-5 h-5 text-electric-cyan" />
                   Active Synthesis {lowMotivationMode && <span className="text-xs text-orange-400 bg-orange-500/20 px-2 py-0.5 rounded ml-2">Minimal Workload</span>}
                 </h3>
-                <span className="font-mono text-[10px] text-on-surface-variant bg-white/5 px-2.5 py-1 rounded-md border border-glass-stroke font-bold">
-                  {lowMotivationMode ? Math.min(1, tasks.filter(t => !t.completed).length) : tasks.filter(t => !t.completed).length} Pending
-                </span>
               </div>
-
-              {/* Quick task checklist adding utility form */}
               <form onSubmit={handleAddTask} className="flex gap-2 mb-4">
                 <input 
                   type="text"
                   placeholder="Inject new revision target..."
                   value={newTaskTitle}
                   onChange={(e) => setNewTaskTitle(e.target.value)}
-                  className="flex-1 bg-surface-container-low border border-glass-stroke rounded-xl px-3 py-2 text-sm text-on-surface placeholder-outline-variant focus:outline-none focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan/35 transition-all"
+                  className="flex-1 bg-surface-container-low border border-glass-stroke rounded-xl px-3 py-2 text-sm text-on-surface placeholder-outline-variant focus:outline-none focus:border-electric-cyan transition-all"
                 />
-                <button 
-                  type="submit"
-                  className="p-2.5 rounded-xl bg-electric-cyan text-void-black hover:bg-electric-cyan/85 hover:scale-105 active:scale-95 transition-all border border-electric-cyan/35"
-                  title="Add Target To List"
-                >
+                <button type="submit" className="p-2.5 rounded-xl bg-electric-cyan text-void-black hover:bg-electric-cyan/85 transition-all">
                   <Plus className="w-4 h-4 font-extrabold" />
                 </button>
               </form>
-
-              {/* List display */}
               <div className="flex-1 overflow-y-auto space-y-3 pr-1 max-h-[240px]">
                 {tasks.slice(0, lowMotivationMode ? 1 : tasks.length).map((task) => (
-                  <div 
-                    key={task.id}
-                    className={`group flex flex-col gap-2 bg-void-black/35 border rounded-xl p-3.5 hover:border-electric-cyan/50 hover:bg-white/5 transition-all duration-300 ${
-                      task.completed ? 'opacity-40 border-glass-stroke line-through' : 'border-glass-stroke'
-                    }`}
-                  >
+                  <div key={task.id} className={`group flex flex-col gap-2 bg-void-black/35 border rounded-xl p-3.5 hover:border-electric-cyan/50 transition-all ${task.completed ? 'opacity-40 border-glass-stroke line-through' : 'border-glass-stroke'}`}>
                     <div className="flex items-start gap-3 cursor-pointer" onClick={() => handleToggleTask(task.id)}>
-                      <div className={`mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${
-                        task.completed 
-                          ? 'border-electric-cyan bg-electric-cyan/10' 
-                          : 'border-glass-stroke group-hover:border-electric-cyan'
-                      }`}>
+                      <div className={`mt-0.5 w-5 h-5 rounded-full border flex items-center justify-center transition-colors ${task.completed ? 'border-electric-cyan bg-electric-cyan/10' : 'border-glass-stroke'}`}>
                         {task.completed && <Check className="w-3.5 h-3.5 text-electric-cyan font-bold" />}
                       </div>
                       <div className="flex-1">
-                        <h4 className="font-sans font-medium text-sm text-on-surface group-hover:text-electric-cyan transition-colors">
-                          {task.title}
-                        </h4>
-                        <p className="font-mono text-[10px] text-on-surface-variant flex items-center gap-1 mt-1">
-                          <span>{task.moduleName}</span>
-                          <span>•</span>
-                          <span>Est. {task.estimatedMinutes}m</span>
-                        </p>
+                        <h4 className="font-sans font-medium text-sm text-on-surface group-hover:text-electric-cyan transition-colors">{task.title}</h4>
                       </div>
                     </div>
-                    {/* Feature 4: Frictionless Micro-Tasking Engine */}
-                    {!task.completed && (
-                      <button onClick={(e) => { e.stopPropagation(); alert("Task broken down into three 3-minute subtasks."); }} className="ml-8 mt-1 flex items-center gap-1 text-[10px] text-plasma-violet font-bold hover:text-white transition-colors bg-plasma-violet/10 px-2 py-1 rounded w-fit">
-                        <SplitSquareHorizontal className="w-3 h-3" /> Convert to Micro-tasks
-                      </button>
-                    )}
                   </div>
                 ))}
-
                 {tasks.length === 0 && (
-                  <div className="flex flex-col items-center justify-center py-10 text-center select-none text-on-surface-variant">
+                  <div className="flex flex-col items-center justify-center py-10 text-center text-on-surface-variant">
                     <AlertCircle className="w-8 h-8 opacity-40 mb-2" />
                     <p className="text-xs font-sans">No tasks currently queued.</p>
-                    <p className="text-[10px] tracking-wide uppercase font-mono mt-0.5">Focus State fully synchronized</p>
                   </div>
                 )}
               </div>
@@ -637,55 +422,31 @@ export default function CognitiveMap({
           </div>
         ) : (
           <div className="space-y-6 animate-in fade-in slide-in-from-right-4 duration-500">
-            {/* Feature 14: Peer-Led Growth Circles */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke bg-synapse-green/5 border-synapse-green/30">
               <h3 className="font-bold text-synapse-green flex items-center gap-2 mb-2"><Users className="w-5 h-5" /> Peer-Led Growth Circle</h3>
               <p className="text-xs text-on-surface-variant mb-3">Your circle 'Code Masters' is 1 module away from a shared reward!</p>
-              <div className="flex gap-2">
-                <div className="w-8 h-8 bg-synapse-green/20 rounded-full flex items-center justify-center border border-synapse-green"><Check className="w-4 h-4 text-synapse-green"/></div>
-                <div className="w-8 h-8 bg-synapse-green/20 rounded-full flex items-center justify-center border border-synapse-green"><Check className="w-4 h-4 text-synapse-green"/></div>
-                <div className="w-8 h-8 bg-white/5 rounded-full flex items-center justify-center border border-glass-stroke text-xs">You</div>
-              </div>
             </div>
-
-            {/* AUDIO NOTES FROM MENTOR */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke">
-              <AudioNotes 
-                notes={[]} 
-              />
+              <AudioNotes notes={[]} />
             </div>
-
-            {/* PEER INSIGHT SYSTEM */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke">
-              <PeerInsight 
-                receivedFeedback={[]}
-                sendToUserId="random"
-                onSend={(msg, type) => alert(`Anonymized ${type} insight sent to cohort peer!`)}
-              />
+              <PeerInsight receivedFeedback={[]} sendToUserId="random" onSend={() => alert('Sent!')} />
             </div>
-
-            {/* ACHIEVEMENT GALLERY */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke">
-              <AchievementGallery 
-                achievements={[]} 
-              />
+              <AchievementGallery achievements={[]} />
             </div>
           </div>
         )}
-
       </aside>
 
-      {/* Floating System-wide SOS Trigger button */}
       <div className="fixed bottom-6 right-6 z-30">
         <button
           onClick={onSosClick}
-          className="w-14 h-14 rounded-full bg-void-black/40 border border-glass-stroke backdrop-blur-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] group hover:border-error/50 hover:shadow-[0_0_35px_rgba(255,180,171,0.25)]"
-          title="Open Mental SOS Toolkit"
+          className="w-14 h-14 rounded-full bg-void-black/40 border border-glass-stroke backdrop-blur-xl flex items-center justify-center hover:scale-110 active:scale-95 transition-all shadow-[0_0_30px_rgba(255,255,255,0.15)] hover:border-error/50 hover:shadow-[0_0_35px_rgba(255,180,171,0.25)]"
         >
-          <HelpCircle className="w-7 h-7 text-on-surface group-hover:text-error transition-colors" />
+          <HelpCircle className="w-7 h-7 text-on-surface hover:text-error transition-colors" />
         </button>
       </div>
-
     </div>
   );
 }

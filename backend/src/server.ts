@@ -256,7 +256,52 @@ async function startServer() {
   // Courses
   app.get("/api/courses", async (req, res) => {
     try {
-      const courses = await CourseModel.find().sort({ order: 1 });
+      let courses = await CourseModel.find().sort({ order: 1 });
+      
+      // Auto-seed dummy course data if the database is empty
+      if (courses.length === 0) {
+        console.log("No courses found. Seeding dummy data...");
+        const defaultCourse = new CourseModel({
+          id: "course-demo",
+          classLevel: "Class 10",
+          subject: "Physics",
+          title: "Introduction to Kinematics",
+          description: "A foundational course on motion and forces.",
+          order: 1
+        });
+        await defaultCourse.save();
+        
+        const defaultModule = new ModuleModel({
+          id: "mod-demo-1",
+          courseId: "course-demo",
+          term: "Term 1",
+          title: "Mechanics",
+          learningObjectives: ["Understand velocity and acceleration", "Apply Newton's Laws"],
+          order: 1
+        });
+        await defaultModule.save();
+        
+        const defaultLesson = new LessonModel({
+          id: "les-demo-1",
+          moduleId: "mod-demo-1",
+          month: "April",
+          theme: "Motion",
+          topic: "Velocity vs. Speed",
+          learningOutcome: "Distinguish between scalar and vector quantities of motion.",
+          instructionalFlow: [
+            { step: "Hook", duration: "5 mins", activity: "Show a racecar video." },
+            { step: "Direct Instruction", duration: "15 mins", activity: "Explain concepts." },
+            { step: "Practice", duration: "15 mins", activity: "Worksheet on velocity calculation." },
+            { step: "Closure", duration: "5 mins", activity: "Exit ticket." }
+          ],
+          resources: ["Video link", "Worksheet PDF"],
+          order: 1
+        });
+        await defaultLesson.save();
+
+        courses = [defaultCourse];
+      }
+      
       res.json(courses);
     } catch (err) {
       console.error("Error in /api/courses:", err);

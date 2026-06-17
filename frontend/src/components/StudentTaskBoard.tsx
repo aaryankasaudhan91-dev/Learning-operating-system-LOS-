@@ -95,6 +95,25 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
     }
   };
 
+  const [activeQuiz, setActiveQuiz] = useState<HomeworkTask | null>(null);
+  const [quizAnswer, setQuizAnswer] = useState('');
+
+  const handleQuizSubmit = async () => {
+    if (!activeQuiz) return;
+    try {
+      // In a full implementation, we'd save the answer to the DB.
+      // For now, we'll mark the task as completed.
+      await taskService.updateTaskStatus(activeQuiz.id, 'completed');
+      setTasks(prev => prev.map(t => t.id === activeQuiz.id ? { ...t, status: 'completed' } : t));
+      if (onStatusChange) onStatusChange();
+      alert('Quiz submitted successfully!');
+      setActiveQuiz(null);
+      setQuizAnswer('');
+    } catch (error) {
+      console.error("Failed to submit quiz", error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center py-10">
@@ -115,6 +134,39 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
 
   return (
     <div className="space-y-4">
+      {/* Quiz Modal Overlay */}
+      {activeQuiz && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-void-black/80 backdrop-blur-md">
+          <div className="bg-surface-container w-full max-w-2xl rounded-2xl border border-glass-stroke p-6 shadow-2xl relative">
+            <button 
+              onClick={() => { setActiveQuiz(null); setQuizAnswer(''); }}
+              className="absolute top-4 right-4 text-on-surface-variant hover:text-white"
+            >
+              ×
+            </button>
+            <h3 className="text-2xl font-bold text-electric-cyan mb-2">{activeQuiz.title}</h3>
+            <p className="text-sm text-on-surface-variant mb-6 whitespace-pre-wrap">{activeQuiz.description}</p>
+            <div className="space-y-4">
+              <label className="block text-sm font-bold text-on-surface">Your Response:</label>
+              <textarea
+                value={quizAnswer}
+                onChange={(e) => setQuizAnswer(e.target.value)}
+                rows={6}
+                placeholder="Type your answer or solution here..."
+                className="w-full bg-void-black/50 border border-glass-stroke rounded-xl p-4 text-on-surface focus:border-electric-cyan focus:ring-1 focus:ring-electric-cyan outline-none"
+              />
+              <button 
+                onClick={handleQuizSubmit}
+                disabled={!quizAnswer.trim()}
+                className="w-full py-3 bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+              >
+                Submit Answer
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="flex justify-between items-center">
         <h3 className="font-sans font-bold text-lg text-on-surface flex items-center gap-2">
           <ClipboardCheck className="w-5 h-5 text-synapse-green" />
@@ -144,11 +196,13 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
       )}
 
       <div className="space-y-3">
-        {tasks.map(task => (
+        {tasks.map(task => {
+          const isQuiz = task.title.toLowerCase().includes('quiz') || task.title.toLowerCase().includes('test');
+          return (
           <div 
             key={task.id}
-            onClick={() => toggleStatus(task)}
-            className={`group p-4 rounded-xl border transition-all cursor-pointer ${
+            onClick={() => !isQuiz && toggleStatus(task)}
+            className={`group p-4 rounded-xl border transition-all ${!isQuiz ? 'cursor-pointer' : ''} ${
               task.status === 'completed' 
                 ? 'bg-synapse-green/5 border-synapse-green/20 opacity-60' 
                 : task.status === 'in-progress'
@@ -163,7 +217,7 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
                 ) : task.status === 'in-progress' ? (
                   <RefreshCw className="w-5 h-5 text-electric-cyan animate-spin-slow" />
                 ) : (
-                  <Circle className="w-5 h-5 text-on-surface-variant group-hover:text-white transition-colors" />
+                  <Circle className={`w-5 h-5 text-on-surface-variant ${!isQuiz && 'group-hover:text-white'} transition-colors`} />
                 )}
               </div>
               <div className="flex-1">
@@ -173,8 +227,21 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
                 </div>
                 <p className="text-xs text-on-surface-variant line-clamp-2 mt-1">{task.description}</p>
                 
+                {/* Test/Quiz Taking Button */}
+                {isQuiz && task.status !== 'completed' && (
+                  <div className="mt-3">
+                    <button 
+                      onClick={(e) => { e.stopPropagation(); setActiveQuiz(task); }}
+                      className="text-xs bg-plasma-violet/20 hover:bg-plasma-violet/30 text-plasma-violet border border-plasma-violet/40 px-4 py-1.5 rounded-lg transition-colors font-bold flex items-center gap-2"
+                    >
+                      <BrainCircuit className="w-4 h-4" />
+                      Take Assessment
+                    </button>
+                  </div>
+                )}
+
                 {/* AI Hint Section */}
-                {task.status !== 'completed' && (
+                {!isQuiz && task.status !== 'completed' && (
                   <div className="mt-2" onClick={e => e.stopPropagation()}>
                     {!taskHints[task.id] && !loadingHints[task.id] ? (
                       <button 
@@ -212,7 +279,8 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
               </div>
             </div>
           </div>
-        ))}
+          );
+        })}
 
         {tasks.length === 0 && (
           <div className="flex flex-col items-center justify-center py-12 text-center text-on-surface-variant border-2 border-dashed border-glass-stroke rounded-2xl">

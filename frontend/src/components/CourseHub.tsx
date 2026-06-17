@@ -46,7 +46,7 @@ export default function CourseHub() {
 
   // Filter classes based on role
   const classes = profile?.role === 'student' 
-    ? (userClass ? [userClass] : [])
+    ? (userClass ? [userClass] : allClasses)
     : allClasses;
 
   useEffect(() => {
@@ -54,8 +54,8 @@ export default function CourseHub() {
       setLoading(true);
       const data = await dbService.getCourses();
       
-      // Strictly limit the courses state to only the student's assigned class
-      const allowedCourses = profile?.role === 'student' 
+      // Strictly limit the courses state to only the student's assigned class (if they have one)
+      const allowedCourses = profile?.role === 'student' && userClass
         ? data.filter(c => c.classLevel === userClass)
         : data;
         
