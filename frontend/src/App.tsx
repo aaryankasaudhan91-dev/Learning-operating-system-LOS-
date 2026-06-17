@@ -17,12 +17,15 @@ import UnderConstruction from './components/UnderConstruction';
 import CognitiveMap from './components/CognitiveMap';
 import FocusChamber from './components/FocusChamber';
 import SOSToolkit from './components/SOSToolkit';
+import InsightsHub from './components/InsightsHub';
+import CohortTelemetry from './components/CohortTelemetry';
 import { AppView, StudentSeat, InterventionAlert, SynthesisTask } from './types';
 import SplashScreen from './components/SplashScreen';
 import { Sparkles, MessageSquare, Check, X, ShieldAlert, Heart, Loader2 } from 'lucide-react';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth } from './lib/firebase';
-import { mockApi } from './services/api';
+import { dbService } from './services/db.service';
+import { taskService } from './services/task.service';
 
 export default function App() {
   const [currentView, setView] = useState<AppView>('landing');
@@ -36,50 +39,14 @@ export default function App() {
   const [cognitiveLoad, setCognitiveLoad] = useState<number>(42); // Student default load
   const [activeNotification, setActiveNotification] = useState<string | null>(null);
 
-  // Initial Student Tasks Checklist matching Screen 2
-  const [tasks, setTasks] = useState<SynthesisTask[]>([
-    { id: 't1', title: "Review Dijkstra's Shortest Path Algorithm", moduleName: 'Graph Theory', estimatedMinutes: 15, completed: false },
-    { id: 't2', title: "Complete Cognitive Knowledge Check", moduleName: 'Data Structures', estimatedMinutes: 5, completed: false },
-    { id: 't3', title: "Verify Bhashini translation mode queries baseline", moduleName: 'Regional Dialect OS', estimatedMinutes: 8, completed: true }  
-  ]);
+  // Student Tasks Checklist
+  const [tasks, setTasks] = useState<SynthesisTask[]>([]);
 
-  // Initial Student Classroom Seat data grid (6x4 = 24 seats) matching Screen 4
-  const [seats, setSeats] = useState<StudentSeat[]>([
-    { id: '1', name: 'Elias V.', load: 92, state: 'friction', preferredLanguage: 'Hindi-Dialect', avatarSeed: 'elias', row: 1, col: 1 },
-    { id: '2', name: 'Sarah M.', load: 84, state: 'friction', preferredLanguage: 'English-Proxy', avatarSeed: 'sarah', row: 1, col: 2 },
-    { id: '3', name: 'John Doe', load: 38, state: 'flow', preferredLanguage: 'Hindi-Dialect', avatarSeed: 'john', row: 1, col: 3 },
-    { id: '4', name: 'Alice Smith', load: 81, state: 'low_motivation', preferredLanguage: 'Marathi-Context', avatarSeed: 'alice', row: 1, col: 4 },    
-    { id: '5', name: 'Tony Stark', load: 45, state: 'deep_focus', preferredLanguage: 'English-Proxy', avatarSeed: 'tony', row: 1, col: 5 },
-    { id: '6', name: 'Bruce B.', load: 50, state: 'engaged', preferredLanguage: 'English-Proxy', avatarSeed: 'bruce', row: 1, col: 6 },
+  // Student Classroom Seat data grid
+  const [seats, setSeats] = useState<StudentSeat[]>([]);
 
-    { id: '7', name: 'Natasha R.', load: 41, state: 'deep_focus', preferredLanguage: 'Hindi-Dialect', avatarSeed: 'natasha', row: 2, col: 1 },
-    { id: '8', name: 'Clint B.', load: 30, state: 'flow', preferredLanguage: 'Marathi-Context', avatarSeed: 'clint', row: 2, col: 2 },
-    { id: '9', name: 'Wanda M.', load: 88, state: 'friction', preferredLanguage: 'Hindi-Dialect', avatarSeed: 'wanda', row: 2, col: 3 },
-    { id: '10', name: 'Peter P.', load: 49, state: 'flow', preferredLanguage: 'English-Proxy', avatarSeed: 'peter', row: 2, col: 4 },
-    { id: '11', name: 'Steve R.', load: 32, state: 'engaged', preferredLanguage: 'English-Proxy', avatarSeed: 'steve', row: 2, col: 5 },
-    { id: '12', name: 'Sam W.', load: 44, state: 'flow', preferredLanguage: 'Hindi-Dialect', avatarSeed: 'sam', row: 2, col: 6 },
-
-    { id: '13', name: 'James B.', load: 39, state: 'deep_focus', preferredLanguage: 'Marathi-Context', avatarSeed: 'james', row: 3, col: 1 },
-    { id: '14', name: 'Carol D.', load: 28, state: 'engaged', preferredLanguage: 'English-Proxy', avatarSeed: 'carol', row: 3, col: 2 },
-    // Rest of seats initialized standard
-    { id: '15', name: 'Scott L.', load: 41, state: 'flow', preferredLanguage: 'Hindi', avatarSeed: 'scott', row: 3, col: 3 },
-    { id: '16', name: 'Hope V.', load: 36, state: 'deep_focus', preferredLanguage: 'English', avatarSeed: 'hope', row: 3, col: 4 },
-    { id: '17', name: 'TChalla K.', load: 42, state: 'engaged', preferredLanguage: 'Hindi', avatarSeed: 'tc', row: 3, col: 5 },
-    { id: '18', name: 'Shuri K.', load: 22, state: 'flow', preferredLanguage: 'Marathi', avatarSeed: 'shuri', row: 3, col: 6 },
-
-    { id: '19', name: 'Stephen S.', load: 59, state: 'deep_focus', preferredLanguage: 'English', avatarSeed: 'stephen', row: 4, col: 1 },
-    { id: '20', name: 'Wong L.', load: 31, state: 'engaged', preferredLanguage: 'Hindi', avatarSeed: 'wong', row: 4, col: 2 },
-    { id: '21', name: 'Loki L.', load: 79, state: 'friction', preferredLanguage: 'English', avatarSeed: 'loki', row: 4, col: 3 },
-    { id: '22', name: 'Sylvie L.', load: 38, state: 'flow', preferredLanguage: 'Marathi', avatarSeed: 'sylvie', row: 4, col: 5 },
-    { id: '23', name: 'Thor O.', load: 52, state: 'engaged', preferredLanguage: 'Hindi', avatarSeed: 'thor', row: 4, col: 5 },
-    { id: '24', name: 'Arthur P.', load: 48, state: 'deep_focus', preferredLanguage: 'English', avatarSeed: 'arthur', row: 4, col: 6 }
-  ]);
-
-  // Initial Intervention alerts matching Screen 4
-  const [alerts, setAlerts] = useState<InterventionAlert[]>([
-    { id: 'al1', studentName: 'Elias V.', condition: '92% Frustration', reason: 'Repeated compile sequence anomalies identified down Node Loop.', severity: 'high' },
-    { id: 'al2', studentName: 'Sarah M.', condition: 'Exceeded Idle', reason: 'State inactivity detected for 15+ minutes in Focus Chamber.', severity: 'medium' }
-  ]);
+  // Intervention alerts
+  const [alerts, setAlerts] = useState<InterventionAlert[]>([]);
 
   // Show customized action toast banner message
   const addNotification = (msg: string) => {
@@ -97,30 +64,25 @@ export default function App() {
   }, [activeNotification]);
 
   // Synchronise Student workload changes dynamically into visual seats array to show deep sync
+  // Realtime updates handled via components or services
   useEffect(() => {
-    // Initialize Real-time Cognitive Telemetry Mock Stream
-    mockApi.startTelemetryStream();
-
-    // Subscribe to periodic load updates from the mock WebSocket
-    const unsubscribe = mockApi.subscribeToCognitiveLoad((load) => {
-      setCognitiveLoad(load);
-    });
-
-    return () => {
-      unsubscribe();
-      mockApi.stopTelemetryStream();
-    };
+    // Websocket hooks for real-time load will go here in production
   }, []);
 
+  // Persist cognitive load changes back to MongoDB (debounced 2s)
   useEffect(() => {
-    setSeats(prev => prev.map(seat => {
-      // Elias V represents the synced student node in the simulation!
-      if (seat.name === 'Elias V.') {
-        return { ...seat, load: cognitiveLoad, state: cognitiveLoad > 75 ? 'friction' : 'flow' };
+    if (!currentUser || userRole !== 'student') return;
+    const timer = setTimeout(async () => {
+      try {
+        await dbService.updateUserProfile(currentUser.uid, { cognitiveLoad });
+        console.log("Persisted cognitiveLoad to DB:", cognitiveLoad);
+      } catch (err) {
+        console.warn("Could not persist cognitive load:", err);
       }
-      return seat;
-    }));
-  }, [cognitiveLoad]);
+    }, 2000);
+
+    return () => clearTimeout(timer);
+  }, [cognitiveLoad, currentUser, userRole]);
 
   // Load current user profile and session synchronizations
   useEffect(() => {
@@ -144,6 +106,32 @@ export default function App() {
             setUserProfile(userDocData);
             const role = userDocData.role as 'student' | 'mentor';
             setUserRole(role);
+            setCognitiveLoad(userDocData.cognitiveLoad || 50);
+
+            if (role === 'mentor') {
+              dbService.getStudents(user.email || '').then(students => {
+                setSeats(students.map((s: any, index) => ({
+                  id: s.uid,
+                  name: s.fullName || s.name || 'Student',
+                  load: s.cognitiveLoad || 50,
+                  state: (s.cognitiveLoad || 50) > 75 ? 'friction' : 'flow',
+                  preferredLanguage: 'English',
+                  avatarSeed: s.uid,
+                  row: Math.floor(index / 6) + 1,
+                  col: (index % 6) + 1
+                })));
+              });
+            } else {
+              taskService.getStudentTasks(user.uid, user.email || '', userDocData.name || '').then(data => {
+                setTasks(data.map((t: any) => ({
+                  id: t.id || Math.random().toString(),
+                  title: t.title || 'Untitled Task',
+                  moduleName: t.moduleName || 'General',
+                  estimatedMinutes: t.estimatedMinutes || 15,
+                  completed: t.status === 'completed'
+                })));
+              });
+            }
 
             // Route auth pages to Course Hub as the primary active view
             setView(prev => {
@@ -272,11 +260,25 @@ export default function App() {
           )}
 
           {currentView === 'insights' && (
-            <UnderConstruction setView={setView} featureName="Insights Hub" />
+            <InsightsHub
+              setView={setView}
+              seats={seats}
+              setSeats={setSeats}
+              alerts={alerts}
+              setAlerts={setAlerts}
+              addNotification={addNotification}
+            />
           )}
 
           {currentView === 'cohort' && (
-            <UnderConstruction setView={setView} featureName="Cohort Telemetry" />
+            <CohortTelemetry
+              setView={setView}
+              seats={seats}
+              setSeats={setSeats}
+              alerts={alerts}
+              setAlerts={setAlerts}
+              addNotification={addNotification}
+            />
           )}
 
           {currentView === 'sos' && (

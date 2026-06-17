@@ -43,6 +43,7 @@ export interface UserProfile {
   fullName: string;
   email: string;
   role: 'student' | 'mentor';
+  teacherEmail?: string;
   specialty: string;
   preferredLanguage: string;
   focusStreak: number;
@@ -51,12 +52,13 @@ export interface UserProfile {
   lastFocusDate?: string;
   dailyFocusGoal: number; // in minutes
   todayFocusMinutes: number; // in minutes
+  cognitiveLoad?: number;
   academicInfo?: AcademicInfo;
   achievements: AchievementBadge[];
   createdAt: string;
 }
 
-export type AppView = 'login' | 'register' | 'landing' | 'map' | 'chamber' | 'insights' | 'cohort' | 'sos' | 'profile' | 'settings' | 'courses';
+export type AppView = 'splash' | 'login' | 'register' | 'landing' | 'map' | 'chamber' | 'insights' | 'cohort' | 'sos' | 'profile' | 'settings' | 'courses';
 
 export interface StudentSeat {
   id: string;

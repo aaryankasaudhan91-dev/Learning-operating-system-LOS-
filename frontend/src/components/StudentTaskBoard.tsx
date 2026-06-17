@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   ClipboardCheck, Clock, CheckCircle2, Circle, 
-  Loader2, AlertCircle, RefreshCw 
+  Loader2, AlertCircle, RefreshCw, BrainCircuit
 } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { taskService } from '../services/task.service';
@@ -15,9 +15,51 @@ interface StudentTaskBoardProps {
 export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardProps) {
   const [tasks, setTasks] = useState<HomeworkTask[]>([]);
   const [loading, setLoading] = useState(true);
+  const [taskHints, setTaskHints] = useState<Record<string, string>>({});
+  const [loadingHints, setLoadingHints] = useState<Record<string, boolean>>({});
+
+  const fetchHint = async (e: React.MouseEvent, task: HomeworkTask) => {
+    e.stopPropagation();
+    if (taskHints[task.id] || loadingHints[task.id]) return;
+
+    setLoadingHints(prev => ({ ...prev, [task.id]: true }));
+    try {
+      const response = await fetch('/api/agent/task-hint', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ title: task.title, description: task.description })
+      });
+      const data = await response.json();
+      const fallbacks = [
+        "Start by identifying the very first, smallest step required. Don't worry about the rest yet.",
+        "Try explaining the goal of this task out loud to yourself as if you were teaching it.",
+        "Look for keywords in the description that hint at the core problem to solve.",
+        "If you're stuck, try writing out what you *do* know on a piece of scratch paper."
+      ];
+      if (data.hint) {
+        setTaskHints(prev => ({ ...prev, [task.id]: data.hint }));
+      } else {
+        setTaskHints(prev => ({ ...prev, [task.id]: fallbacks[Math.floor(Math.random() * fallbacks.length)] }));
+      }
+    } catch (err) {
+      console.error(err);
+      const fallbacks = [
+        "Start by identifying the very first, smallest step required. Don't worry about the rest yet.",
+        "Try explaining the goal of this task out loud to yourself as if you were teaching it.",
+        "Look for keywords in the description that hint at the core problem to solve.",
+        "If you're stuck, try writing out what you *do* know on a piece of scratch paper."
+      ];
+      setTaskHints(prev => ({ ...prev, [task.id]: fallbacks[Math.floor(Math.random() * fallbacks.length)] }));
+    } finally {
+      setLoadingHints(prev => ({ ...prev, [task.id]: false }));
+    }
+  };
 
   useEffect(() => {
-    if (!auth.currentUser) return;
+    if (!auth.currentUser) {
+      setLoading(false);
+      return;
+    }
 
     const unsubscribe = taskService.subscribeToStudentTasks(
       auth.currentUser.uid,
@@ -57,6 +99,16 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
     return (
       <div className="flex items-center justify-center py-10">
         <Loader2 className="w-6 h-6 text-electric-cyan animate-spin" />
+      </div>
+    );
+  }
+
+  if (!auth.currentUser) {
+    return (
+      <div className="flex flex-col items-center justify-center py-10 text-center glass-panel rounded-xl border border-glass-stroke p-6">
+        <AlertCircle className="w-8 h-8 text-on-surface-variant mb-2" />
+        <p className="text-sm font-bold text-on-surface">Authentication Required</p>
+        <p className="text-xs text-on-surface-variant mt-1">Please sign in to view your academic tasks.</p>
       </div>
     );
   }
@@ -120,6 +172,32 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
                   <span className="text-[10px] font-mono text-on-surface-variant uppercase">{task.teacherName}</span>
                 </div>
                 <p className="text-xs text-on-surface-variant line-clamp-2 mt-1">{task.description}</p>
+                
+                {/* AI Hint Section */}
+                {task.status !== 'completed' && (
+                  <div className="mt-2" onClick={e => e.stopPropagation()}>
+                    {!taskHints[task.id] && !loadingHints[task.id] ? (
+                      <button 
+                        onClick={(e) => fetchHint(e, task)}
+                        className="text-[10px] flex items-center gap-1 text-electric-cyan border border-electric-cyan/30 bg-electric-cyan/5 px-2 py-1 rounded hover:bg-electric-cyan/20 transition-all"
+                      >
+                        <BrainCircuit className="w-3 h-3" /> Get AI Hint
+                      </button>
+                    ) : (
+                      <div className="bg-electric-cyan/5 border border-electric-cyan/20 rounded p-2 mt-2">
+                        {loadingHints[task.id] ? (
+                          <span className="text-[10px] text-electric-cyan flex items-center gap-1">
+                            <span className="w-2 h-2 border border-electric-cyan border-t-transparent rounded-full animate-spin"></span>
+                            Deconstructing task...
+                          </span>
+                        ) : (
+                          <p className="text-[10px] text-electric-cyan leading-relaxed font-sans">{taskHints[task.id]}</p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <div className="flex items-center gap-4 mt-3">
                   <div className="flex items-center gap-1.5 text-[10px] text-on-surface-variant font-mono">
                     <Clock className="w-3 h-3" />

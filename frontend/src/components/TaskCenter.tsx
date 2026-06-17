@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, Calendar, Clock, CheckCircle2, Circle, 
-  Loader2, ClipboardList, User, Users, Trash2 
+  Loader2, ClipboardList, User, Users, Trash2, Sparkles
 } from 'lucide-react';
 import { auth } from '../lib/firebase';
 import { StudentSeat, HomeworkTask, TaskStatus } from '../types';
@@ -21,6 +21,53 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
   const [description, setDescription] = useState('');
   const [dueDate, setDueDate] = useState('');
   const [assignedTo, setAssignedTo] = useState('all');
+
+  // AI Task Assistant State
+  const [aiTopic, setAiTopic] = useState('');
+  const [aiType, setAiType] = useState('task');
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [aiError, setAiError] = useState('');
+
+  const handleGenerateAI = async (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (!aiTopic.trim()) {
+      setAiError('Please enter a topic first');
+      return;
+    }
+    
+    setIsGenerating(true);
+    setAiError('');
+    try {
+      const response = await fetch('/api/agent/generate-task', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          topic: aiTopic,
+          type: aiType
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('AI Service returned an error');
+      }
+
+      const data = await response.json();
+      if (data.title && data.description) {
+        setTitle(data.title);
+        setDescription(data.description);
+        addNotification(`AI generated task details for "${aiTopic}"`);
+      } else {
+        throw new Error('Unexpected API response structure');
+      }
+    } catch (error: any) {
+      console.error(error);
+      setAiError(error.message || 'Failed to generate task details. Try again.');
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   useEffect(() => {
     if (!auth.currentUser) return;
@@ -143,6 +190,78 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
 
       {isAdding && (
         <form onSubmit={handleAddTask} className="glass-panel p-6 rounded-2xl space-y-4 border-plasma-violet/30 animate-in zoom-in-95 duration-300">
+          {/* AI Task Assistant */}
+          <div className="relative overflow-hidden rounded-xl border border-plasma-violet/20 bg-surface-container/30 p-4 space-y-3">
+            <div className="absolute top-0 right-0 w-24 h-24 bg-plasma-violet/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="absolute bottom-0 left-0 w-24 h-24 bg-electric-cyan/10 rounded-full blur-2xl pointer-events-none" />
+            
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-4 h-4 text-electric-cyan animate-pulse" />
+              <h4 className="text-xs font-bold uppercase tracking-wider text-on-surface">AI Task Generator</h4>
+              <span className="text-[9px] bg-electric-cyan/25 text-electric-cyan px-2 py-0.5 rounded-full font-mono font-semibold">Gemini Powered</span>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-3 items-end">
+              <div className="space-y-1.5">
+                <label className="text-[9px] uppercase tracking-wider font-semibold text-on-surface-variant">Concept / Topic</label>
+                <input 
+                  value={aiTopic}
+                  onChange={e => {
+                    setAiTopic(e.target.value);
+                    if (aiError) setAiError('');
+                  }}
+                  placeholder="e.g., Recursion, CPU Scheduling"
+                  className="w-full bg-surface-container/60 border border-glass-stroke rounded-lg px-3 py-2 text-xs outline-none focus:border-electric-cyan"
+                />
+              </div>
+
+              <div className="space-y-1.5">
+                <label className="text-[9px] uppercase tracking-wider font-semibold text-on-surface-variant">Generation Type</label>
+                <select 
+                  value={aiType}
+                  onChange={e => setAiType(e.target.value)}
+                  className="w-full bg-surface-container/60 border border-glass-stroke rounded-lg px-3 py-2 text-xs outline-none focus:border-electric-cyan"
+                >
+                  <option value="task">General Task</option>
+                  <option value="homework">Homework</option>
+                  <option value="test">Test / Quiz</option>
+                  <option value="study">Study Roadmap</option>
+                </select>
+              </div>
+
+              <div>
+                <button
+                  type="button"
+                  onClick={handleGenerateAI}
+                  disabled={isGenerating}
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-plasma-violet/95 to-electric-cyan/95 text-white text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed shadow-md shadow-electric-cyan/10"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Generating...</span>
+                    </>
+                  ) : (
+                    <>
+                      <Sparkles className="w-3.5 h-3.5" />
+                      <span>Generate with AI</span>
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+
+            {aiError && (
+              <p className="text-[10px] text-red-400 font-medium">{aiError}</p>
+            )}
+            
+            <p className="text-[9px] text-on-surface-variant/80 italic">
+              * Click "Generate with AI" to instantly create and populate the Title and Description fields below.
+            </p>
+          </div>
+
+          <div className="border-t border-glass-stroke my-2" />
+
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="space-y-2">
               <label className="text-[10px] uppercase tracking-widest font-bold text-on-surface-variant">Task Title</label>

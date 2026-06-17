@@ -9,6 +9,7 @@
     "start": "node dist/server.cjs"
   },
   "dependencies": {
+    "@google/genai": "^2.8.0",
     "cors": "^2.8.6",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",

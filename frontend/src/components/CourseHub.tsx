@@ -18,7 +18,7 @@ import { Course, CourseModule, Lesson } from '../types';
 type HubView = 'selection' | 'details' | 'lesson';
 
 export default function CourseHub() {
-  const { profile } = useFirebase();
+  const { profile, loading: firebaseLoading } = useFirebase();
   const [view, setView] = useState<HubView>('selection');
 
   // Selection State
@@ -63,10 +63,10 @@ export default function CourseHub() {
       setLoading(false);
     };
     
-    if (profile) {
+    if (!firebaseLoading) {
       fetchCourses();
     }
-  }, [profile]);
+  }, [profile, firebaseLoading, userClass]);
 
   useEffect(() => {
     if (classes.length === 1 && !selectedClass) {
@@ -157,7 +157,11 @@ export default function CourseHub() {
         <div className="py-32 flex flex-col items-center justify-center text-center opacity-40">
           <GraduationCap className="w-16 h-16 text-on-surface-variant mb-6" />
           <h3 className="text-2xl font-bold text-on-surface mb-2 tracking-tight uppercase italic">Select Academic Grade</h3>
-          <p className="text-sm text-on-surface-variant">Synchronize your cognitive path by selecting a class above.</p>
+          <p className="text-sm text-on-surface-variant">
+            {profile?.role === 'student' && !userClass 
+              ? "No secondary/undergraduate courses are synchronized yet."
+              : "Synchronize your cognitive path by selecting a class above."}
+          </p>
         </div>
       )}
     </div>

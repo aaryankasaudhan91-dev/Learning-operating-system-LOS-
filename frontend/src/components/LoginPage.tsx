@@ -63,19 +63,19 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
     } catch (err: any) {
       console.error('Login error:', err);
       let msg = err.message || 'Authentication sequence failed.';
-      
+
       // Provide actionable feedback on common errors
       if (err.code === 'auth/configuration-not-found' || err.code === 'auth/operation-not-allowed') {
         msg = 'Email/Password Authentication is not enabled in Firebase. Please enable it in the Firebase Console.';
       } else if (
-        err.code === 'auth/invalid-credential' || 
-        err.code === 'auth/wrong-password' || 
+        err.code === 'auth/invalid-credential' ||
+        err.code === 'auth/wrong-password' ||
         err.code === 'auth/user-not-found' ||
         err.code === 'auth/invalid-email'
       ) {
         msg = 'Invalid Cognitive credentials / Secure keys. Verify selection.';
       }
-      
+
       setErrorMessage(msg);
       if (addNotification) {
         addNotification(`Sync Failure info: ${msg.slice(0, 50)}...`);
@@ -86,100 +86,50 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
   };
 
   return (
-    <div className="login-page-root bg-[#f8f9ff] text-[#161b24] min-h-screen w-full flex flex-col justify-center items-center relative overflow-hidden select-none font-sans">
-      {/* Scope-specific custom stylesheet to perfectly render Mockup's styling inside the light container */}
+    <div className="min-h-screen w-full flex items-center justify-center p-5 md:p-[80px] font-sans antialiased text-[#e1e2e7] overflow-x-hidden relative selection:bg-electric-cyan selection:text-void-black">
       <style dangerouslySetInnerHTML={{ __html: `
-        .login-page-root {
-          font-family: 'Geist', sans-serif;
+        .login-body {
+            background-color: #05070a;
+            background-image: radial-gradient(circle at 50% 50%, #001f24 0%, transparent 70%);
+            background-attachment: fixed;
+            background-size: 200vw 200vh;
+            background-position: center;
         }
 
-        .ambient-orb-login {
-          position: absolute;
-          border-radius: 50%;
-          filter: blur(100px);
-          z-index: 1;
-          opacity: 0.4;
-          animation: pulse-slow-login 8s infinite alternate ease-in-out;
-          pointer-events: none;
-        }
-
-        .orb-cyan-login {
-          background-color: #cbdbf5;
-          width: 40vw;
-          height: 40vw;
-          top: 10%;
-          left: 5%;
-        }
-
-        .orb-violet-login {
-          background-color: #f4d9ff;
-          width: 50vw;
-          height: 50vw;
-          bottom: -10%;
-          right: -10%;
-        }
-
-        @keyframes pulse-slow-login {
-          0% { transform: scale(1) translate(0, 0); opacity: 0.2; }
-          100% { transform: scale(1.1) translate(20px, -20px); opacity: 0.5; }
-        }
-
-        /* Glassmorphism Classes */
         .glass-panel-login {
-          background: rgba(255, 255, 255, 0.7);
-          backdrop-filter: blur(24px);
-          -webkit-backdrop-filter: blur(24px);
-          border: 1px solid rgba(0, 0, 0, 0.08);
-          box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.04);
+            background: rgba(255, 255, 255, 0.03);
+            backdrop-filter: blur(24px);
+            -webkit-backdrop-filter: blur(24px);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
         }
 
-        /* Form Inputs */
-        .ethereal-input-login {
-          background: rgba(255, 255, 255, 0.5);
-          border: none;
-          border-bottom: 2px solid #c0c7d5;
-          transition: all 0.3s ease;
+        .ambient-glow-cyan {
+            box-shadow: 0 0 40px rgba(0, 229, 255, 0.25);
         }
         
-        .ethereal-input-login:focus {
-          outline: none;
-          border-bottom-color: #0f5fb2;
-          box-shadow: 0 10px 20px -10px rgba(15, 95, 178, 0.15);
-          background: rgba(255, 255, 255, 0.8);
+        .ambient-glow-cyan-active:active {
+            box-shadow: 0 0 60px rgba(0, 229, 255, 0.4);
+            transform: scale(0.98);
         }
 
-        /* Buttons */
-        .btn-primary-glow-login {
-          background: #0f5fb2;
-          color: #ffffff;
-          box-shadow: 0 4px 14px rgba(15, 95, 178, 0.3);
-          transition: all 0.3s ease;
-        }
-        
-        .btn-primary-glow-login:hover {
-          box-shadow: 0 6px 20px rgba(15, 95, 178, 0.4);
-          transform: scale(1.02);
-          background: #004789;
-        }
-        
-        .btn-ghost-glass-login {
-          background: rgba(255, 255, 255, 0.5);
-          border: 1px solid #c0c7d5;
-          backdrop-filter: blur(10px);
-          transition: all 0.3s ease;
-          color: #161b24;
-        }
-        
-        .btn-ghost-glass-login:hover {
-          background: rgba(255, 255, 255, 0.8);
-          border-color: #717784;
-          transform: scale(1.02);
+        .glass-input-login {
+            background: rgba(0, 0, 0, 0.2);
+            border: none;
+            border-bottom: 1px solid #3b494c;
+            transition: all 0.3s ease;
         }
 
-        /* Active Tab Underline */
+        .glass-input-login:focus {
+            outline: none;
+            border-bottom-color: #00e5ff;
+            box-shadow: 0 4px 20px -10px rgba(0, 229, 255, 0.4);
+        }
+        
         .tab-active-login {
           position: relative;
-          color: #0f5fb2;
+          color: #00e5ff;
+          text-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
         }
         
         .tab-active-login::after {
@@ -189,25 +139,27 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
           left: 0;
           width: 100%;
           height: 2px;
-          background: #0f5fb2;
-          box-shadow: 0 0 10px rgba(15, 95, 178, 0.3);
+          background: #00e5ff;
+          box-shadow: 0 0 10px rgba(0, 229, 255, 0.5);
         }
+
+        .font-geist { font-family: 'Geist', sans-serif; }
       ` }} />
+      <div className="absolute inset-0 login-body -z-10" />
 
       {/* Interactive Background Particle Canvas */}
-      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none" />
-
-      {/* Ambient Radial Glows */}
-      <div className="ambient-orb-login orb-cyan-login" />
-      <div className="ambient-orb-login orb-violet-login" />
+      <canvas ref={canvasRef} className="fixed top-0 left-0 w-full h-full z-0 pointer-events-none opacity-30" />
 
       {/* Main Container */}
-      <main className="w-full max-w-md px-5 md:px-0 z-10 flex flex-col items-center">
-        
+      <main className="w-full max-w-md relative z-10 flex flex-col items-center">
+
         {/* Brand Header */}
-        <header className="mb-8 text-center flex flex-col items-center gap-2">
-          <AppLogo className="w-16 h-16 sm:w-20 sm:h-20 mb-4" />
-          <p className="font-mono text-xs text-[#414753] tracking-widest uppercase font-semibold mt-2">
+        <header className="mb-10 text-center font-geist flex flex-col items-center gap-2">
+          <AppLogo className="w-20 h-20 sm:w-24 sm:h-24 mb-4" showText={false} />
+          <h1 className="text-4xl md:text-5xl font-extrabold mb-2 tracking-tight text-white drop-shadow-[0_0_15px_rgba(255,255,255,0.3)]">
+            LOS
+          </h1>
+          <p className="font-mono text-xs text-[#bac9cc] tracking-[0.2em] uppercase font-semibold mt-1">
             Cognitive Sync Protocol Active
           </p>
         </header>
@@ -215,48 +167,46 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
         {/* Glassmorphic Login Card */}
         <div className="glass-panel-login w-full rounded-2xl p-8 relative overflow-hidden group">
           {/* Subtle internal glow highlight */}
-          <div className="absolute -top-20 -right-20 w-40 h-40 bg-white/40 rounded-full blur-3xl group-hover:bg-white/60 transition-all duration-700"></div>
+          <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-electric-cyan rounded-full mix-blend-screen filter blur-[100px] opacity-20 group-hover:opacity-30 transition-opacity duration-700 pointer-events-none"></div>
 
           {/* Role Selector Tabs */}
-          <div className="flex border-b border-[rgba(0,0,0,0.1)] mb-8 pb-2">
+          <div className="flex border-b border-[rgba(255,255,255,0.1)] mb-8 pb-2 font-geist">
             <button
               type="button"
               onClick={() => setActiveTab('student')}
-              className={`flex-1 text-sm md:text-base font-semibold text-center py-2 transition-colors ${
-                activeTab === 'student'
-                  ? 'tab-active-login'
-                  : 'text-[#414753] hover:text-[#161b24]'
-              }`}
+              className={`flex-1 text-sm md:text-base font-semibold text-center py-2 transition-colors ${activeTab === 'student'
+                ? 'tab-active-login'
+                : 'text-[#bac9cc] hover:text-white'
+                }`}
             >
               Student Login
             </button>
             <button
               type="button"
               onClick={() => setActiveTab('mentor')}
-              className={`flex-1 text-sm md:text-base font-semibold text-center py-2 transition-colors ${
-                activeTab === 'mentor'
-                  ? 'tab-active-login'
-                  : 'text-[#414753] hover:text-[#161b24]'
-              }`}
+              className={`flex-1 text-sm md:text-base font-semibold text-center py-2 transition-colors ${activeTab === 'mentor'
+                ? 'tab-active-login'
+                : 'text-[#bac9cc] hover:text-white'
+                }`}
             >
               Educator Portal
             </button>
           </div>
 
           {/* Login Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6">
-            
+          <form onSubmit={handleSubmit} className="flex flex-col gap-6 font-geist relative z-10">
+
             {errorMessage && (
-              <div id="login-error-alert" className="p-3 rounded-lg bg-red-50/90 border border-red-200 text-red-700 font-medium text-xs flex items-center gap-2">
-                <span className="material-symbols-outlined text-sm flex-shrink-0 text-red-500">report_gmailerrorred</span>
+              <div id="login-error-alert" className="p-3 rounded-lg bg-red-900/40 border border-red-500/50 text-red-200 font-medium text-xs flex items-center gap-2 animate-[fadeIn_0.2s_ease-out]">
+                <span className="material-symbols-outlined text-sm flex-shrink-0">report</span>
                 <span>{errorMessage}</span>
               </div>
             )}
-            
+
             {/* Cognitive ID */}
             <div className="flex flex-col gap-2">
-              <label 
-                className="font-mono text-xs text-[#161b24] font-semibold flex items-center gap-2" 
+              <label
+                className="font-mono text-xs text-[#bac9cc] font-semibold flex items-center gap-2 tracking-wide"
                 htmlFor="cognitive-id"
               >
                 <span className="material-symbols-outlined text-sm">fingerprint</span>
@@ -269,15 +219,15 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
                 value={cognitiveId}
                 onChange={(e) => setCognitiveId(e.target.value)}
                 placeholder="Enter identifier..."
-                className="ethereal-input-login w-full px-4 py-3 rounded-t-lg text-[#161b24] text-base focus:ring-0 placeholder:text-[#cbd5e1] border-none"
+                className="glass-input-login w-full px-4 py-3 rounded-t-lg text-white text-base placeholder-[#bac9cc]/50 focus:ring-0"
               />
             </div>
 
             {/* Secure Sync Key */}
             <div className="flex flex-col gap-2">
               <div className="flex justify-between items-center">
-                <label 
-                  className="font-mono text-xs text-[#161b24] font-semibold flex items-center gap-2" 
+                <label
+                  className="font-mono text-xs text-[#bac9cc] font-semibold flex items-center gap-2 tracking-wide"
                   htmlFor="secure-sync"
                 >
                   <span className="material-symbols-outlined text-sm">lock</span>
@@ -286,7 +236,7 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
                 <button
                   type="button"
                   onClick={() => alert('Secure reset link dispatched to authorized cognitive address.')}
-                  className="text-xs text-[#0f5fb2] hover:text-[#004789] transition-colors"
+                  className="text-xs text-electric-cyan hover:text-white transition-colors tracking-wide"
                 >
                   Reset Link
                 </button>
@@ -298,38 +248,38 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
                 value={secureSync}
                 onChange={(e) => setSecureSync(e.target.value)}
                 placeholder="••••••••"
-                className="ethereal-input-login w-full px-4 py-3 rounded-t-lg text-[#161b24] text-base focus:ring-0 placeholder:text-[#cbd5e1] border-none"
+                className="glass-input-login w-full px-4 py-3 rounded-t-lg text-white text-base placeholder-[#bac9cc]/50 focus:ring-0"
               />
-             </div>
+            </div>
 
             {/* Actions */}
-            <div className="pt-4 flex flex-col gap-4">
-              <button 
+            <div className="pt-6 flex flex-col gap-4">
+              <button
                 type="submit"
                 disabled={loading}
-                className="btn-primary-glow-login w-full py-4 rounded-xl text-base font-semibold flex items-center justify-center gap-2 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black text-sm font-bold uppercase tracking-widest ambient-glow-cyan ambient-glow-cyan-active transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
               >
                 <span>{loading ? 'Synchronizing Protocols...' : 'Initialize Sync'}</span>
                 {loading ? (
-                  <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                  <span className="material-symbols-outlined text-sm animate-spin">sync</span>
                 ) : (
-                  <span className="material-symbols-outlined">arrow_forward</span>
+                  <span className="material-symbols-outlined text-sm">arrow_forward</span>
                 )}
               </button>
 
-              <div className="relative flex py-2 items-center">
-                <div className="flex-grow border-t border-[rgba(0,0,0,0.1)]"></div>
-                <span className="flex-shrink-0 mx-4 text-[#414753] font-mono text-xs font-semibold">OR</span>
-                <div className="flex-grow border-t border-[rgba(0,0,0,0.1)]"></div>
+              <div className="relative flex py-2 items-center opacity-50">
+                <div className="flex-grow border-t border-[rgba(255,255,255,0.1)]"></div>
+                <span className="flex-shrink-0 mx-4 text-[#bac9cc] font-mono text-[10px] uppercase tracking-widest font-semibold">Or New Identity</span>
+                <div className="flex-grow border-t border-[rgba(255,255,255,0.1)]"></div>
               </div>
 
               <button
                 type="button"
                 onClick={() => setView('register')}
-                className="btn-ghost-glass-login w-full py-4 rounded-xl text-base font-semibold flex items-center justify-center gap-2 group"
+                className="w-full py-4 rounded-full bg-transparent border border-glass-stroke backdrop-blur-md text-[#bac9cc] text-sm font-bold uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/5 hover:border-electric-cyan hover:text-white hover:scale-[1.02] active:scale-95 transition-all group"
               >
                 <span>Create Signature</span>
-                <span className="material-symbols-outlined group-hover:translate-x-1 transition-transform">how_to_reg</span>
+                <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">how_to_reg</span>
               </button>
             </div>
           </form>
@@ -337,23 +287,21 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
       </main>
 
       {/* Minimalist Footer */}
-      <footer className="fixed bottom-0 w-full p-6 flex justify-center items-center gap-6 z-10 text-xs text-[#414753]">
+      <footer className="fixed bottom-0 w-full p-6 flex justify-center items-center gap-6 z-10 text-[10px] uppercase tracking-widest text-[#bac9cc] font-mono opacity-60">
         <button
           type="button"
           onClick={() => alert('Access governed by Cognitive Sync Protocol. Dynamic auditing active.')}
-          className="hover:text-[#0f5fb2] transition-colors flex items-center gap-1 font-semibold"
+          className="hover:text-electric-cyan transition-colors"
         >
-          <span className="material-symbols-outlined text-[14px]">policy</span>
-          Privacy Protocol
+          Protocol Terms
         </button>
-        <span className="text-gray-300">|</span>
+        <span className="text-[rgba(255,255,255,0.1)]">|</span>
         <button
           type="button"
           onClick={() => alert('Neural connection normal. Operational latency: 14ms')}
-          className="hover:text-[#0f5fb2] transition-colors flex items-center gap-1 font-semibold"
+          className="hover:text-electric-cyan transition-colors"
         >
-          <span className="material-symbols-outlined text-[14px]">support_agent</span>
-          Neural Support
+          System Status
         </button>
       </footer>
     </div>

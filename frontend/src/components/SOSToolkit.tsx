@@ -65,6 +65,66 @@ export default function SOSToolkit({
     { sender: 'mentor', text: 'Hello explorer. I observe a load surge in your cognitive metrics. Take a breath. I am details here. What is occurring on your screen?' }
   ]);
   const [userInputField, setUserInputField] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
+
+  const sendToAI = async (history: typeof chatLog) => {
+    setIsTyping(true);
+    let streamStarted = false;
+
+    try {
+      const response = await fetch('/api/agent/sos-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatHistory: history })
+      });
+      
+      if (!response.ok) {
+        const fallbacks = [
+          "I hear you. Take a slow, deep breath. Focus on the rhythm of your breathing.",
+          "It's completely normal to feel overwhelmed when tackling complex concepts. Let's break this down.",
+          "Your cognitive load is high, but you are capable. Try stepping back for a moment and returning with fresh eyes.",
+          "Let's reset. Close your eyes for 10 seconds and visualize a calm, quiet space."
+        ];
+        setChatLog(prev => [...prev, { sender: 'mentor', text: fallbacks[Math.floor(Math.random() * fallbacks.length)] }]);
+        return;
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          
+          if (!streamStarted) {
+            streamStarted = true;
+            setIsTyping(false); // Hide the loading dots
+            setChatLog(prev => [...prev, { sender: 'mentor', text: chunk }]);
+          } else {
+            setChatLog(prev => {
+              const newLog = [...prev];
+              const lastItem = newLog[newLog.length - 1];
+              newLog[newLog.length - 1] = { ...lastItem, text: lastItem.text + chunk };
+              return newLog;
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      const fallbacks = [
+        "I hear you. Take a slow, deep breath. Focus on the rhythm of your breathing.",
+        "It's completely normal to feel overwhelmed when tackling complex concepts. Let's break this down.",
+        "Your cognitive load is high, but you are capable. Try stepping back for a moment and returning with fresh eyes.",
+        "Let's reset. Close your eyes for 10 seconds and visualize a calm, quiet space."
+      ];
+      setChatLog(prev => [...prev, { sender: 'mentor', text: fallbacks[Math.floor(Math.random() * fallbacks.length)] }]);
+    } finally {
+      setIsTyping(false);
+    }
+  };
 
   const chatOptions = [
     "I am feeling extremely overwhelmed by this syntax errors.",
@@ -73,32 +133,18 @@ export default function SOSToolkit({
   ];
 
   const handleSelectPrewrittenChat = (phrase: string) => {
-    setChatLog(prev => [...prev, { sender: 'user', text: phrase }]);
-    
-    // Mentor answers simulating supportive guidance
-    let reply = "Deep breaths. Complexity is just information layered together too quickly. Tap the Breathing bubble above to box-breathe for 1 minute. I have requested our Bhashini Translation system to prioritize simplified code schemas.";
-    if (phrase.includes("focus")) {
-      reply = "A shattered focus is normal. The synaptic pathway is simply over-saturated. Toggle the 'Reduce Study Workload' slider below to set our system into 'Low Density' study pacing. This frees up temporary working memory.";
-    }
-
-    setTimeout(() => {
-      setChatLog(prev => [...prev, { sender: 'mentor', text: reply }]);
-    }, 800);
+    const newLog: { sender: 'user' | 'mentor'; text: string }[] = [...chatLog, { sender: 'user', text: phrase }];
+    setChatLog(newLog);
+    sendToAI(newLog);
   };
 
   const handleCustomSend = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!userInputField.trim()) return;
-    const msg = userInputField;
-    setChatLog(prev => [...prev, { sender: 'user', text: msg }]);
+    if (!userInputField.trim() || isTyping) return;
+    const newLog: { sender: 'user' | 'mentor'; text: string }[] = [...chatLog, { sender: 'user', text: userInputField }];
+    setChatLog(newLog);
     setUserInputField('');
-
-    setTimeout(() => {
-      setChatLog(prev => [...prev, { 
-        sender: 'mentor', 
-        text: "I am hear you. Keep breathing calmly. You are in a safe space. Click 'Adjust Workload Density' down below to clear visual items from the primary Cognitive Map view, then proceed in low-density format." 
-      }]);
-    }, 800);
+    sendToAI(newLog);
   };
 
   // Adjust workload handler
@@ -294,6 +340,15 @@ export default function SOSToolkit({
                 </div>
               </div>
             ))}
+            {isTyping && (
+              <div className="flex max-w-[85%]">
+                <div className="p-3.5 rounded-2xl text-xs leading-relaxed bg-surface-container border border-glass-stroke text-on-surface rounded-tl-none font-sans flex items-center gap-1.5 h-10">
+                  <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse"></span>
+                  <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse delay-150"></span>
+                  <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse delay-300"></span>
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Standard user input form + clickable quick feelings prompts */}

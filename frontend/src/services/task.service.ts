@@ -27,19 +27,17 @@ export const taskService = {
    * Subscribe to tasks using polling
    */
   subscribeToStudentTasks(uid: string, email: string, name: string, callback: (tasks: HomeworkTask[]) => void) {
-    let isSubscribed = true;
-    
     const poll = async () => {
-      if (!isSubscribed) return;
       const tasks = await this.getStudentTasks(uid, email, name);
-      if (isSubscribed) callback(tasks);
-      setTimeout(poll, 5000);
+      callback(tasks);
     };
 
     poll();
 
+    const intervalId = setInterval(poll, 5000);
+
     return () => {
-      isSubscribed = false;
+      clearInterval(intervalId);
     };
   },
 

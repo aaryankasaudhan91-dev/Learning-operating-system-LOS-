@@ -42,6 +42,39 @@ export default function InsightsHub({
   const [deployedHistory, setDeployedHistory] = useState<string[]>([]);
   const [activeTab, setActiveTab] = useState<'matrix' | 'tasks' | 'heatmap'>('matrix');
   const [recordingStudentId, setRecordingStudentId] = useState<string | null>(null);
+  const [isGeneratingPrompt, setIsGeneratingPrompt] = useState(false);
+
+  const handleAutoGeneratePrompt = async () => {
+    setIsGeneratingPrompt(true);
+    try {
+      const response = await fetch('/api/agent/insights-prompt', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cohort: selectedCohort })
+      });
+      const data = await response.json();
+      const fallbacks = [
+        "How are you connecting today's topics to real-world applications?",
+        "What was the most challenging friction point you encountered, and how did you resolve it?",
+        "Reflect on your focus levels today. What strategies helped you stay in the flow state?"
+      ];
+      if (data.prompt) {
+        setPromptPayload(data.prompt);
+      } else {
+        setPromptPayload(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+      }
+    } catch (err) {
+      console.error(err);
+      const fallbacks = [
+        "How are you connecting today's topics to real-world applications?",
+        "What was the most challenging friction point you encountered, and how did you resolve it?",
+        "Reflect on your focus levels today. What strategies helped you stay in the flow state?"
+      ];
+      setPromptPayload(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+    } finally {
+      setIsGeneratingPrompt(false);
+    }
+  };
 
   // PDF Report Generator
   const handleDownloadReport = (student: StudentSeat) => {
@@ -127,25 +160,45 @@ export default function InsightsHub({
   ];
 
   // Deploy Metacognitive Prompt Handler
-  const handleDeployPrompt = (e: React.FormEvent) => {
+  const handleDeployPrompt = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!promptPayload.trim()) {
       alert("Please write a prompt payload before deploying.");
       return;
     }
-    addNotification(`Deployed Prompt safely list: "${promptPayload}" to target: "${selectedCohort}"`);
-    setDeployedHistory(prev => [promptPayload, ...prev]);
-    
-    // Reduce student stress slightly when a supporting prompt is deployed!
-    setSeats(prev => prev.map(seat => {
-      if (seat.load > 70) {
-        return { ...seat, load: Math.max(seat.load - 10, 45) };
-      }
-      return seat;
-    }));
 
-    setPromptPayload('');
-    alert(`Success! Prompt deployed to all student canvases. Responsive feedback monitored.`);
+    try {
+      const response = await fetch('/api/prompts/broadcast', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          text: promptPayload,
+          cohort: selectedCohort,
+          mentorId: 'mentor'
+        })
+      });
+
+      if (!response.ok) {
+        throw new Error('Deployment request failed.');
+      }
+
+      addNotification(`Deployed Prompt safely list: "${promptPayload}" to target: "${selectedCohort}"`);
+      setDeployedHistory(prev => [promptPayload, ...prev]);
+      
+      // Reduce student stress slightly when a supporting prompt is deployed!
+      setSeats(prev => prev.map(seat => {
+        if (seat.load > 70) {
+          return { ...seat, load: Math.max(seat.load - 10, 45) };
+        }
+        return seat;
+      }));
+
+      setPromptPayload('');
+      alert(`Success! Prompt deployed to all student canvases. Responsive feedback monitored.`);
+    } catch (err: any) {
+      console.error(err);
+      alert(`Error broadcasting prompt: ${err.message}`);
+    }
   };
 
   // Intervention Alert Triggers
@@ -527,6 +580,18 @@ export default function InsightsHub({
                 {deployedHistory.length > 0 ? `${deployedHistory.length} Prompt(s) Active` : 'No active drafts'}
               </span>
               <div className="flex gap-2">
+                <button 
+                  type="button" 
+                  onClick={handleAutoGeneratePrompt}
+                  disabled={isGeneratingPrompt}
+                  className="px-5 py-2 rounded-full border border-electric-cyan text-electric-cyan text-xs font-bold hover:bg-electric-cyan/10 transition-all flex items-center gap-1.5"
+                >
+                  {isGeneratingPrompt ? (
+                    <><span className="w-3 h-3 border-2 border-electric-cyan border-t-transparent rounded-full animate-spin"></span> Generating...</>
+                  ) : (
+                    <><BrainCircuit className="w-3.5 h-3.5" /> Auto-Generate via AI</>
+                  )}
+                </button>
                 <button 
                   type="button" 
                   onClick={() => alert(`Saved Draft Payload safely inside offline buffer.`)}

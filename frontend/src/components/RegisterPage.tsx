@@ -24,6 +24,7 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
   const [designation, setDesignation] = useState('');
   const [comms, setComms] = useState('');
   const [encryption, setEncryption] = useState('');
+  const [teacherEmail, setTeacherEmail] = useState('');
 
   // Academic States
   const [academicLevel, setAcademicLevel] = useState<'primary' | 'secondary' | 'high_secondary' | 'undergraduate' | ''>('');
@@ -59,6 +60,27 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
 
     try {
       const activeTab = selectedRole === 'Mentor' ? 'mentor' : 'student';
+
+      // Validate teacher email exists in DB for students
+      if (activeTab === 'student') {
+        if (!teacherEmail.trim()) {
+          throw new Error("Teacher's Email is required for registration.");
+        }
+        
+        try {
+          const checkResponse = await fetch(`/api/users?role=mentor&email=${encodeURIComponent(teacherEmail.trim())}`);
+          if (!checkResponse.ok) {
+            throw new Error("Unable to contact verification service. Please try again.");
+          }
+          const mentors = await checkResponse.json();
+          if (!Array.isArray(mentors) || mentors.length === 0) {
+            throw new Error(`Teacher email "${teacherEmail.trim()}" is not registered in the system. Please input a valid mentor email.`);
+          }
+        } catch (valErr: any) {
+          throw new Error(valErr.message || "Teacher email verification failed.");
+        }
+      }
+
       const userCredential = await authService.register(comms, encryption);
       const user = userCredential.user;
 
@@ -80,6 +102,7 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
         lastFocusDate: undefined,
         dailyFocusGoal: 120, // 2 hours default
         todayFocusMinutes: 0,
+        teacherEmail: selectedRole === 'Learner' ? teacherEmail || undefined : undefined,
         academicInfo: selectedRole === 'Learner' ? {
           level: academicLevel as any,
           className: className || undefined,
@@ -337,6 +360,18 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
               </div>
 
               <form className="space-y-6 mt-8 w-full max-w-md mx-auto" onSubmit={handleCompleteRegistration}>
+                <div className="space-y-2">
+                  <label className="font-mono text-data-mono text-[#bac9cc] block">Teacher's Email Address (Required)</label>
+                  <input 
+                    className="glass-input-reg w-full px-4 py-3 text-white text-body-md"
+                    placeholder="mentor@synapse.edu" 
+                    required 
+                    type="email"
+                    value={teacherEmail}
+                    onChange={(e) => setTeacherEmail(e.target.value)}
+                  />
+                </div>
+
                 <div className="space-y-2">
                   <label className="font-mono text-data-mono text-[#bac9cc] block">Primary Level</label>
                   <select 

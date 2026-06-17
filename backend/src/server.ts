@@ -4,12 +4,15 @@ import express from "express";
 import path from "path";
 import mongoose from "mongoose";
 import cors from "cors";
+import { GoogleGenAI } from "@google/genai";
+import { setupAgentRoutes } from "./agents";
 
 // Models
 const userSchema = new mongoose.Schema({
   uid: { type: String, required: true, unique: true },
   name: String,
   role: { type: String, enum: ['student', 'mentor'], required: true },
+  teacherEmail: String,
   dailyFocusGoal: { type: Number, default: 120 },
   todayFocusMinutes: { type: Number, default: 0 },
   taskCompletionRate: { type: Number, default: 0 },
@@ -74,12 +77,31 @@ const lessonSchema = new mongoose.Schema({
 }, { strict: false });
 export const LessonModel = mongoose.model('Lesson', lessonSchema);
 
+const promptSchema = new mongoose.Schema({
+  id: { type: String, required: true, unique: true },
+  mentorId: String,
+  text: { type: String, required: true },
+  cohort: String,
+  createdAt: { type: Date, default: Date.now }
+});
+export const PromptModel = mongoose.model('BroadcastPrompt', promptSchema);
+
 async function startServer() {
   const app = express();
   const PORT = 3000;
 
   app.use(cors());
   app.use(express.json());
+
+  // Initialize Gemini AI Client
+  const geminiApiKey = process.env.GEMINI_API_KEY;
+  let ai: GoogleGenAI | null = null;
+  if (geminiApiKey) {
+    ai = new GoogleGenAI({ apiKey: geminiApiKey });
+    console.log("Google Gen AI client initialized.");
+  } else {
+    console.warn("GEMINI_API_KEY is missing. AI Agent features will fail.");
+  }
 
   // Connect to MongoDB
   const mongoURI = process.env.MONGODB_URI;
@@ -99,6 +121,19 @@ async function startServer() {
   // --- API Routes ---
 
   // Users
+  app.get("/api/users", async (req, res) => {
+    try {
+      const query: any = {};
+      if (req.query.role) query.role = req.query.role;
+      if (req.query.email) query.email = req.query.email;
+      if (req.query.teacherEmail) query.teacherEmail = req.query.teacherEmail;
+      const users = await UserProfileModel.find(query);
+      res.json(users);
+    } catch (err) {
+      console.error("Error in /api/users:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  });
   app.get("/api/users/:uid", async (req, res) => {
     try {
       const user = await UserProfileModel.findOne({ uid: req.params.uid });
@@ -112,6 +147,9 @@ async function startServer() {
     }
   });
 
+  // --- AI Agent Routes ---
+  setupAgentRoutes(app, ai);
+
   app.post("/api/users/:uid", async (req, res) => {
     try {
       const user = await UserProfileModel.findOneAndUpdate(
@@ -122,6 +160,37 @@ async function startServer() {
       res.json(user);
     } catch (err) {
       console.error("Error in POST /api/users/:uid:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  // Prompts / Broadcasts
+  app.post("/api/prompts/broadcast", async (req, res) => {
+    try {
+      const { text, cohort, mentorId } = req.body;
+      if (!text) {
+        return res.status(400).json({ error: "Prompt text is required" });
+      }
+      const newPrompt = new PromptModel({
+        id: new mongoose.Types.ObjectId().toString(),
+        mentorId: mentorId || "system",
+        text,
+        cohort: cohort || "All Students"
+      });
+      await newPrompt.save();
+      res.json({ success: true, prompt: newPrompt });
+    } catch (err) {
+      console.error("Error in POST /api/prompts/broadcast:", err);
+      res.status(500).json({ error: "Server error" });
+    }
+  });
+
+  app.get("/api/prompts/latest", async (req, res) => {
+    try {
+      const latestPrompt = await PromptModel.findOne().sort({ createdAt: -1 });
+      res.json(latestPrompt || null);
+    } catch (err) {
+      console.error("Error in GET /api/prompts/latest:", err);
       res.status(500).json({ error: "Server error" });
     }
   });

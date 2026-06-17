@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   AlertTriangle, Heart, Coffee, MessageCircle, 
@@ -12,7 +12,56 @@ interface InterventionCenterProps {
 }
 
 export default function InterventionCenter({ students, onAction }: InterventionCenterProps) {
-  const atRiskStudents = students.filter(s => s.state === 'friction' || s.state === 'low_motivation' || s.load > 85);
+  const atRiskStudents = useMemo(() => {
+    return students.filter(s => s.state === 'friction' || s.state === 'low_motivation' || s.load > 85);
+  }, [students]);
+  
+  const [suggestions, setSuggestions] = useState<Record<string, string>>({});
+  const [loadingSuggestions, setLoadingSuggestions] = useState<Record<string, boolean>>({});
+  const fetchedIdsRef = useRef<Set<string>>(new Set());
+
+  useEffect(() => {
+    atRiskStudents.forEach(student => {
+      if (!fetchedIdsRef.current.has(student.id) && !suggestions[student.id] && !loadingSuggestions[student.id]) {
+        fetchedIdsRef.current.add(student.id);
+        fetchSuggestion(student);
+      }
+    });
+  }, [atRiskStudents]);
+
+  const fetchSuggestion = async (student: StudentSeat) => {
+    setLoadingSuggestions(prev => ({ ...prev, [student.id]: true }));
+    try {
+      const response = await fetch('/api/agent/intervention-suggestion', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ name: student.name, state: student.state, load: student.load })
+      });
+      const data = await response.json();
+      const fallbacks = [
+        "Suggest a 3-minute box breathing session.",
+        "Recommend switching to 'Low Density' visual mode.",
+        "Prompt a brief stand-up-and-stretch break.",
+        "Review fundamental concepts to rebuild confidence."
+      ];
+      if (data.suggestion) {
+        setSuggestions(prev => ({ ...prev, [student.id]: data.suggestion }));
+      } else {
+        setSuggestions(prev => ({ ...prev, [student.id]: fallbacks[Math.floor(Math.random() * fallbacks.length)] }));
+      }
+    } catch (err) {
+      console.error(err);
+      const fallbacks = [
+        "Suggest a 3-minute box breathing session.",
+        "Recommend switching to 'Low Density' visual mode.",
+        "Prompt a brief stand-up-and-stretch break.",
+        "Review fundamental concepts to rebuild confidence."
+      ];
+      setSuggestions(prev => ({ ...prev, [student.id]: fallbacks[Math.floor(Math.random() * fallbacks.length)] }));
+    } finally {
+      setLoadingSuggestions(prev => ({ ...prev, [student.id]: false }));
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -86,8 +135,10 @@ export default function InterventionCenter({ students, onAction }: InterventionC
               </div>
 
               <div className="mt-3 pt-3 border-t border-glass-stroke flex items-center justify-between opacity-0 group-hover:opacity-100 transition-opacity">
-                <p className="text-[9px] text-on-surface-variant italic">Suggestion: Logic-flow module re-engagement</p>
-                <ChevronRight className="w-3 h-3 text-on-surface-variant" />
+                <p className="text-[9px] text-on-surface-variant italic">
+                  Suggestion: {loadingSuggestions[student.id] ? "Synthesizing AI Intervention..." : suggestions[student.id] || "Logic-flow module re-engagement"}
+                </p>
+                <ChevronRight className="w-3 h-3 text-on-surface-variant flex-shrink-0" />
               </div>
             </motion.div>
           ))}
@@ -98,7 +149,7 @@ export default function InterventionCenter({ students, onAction }: InterventionC
             <div className="w-16 h-16 rounded-full bg-synapse-green/10 flex items-center justify-center mb-4">
               <Zap className="w-8 h-8 text-synapse-green animate-pulse" />
             </div>
-            <p className="text-sm font-bold text-on-surface">Neural Stability Maintained</p>
+            <p className="text-sm font-bold text-on-surface">✅ All students are in a healthy cognitive state.</p>
             <p className="text-[10px] font-mono text-on-surface-variant uppercase mt-1 tracking-widest">0 Critical Alarms in Cohort</p>
           </div>
         )}

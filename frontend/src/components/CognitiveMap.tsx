@@ -3,12 +3,13 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
   ZoomIn, ZoomOut, Database, Code, Network, Lock, HelpCircle, 
   BrainCircuit, LayoutGrid, Check, Play, Pause, Plus, AlertCircle,
-  ClipboardCheck, Flame, Shield, Trophy, Smile, Bell, SplitSquareHorizontal, Users, Map, BatteryLow, Clock, Zap
+  ClipboardCheck, Flame, Shield, Trophy, Smile, Bell, SplitSquareHorizontal, Users, Map, BatteryLow, Clock, Zap,
+  Radio, X
 } from 'lucide-react';
 import { useFirebase } from './FirebaseProvider';
 
@@ -115,8 +116,29 @@ export default function CognitiveMap({
   // New states for Features
   const [moodModalOpen, setMoodModalOpen] = useState(true);
   const [spacedRepetitionPrompt, setSpacedRepetitionPrompt] = useState(true);
-  const [lowMotivationMode, setLowMotivationMode] = useState(false);
   const [foggPrompt, setFoggPrompt] = useState(true);
+  const [activeBroadcastPrompt, setActiveBroadcastPrompt] = useState<string | null>(null);
+  const [lowMotivationMode, setLowMotivationMode] = useState(false);
+
+  useEffect(() => {
+    const fetchLatestPrompt = async () => {
+      try {
+        const response = await fetch('/api/prompts/latest');
+        if (response.ok) {
+          const data = await response.json();
+          if (data && data.text) {
+            setActiveBroadcastPrompt(data.text);
+          }
+        }
+      } catch (err) {
+        console.error("Error fetching latest broadcast prompt:", err);
+      }
+    };
+    fetchLatestPrompt();
+    // Poll every 10 seconds to keep it updated dynamically
+    const interval = setInterval(fetchLatestPrompt, 10000);
+    return () => clearInterval(interval);
+  }, []);
 
   // Node helper coordinates (with scale)
   const baseNodes = [
@@ -168,7 +190,26 @@ export default function CognitiveMap({
   };
 
   return (
-    <div className="flex flex-col xl:flex-row gap-6 h-full min-h-[85vh] select-none">
+    <div className="flex flex-col xl:flex-row gap-6 h-full min-h-[85vh] select-none relative">
+      
+      {/* Mentor Broadcasted Metacognitive Prompt */}
+      {activeBroadcastPrompt && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-void-black/95 border border-plasma-violet/60 text-white px-6 py-4 rounded-2xl flex flex-col gap-2 max-w-md shadow-[0_0_20px_rgba(112,0,255,0.3)] backdrop-blur-md animate-[fadeIn_0.3s_ease-out]">
+          <div className="flex items-center gap-2 text-plasma-violet">
+            <Radio className="w-4 h-4 text-plasma-violet animate-pulse" />
+            <span className="font-mono text-[10px] uppercase tracking-widest font-extrabold">Cohort Broadcast Nudge</span>
+          </div>
+          <p className="text-sm font-sans font-medium text-on-surface leading-relaxed pr-6">
+            "{activeBroadcastPrompt}"
+          </p>
+          <button 
+            onClick={() => setActiveBroadcastPrompt(null)} 
+            className="absolute top-3 right-3 text-on-surface-variant hover:text-white p-1 rounded-full hover:bg-white/5 transition-colors"
+          >
+            <X className="w-4.5 h-4.5" />
+          </button>
+        </div>
+      )}
       
       {/* Feature 2: Emotional State and Mood Check-Ins */}
       {moodModalOpen && (
@@ -610,19 +651,14 @@ export default function CognitiveMap({
             {/* AUDIO NOTES FROM MENTOR */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke">
               <AudioNotes 
-                notes={[
-                  { id: '1', studentId: 'current', mentorName: 'Dr. Synapse', audioUrl: '#', duration: '0:45', timestamp: '2h ago' }
-                ]} 
+                notes={[]} 
               />
             </div>
 
             {/* PEER INSIGHT SYSTEM */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke">
               <PeerInsight 
-                receivedFeedback={[
-                  { id: '1', toUserId: 'cur', message: 'Your logic flow on the last module was incredible!', badgeType: 'logic', isAnonymized: true, timestamp: '1h ago' },
-                  { id: '2', toUserId: 'cur', message: 'Keep pushing! We are all in this cohort together.', badgeType: 'helpful', isAnonymized: true, timestamp: '3h ago' }
-                ]}
+                receivedFeedback={[]}
                 sendToUserId="random"
                 onSend={(msg, type) => alert(`Anonymized ${type} insight sent to cohort peer!`)}
               />
@@ -631,10 +667,7 @@ export default function CognitiveMap({
             {/* ACHIEVEMENT GALLERY */}
             <div className="glass-panel rounded-2xl p-6 border border-glass-stroke">
               <AchievementGallery 
-                achievements={[
-                  { id: '1', type: 'earlyBird', title: 'Early Bird Learner', dateAwarded: '2024-05-12' },
-                  { id: '2', type: 'deepFocusMaster', title: 'Deep Focus Master', dateAwarded: '2024-06-01' }
-                ]} 
+                achievements={[]} 
               />
             </div>
           </div>

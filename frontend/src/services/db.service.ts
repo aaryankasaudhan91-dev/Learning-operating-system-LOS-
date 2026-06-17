@@ -2,6 +2,18 @@ import { UserProfile, Course, CourseModule, Lesson } from '../types';
 
 export const dbService = {
   // User Profile Methods
+  async getStudents(mentorEmail?: string): Promise<UserProfile[]> {
+    try {
+      const url = mentorEmail ? `/api/users?role=student&teacherEmail=${encodeURIComponent(mentorEmail)}` : `/api/users?role=student`;
+      const response = await fetch(url);
+      if (!response.ok) throw new Error('Failed to fetch students');
+      return await response.json();
+    } catch (err) {
+      console.error(err);
+      return [];
+    }
+  },
+
   async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
       const response = await fetch(`/api/users/${uid}`);

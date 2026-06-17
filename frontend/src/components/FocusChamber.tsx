@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect } from 'react';
-import { Shield, Play, Pause, Volume2, Users, LogOut, Disc, LayoutGrid, Brain, MessageSquare, Target, Settings2, Image as ImageIcon, FileText, Zap, Gift } from 'lucide-react';
+import { Shield, Play, Pause, Volume2, Users, LogOut, Disc, LayoutGrid, Brain, MessageSquare, Target, Settings2, Image as ImageIcon, FileText, Zap, Gift, Loader2 } from 'lucide-react';
 import { AppView } from '../types';
 
 interface FocusChamberProps {
@@ -28,6 +28,11 @@ export default function FocusChamber({ setView, setCognitiveLoad }: FocusChamber
   const [analogyMode, setAnalogyMode] = useState<boolean>(false);
   const [complexitySteppedDown, setComplexitySteppedDown] = useState<boolean>(false);
   const [milestoneUnlocked, setMilestoneUnlocked] = useState<boolean>(false);
+  const [topic, setTopic] = useState<string>("Dijkstra's Algorithm");
+  
+  // AI Agent States
+  const [aiContent, setAiContent] = useState<string>('');
+  const [isAiLoading, setIsAiLoading] = useState<boolean>(false);
 
   // Feature 13: Smart Distraction Interception Shields
   useEffect(() => {
@@ -40,6 +45,56 @@ export default function FocusChamber({ setView, setCognitiveLoad }: FocusChamber
     window.addEventListener('blur', handleBlur);
     return () => window.removeEventListener('blur', handleBlur);
   }, [timerRunning]);
+
+  // Fetch contextual content from AI Agent backend
+  useEffect(() => {
+    setIsAiLoading(true);
+    const controller = new AbortController();
+    const signal = controller.signal;
+    let isMounted = true;
+
+    const timeoutId = setTimeout(async () => {
+      try {
+        const response = await fetch('/api/agent/focus', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            topic,
+            contentMode,
+            analogyMode,
+            complexitySteppedDown
+          }),
+          signal
+        });
+        const data = await response.json();
+        if (isMounted) {
+          if (data.content) {
+            setAiContent(data.content);
+          } else {
+            const fallbacks = ["Take a moment to absorb this concept. Knowledge consolidation occurs during quiet reflection.", "Consider how this ties into the broader architecture of your current studies.", "Your neural pathways are strengthening. Keep focusing on the core principles."];
+            setAiContent(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+          }
+        }
+      } catch (err: any) {
+        if (err.name === 'AbortError') {
+          console.log('Fetch aborted due to rapid state changes.');
+          return;
+        }
+        if (isMounted) {
+          const fallbacks = ["Take a moment to absorb this concept. Knowledge consolidation occurs during quiet reflection.", "Consider how this ties into the broader architecture of your current studies.", "Your neural pathways are strengthening. Keep focusing on the core principles."];
+          setAiContent(fallbacks[Math.floor(Math.random() * fallbacks.length)]);
+        }
+      } finally {
+        if (isMounted) setIsAiLoading(false);
+      }
+    }, 600); // 600ms debounce
+    
+    return () => { 
+      isMounted = false; 
+      clearTimeout(timeoutId);
+      controller.abort();
+    };
+  }, [contentMode, analogyMode, complexitySteppedDown, topic]);
 
   // Handle countdown ticking
   useEffect(() => {
@@ -64,7 +119,7 @@ export default function FocusChamber({ setView, setCognitiveLoad }: FocusChamber
         setBarHeights(prev => prev.map(() => Math.floor(Math.random() * 70) + 20));
       }, 250);
     } else {
-      setBarHeights([40, 80, 60, 90, 50, 70, 30]);
+      setBarHeights([5, 5, 5, 5, 5, 5, 5]);
     }
     return () => clearInterval(animationInterval);
   }, [soundPlaying]);
@@ -278,15 +333,33 @@ export default function FocusChamber({ setView, setCognitiveLoad }: FocusChamber
               </div>
             </div>
             
-            {/* Dynamic Content Display demonstrating Feature 1 & 6 & 12 */}
-            <div className="absolute top-24 left-6 right-6 z-20 bg-void-black/80 border border-glass-stroke rounded-xl p-4 backdrop-blur-md">
-              <h3 className="text-white font-bold mb-2">Feature Test: Contextual Content</h3>
-              <p className="text-sm text-on-surface-variant">
-                {contentMode === 'audio' ? 'Playing Audio Summary...' : 
-                 contentMode === 'visual' ? '[Displaying Interactive Diagram]' :
-                 analogyMode ? 'Analogy: Think of Graph Theory like passing a soccer ball between teammates.' :
-                 complexitySteppedDown ? 'Simplified: Nodes are points, edges are lines between them.' :
-                 "Complex: Dijkstra's algorithm operates on weighted graphs to find the shortest path tree."}
+            {/* Dynamic AI Agent Contextual Content Display */}
+            <div className="absolute top-24 left-6 right-6 z-20 bg-void-black/85 border border-glass-stroke rounded-xl p-4 backdrop-blur-md">
+              <div className="flex flex-col sm:flex-row justify-between sm:items-center gap-3 mb-3 pb-3 border-b border-glass-stroke/50">
+                <h3 className="text-white font-bold flex items-center gap-2">
+                  <Brain className="w-4 h-4 text-plasma-violet" />
+                  AI Contextual Agent
+                </h3>
+                <div className="flex items-center gap-2">
+                  <span className="text-[10px] font-mono text-[#bac9cc]/55 uppercase font-bold">Topic:</span>
+                  <input
+                    type="text"
+                    value={topic}
+                    onChange={(e) => setTopic(e.target.value)}
+                    className="bg-void-black/60 border border-glass-stroke rounded-lg px-2.5 py-1 text-xs text-white placeholder-on-surface-variant focus:outline-none focus:border-electric-cyan transition-colors w-36 sm:w-48 font-sans"
+                    placeholder="e.g. Dijkstra's Algorithm"
+                  />
+                </div>
+              </div>
+              <p className="text-sm text-on-surface-variant min-h-[40px]">
+                {isAiLoading ? (
+                  <span className="animate-pulse text-plasma-violet flex items-center gap-2">
+                    <Loader2 className="w-4 h-4 animate-spin text-plasma-violet" />
+                    Synthesizing Neural Path...
+                  </span>
+                ) : (
+                  aiContent || "No context generated."
+                )}
               </p>
             </div>
 
