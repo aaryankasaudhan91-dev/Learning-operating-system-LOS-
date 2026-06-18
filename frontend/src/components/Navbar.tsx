@@ -34,9 +34,7 @@ export default function Navbar({
         {/* Brand Logo */}
         <div
           onClick={() => {
-            if (currentView !== 'landing') {
-              setView('courses');
-            }
+            setView(userName ? 'courses' : 'landing');
           }}
           className="flex items-center gap-2 cursor-pointer group"
         >
@@ -48,53 +46,95 @@ export default function Navbar({
           </span>
         </div>
 
-        {/* Navigation moved to Sidebar */}
-        {/* Authenticated Portal Badge & Active User Profile */}
-        <div id="authenticated-user-profile" className={`flex items-center gap-4 ${currentView === 'landing' ? 'invisible' : ''}`}>
-          <div className="flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide border border-glass-stroke bg-surface-container bg-opacity-40">
-            {userRole === 'student' ? (
-              <>
-                <Brain className="w-3.5 h-3.5 text-electric-cyan animate-pulse" />
-                <span className="text-electric-cyan font-bold tracking-wider">STUDENT PORTAL</span>
-              </>
-            ) : (
-              <>
-                <GraduationCap className="w-3.5 h-3.5 text-plasma-violet animate-pulse" />
-                <span className="text-plasma-violet font-bold tracking-wider">MENTOR PORTAL</span>
-              </>
-            )}
-          </div>
-
-          {/* User Name Display */}
-          <div className="hidden sm:block font-sans text-xs font-medium text-on-surface-variant bg-white/5 px-3 py-1.5 rounded-lg border border-glass-stroke">
-            {userName || (userRole === 'student' ? 'Student' : 'Mentor')}
-          </div>
-
-          <div className="flex items-center gap-2">
-            <div
-              onClick={() => setView('courses')}
-              className="w-8 h-8 rounded-full border border-glass-stroke bg-surface-container flex items-center justify-center hover:border-electric-cyan hover:scale-105 transition-all cursor-pointer"
-              title="Return to Dashboard"
+        {/* Center Public Links */}
+        {(currentView === 'landing' || currentView === 'about') && (
+          <div className="flex items-center gap-6 md:gap-8 font-sans text-sm font-semibold">
+            <button
+              onClick={() => setView('landing')}
+              className={`hover:text-electric-cyan transition-colors cursor-pointer ${currentView === 'landing' ? 'text-electric-cyan' : 'text-on-surface-variant'}`}
             >
+              Home
+            </button>
+            <button
+              onClick={() => setView('about')}
+              className={`hover:text-electric-cyan transition-colors cursor-pointer ${currentView === 'about' ? 'text-electric-cyan' : 'text-on-surface-variant'}`}
+            >
+              About Us
+            </button>
+          </div>
+        )}
+
+        {/* Right side controls */}
+        {userName ? (
+          /* Authenticated User Actions */
+          <div id="authenticated-user-profile" className="flex items-center gap-4 animate-[fadeIn_0.3s_ease-out]">
+            <div className="hidden lg:flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-semibold tracking-wide border border-glass-stroke bg-surface-container bg-opacity-40">
               {userRole === 'student' ? (
-                <Brain className="w-4 h-4 text-electric-cyan" />
+                <>
+                  <Brain className="w-3.5 h-3.5 text-electric-cyan animate-pulse" />
+                  <span className="text-electric-cyan font-bold tracking-wider">STUDENT PORTAL</span>
+                </>
               ) : (
-                <GraduationCap className="w-4 h-4 text-plasma-violet" />
+                <>
+                  <GraduationCap className="w-3.5 h-3.5 text-plasma-violet animate-pulse" />
+                  <span className="text-plasma-violet font-bold tracking-wider">MENTOR PORTAL</span>
+                </>
               )}
             </div>
 
-            {/* Logout Trigger */}
-            {onLogout && (
+            {/* User Name Display */}
+            <div className="hidden sm:block font-sans text-xs font-medium text-on-surface-variant bg-white/5 px-3 py-1.5 rounded-lg border border-glass-stroke">
+              {userName}
+            </div>
+
+            <div className="flex items-center gap-2">
               <button
-                onClick={onLogout}
-                className="w-8 h-8 rounded-full border border-glass-stroke bg-red-900/10 flex items-center justify-center text-red-400 hover:text-red-300 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
-                title="Secure Logout Session"
+                onClick={() => setView('courses')}
+                className="px-4 py-1.5 rounded-full border border-glass-stroke bg-surface-container flex items-center justify-center gap-1.5 text-xs font-bold text-on-surface hover:border-electric-cyan hover:scale-105 transition-all cursor-pointer"
+                title="Return to Dashboard"
               >
-                <LogOut className="w-4 h-4" />
+                {userRole === 'student' ? (
+                  <>
+                    <Brain className="w-3.5 h-3.5 text-electric-cyan" />
+                    <span>Dashboard</span>
+                  </>
+                ) : (
+                  <>
+                    <GraduationCap className="w-3.5 h-3.5 text-plasma-violet" />
+                    <span>Portal</span>
+                  </>
+                )}
               </button>
-            )}
+
+              {/* Logout Trigger */}
+              {onLogout && (
+                <button
+                  onClick={onLogout}
+                  className="w-8 h-8 rounded-full border border-glass-stroke bg-red-900/10 flex items-center justify-center text-red-400 hover:text-red-300 hover:border-red-500 hover:scale-105 transition-all cursor-pointer"
+                  title="Secure Logout Session"
+                >
+                  <LogOut className="w-4 h-4" />
+                </button>
+              )}
+            </div>
           </div>
-        </div>
+        ) : (
+          /* Unauthenticated Public Actions */
+          <div className="flex items-center gap-3">
+            <button
+              onClick={() => setView('login')}
+              className="text-xs md:text-sm text-on-surface-variant hover:text-on-surface font-semibold px-3 py-2 cursor-pointer transition-colors"
+            >
+              Log In
+            </button>
+            <button
+              onClick={() => setView('register')}
+              className="px-4 py-2 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-white text-xs md:text-sm font-bold tracking-wide hover:scale-105 hover:shadow-[0_0_20px_rgba(2,132,199,0.3)] active:scale-95 transition-all cursor-pointer"
+            >
+              Register
+            </button>
+          </div>
+        )}
       </div>
     </nav>
   );

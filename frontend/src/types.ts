@@ -58,7 +58,7 @@ export interface UserProfile {
   createdAt: string;
 }
 
-export type AppView = 'splash' | 'login' | 'register' | 'landing' | 'map' | 'chamber' | 'insights' | 'cohort' | 'sos' | 'profile' | 'settings' | 'courses';
+export type AppView = 'splash' | 'login' | 'register' | 'landing' | 'about' | 'map' | 'chamber' | 'insights' | 'cohort' | 'sos' | 'profile' | 'settings' | 'courses';
 
 export interface StudentSeat {
   id: string;
