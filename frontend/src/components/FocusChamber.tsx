@@ -9,10 +9,10 @@ import { AppView } from '../types';
 
 interface SpaceMissionProps {
   setView: (view: AppView) => void;
-  setBrainPower: React.Dispatch<React.SetStateAction<number>>;
+  setCognitiveLoad: React.Dispatch<React.SetStateAction<number>>;
 }
 
-export default function SpaceMission({ setView, setBrainPower }: SpaceMissionProps) {
+export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMissionProps) {
   const [secondsRemaining, setSecondsRemaining] = useState<number>(15 * 60);
   const [timerRunning, setTimerRunning] = useState<boolean>(false);
   const [musicPlaying, setMusicPlaying] = useState<boolean>(false);
@@ -103,7 +103,7 @@ export default function SpaceMission({ setView, setBrainPower }: SpaceMissionPro
   const submitReflection = (feeling: string) => {
     setShowReflection(false);
     setMissionComplete(false);
-    setBrainPower(prev => prev + 10);
+    setCognitiveLoad(prev => prev + 10);
     setView('map');
   };
 

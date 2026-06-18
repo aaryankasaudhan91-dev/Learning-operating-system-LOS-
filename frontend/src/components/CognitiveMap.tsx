@@ -95,6 +95,7 @@ interface LearningMapProps {
   cognitiveLoad: number;
   setCognitiveLoad: React.Dispatch<React.SetStateAction<number>>;
   onSosClick: () => void;
+  profile?: any;
 }
 
 export default function LearningMap({
