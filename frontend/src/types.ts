@@ -144,4 +144,8 @@ export interface Lesson {
   instructionalFlow: LessonStep[];
   resources?: string[];
   order?: number;
+  personalVideo?: string;
+  videoTutorial?: string;
+  notes?: string;
+  test?: string;
 }

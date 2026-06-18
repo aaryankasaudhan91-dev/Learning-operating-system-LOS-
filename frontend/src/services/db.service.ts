@@ -97,5 +97,35 @@ export const dbService = {
       console.error(err);
       return null;
     }
+  },
+
+  async createCourse(course: Course): Promise<Course> {
+    const response = await fetch('/api/courses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(course)
+    });
+    if (!response.ok) throw new Error('Failed to create course');
+    return await response.json();
+  },
+
+  async createModule(courseId: string, module: CourseModule): Promise<CourseModule> {
+    const response = await fetch(`/api/courses/${courseId}/modules`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(module)
+    });
+    if (!response.ok) throw new Error('Failed to create module');
+    return await response.json();
+  },
+
+  async createLesson(courseId: string, moduleId: string, lesson: Lesson): Promise<Lesson> {
+    const response = await fetch(`/api/courses/${courseId}/modules/${moduleId}/lessons`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(lesson)
+    });
+    if (!response.ok) throw new Error('Failed to create lesson');
+    return await response.json();
   }
 };

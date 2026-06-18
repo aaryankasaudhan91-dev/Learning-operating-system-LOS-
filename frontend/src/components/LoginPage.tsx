@@ -4,7 +4,8 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { AppView } from '../types';
+import { motion } from 'framer-motion';
+import { AppView, UserProfile } from '../types';
 import { authService } from '../services/auth.service';
 import { dbService } from '../services/db.service';
 import { AppLogo } from './AppLogo';
@@ -17,14 +18,13 @@ interface LoginPageProps {
 }
 
 export default function LoginPage({ setView, setUserRole, setUserProfile, addNotification }: LoginPageProps) {
-  const [activeTab, setActiveTab] = useState<'student' | 'mentor'>('student');
   const [cognitiveId, setCognitiveId] = useState('');
   const [secureSync, setSecureSync] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
-  // ... (rest of the component keeps the same canvas logic, only handleSubmit changes)
+  // ... (Keep your existing canvas logic/useEffect here if you have it) ...
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,8 +54,9 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
         }
       } else {
         // Fallback if the user profile hasn't finished replication
-        setUserRole(activeTab);
-        setView(activeTab === 'student' ? 'map' : 'insights');
+        // Since tab is removed, defaulting to 'student' and 'map'
+        setUserRole('student');
+        setView('map');
         if (addNotification) {
           addNotification(`Sync Complete. Connected as ${user.email}`);
         }
@@ -85,9 +86,182 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
     }
   };
 
+  const handleDemoLogin = async (role: 'student' | 'mentor') => {
+    setLoading(true);
+    setErrorMessage(null);
+    if (addNotification) {
+      addNotification(`Initializing secure bypass protocols for Demo ${role.toUpperCase()}...`);
+    }
+
+    try {
+      const demoUid = role === 'student' ? 'demo-student' : 'demo-mentor';
+      const demoEmail = role === 'student' ? 'demo-student@example.com' : 'demo-mentor@example.com';
+      const demoName = role === 'student' ? 'Alex Mercer (Demo Student)' : 'Dr. Clara Oswald (Demo Mentor)';
+
+      // 1. Try to fetch this profile from backend database
+      let profileData = await dbService.getUserProfile(demoUid);
+
+      if (!profileData) {
+        // 2. If it doesn't exist, create it in the database
+        const defaultProfile: UserProfile = {
+          uid: demoUid,
+          fullName: demoName,
+          email: demoEmail,
+          role: role,
+          specialty: role === 'student' ? 'Cognitive Explorer' : 'Cohort Architect',
+          preferredLanguage: 'English (Default)',
+          focusStreak: role === 'student' ? 5 : 0,
+          bestFocusStreak: role === 'student' ? 12 : 0,
+          taskCompletionRate: role === 'student' ? 85 : 0,
+          dailyFocusGoal: 120,
+          todayFocusMinutes: role === 'student' ? 45 : 0,
+          cognitiveLoad: role === 'student' ? 42 : 50,
+          teacherEmail: role === 'student' ? 'demo-mentor@example.com' : undefined,
+          academicInfo: role === 'student' ? {
+            level: 'high_secondary',
+            className: '12',
+            stream: 'Science',
+            entranceExam: 'JEE'
+          } : undefined,
+          achievements: role === 'student' ? [
+            { id: 'earlyBird', type: 'earlyBird', title: 'Early Bird', dateAwarded: new Date().toISOString() },
+            { id: 'deepFocusMaster', type: 'deepFocusMaster', title: 'Deep Focus Master', dateAwarded: new Date().toISOString() }
+          ] : [],
+          createdAt: new Date().toISOString()
+        };
+
+        await dbService.createUserProfile(defaultProfile);
+        profileData = defaultProfile;
+      }
+
+      // If logging in as a student, let's also ensure a mentor profile exists in the DB so they are linked
+      if (role === 'student') {
+        const mentorProfile = await dbService.getUserProfile('demo-mentor');
+        if (!mentorProfile) {
+          const defaultMentor: UserProfile = {
+            uid: 'demo-mentor',
+            fullName: 'Dr. Clara Oswald (Demo Mentor)',
+            email: 'demo-mentor@example.com',
+            role: 'mentor',
+            specialty: 'Cohort Architect',
+            preferredLanguage: 'English (Default)',
+            focusStreak: 0,
+            bestFocusStreak: 0,
+            taskCompletionRate: 0,
+            dailyFocusGoal: 120,
+            todayFocusMinutes: 0,
+            cognitiveLoad: 50,
+            achievements: [],
+            createdAt: new Date().toISOString()
+          };
+          await dbService.createUserProfile(defaultMentor);
+        }
+      } else {
+        // Mentor: ensure the demo student and a couple of other demo students exist so the cohort dashboard is loaded
+        const studentProfile = await dbService.getUserProfile('demo-student');
+        if (!studentProfile) {
+          const defaultStudent: UserProfile = {
+            uid: 'demo-student',
+            fullName: 'Alex Mercer (Demo Student)',
+            email: 'demo-student@example.com',
+            role: 'student',
+            teacherEmail: 'demo-mentor@example.com',
+            specialty: 'Cognitive Explorer',
+            preferredLanguage: 'English (Default)',
+            focusStreak: 5,
+            bestFocusStreak: 12,
+            taskCompletionRate: 85,
+            dailyFocusGoal: 120,
+            todayFocusMinutes: 45,
+            cognitiveLoad: 42,
+            academicInfo: {
+              level: 'high_secondary',
+              className: '12',
+              stream: 'Science',
+              entranceExam: 'JEE'
+            },
+            achievements: [
+              { id: 'earlyBird', type: 'earlyBird', title: 'Early Bird', dateAwarded: new Date().toISOString() }
+            ],
+            createdAt: new Date().toISOString()
+          };
+          await dbService.createUserProfile(defaultStudent);
+        }
+
+        // Add 2 more demo students for a rich matrix
+        const demoStudent2 = await dbService.getUserProfile('demo-student-2');
+        if (!demoStudent2) {
+          const student2: UserProfile = {
+            uid: 'demo-student-2',
+            fullName: 'Sarah Connor',
+            email: 'sarah.c@example.com',
+            role: 'student',
+            teacherEmail: 'demo-mentor@example.com',
+            specialty: 'Friction Solver',
+            preferredLanguage: 'English',
+            focusStreak: 2,
+            bestFocusStreak: 4,
+            taskCompletionRate: 40,
+            dailyFocusGoal: 120,
+            todayFocusMinutes: 10,
+            cognitiveLoad: 89, // High load!
+            achievements: [],
+            createdAt: new Date().toISOString()
+          };
+          await dbService.createUserProfile(student2);
+        }
+        
+        const demoStudent3 = await dbService.getUserProfile('demo-student-3');
+        if (!demoStudent3) {
+          const student3: UserProfile = {
+            uid: 'demo-student-3',
+            fullName: 'Marcus Vance',
+            email: 'marcus.v@example.com',
+            role: 'student',
+            teacherEmail: 'demo-mentor@example.com',
+            specialty: 'Flow State Master',
+            preferredLanguage: 'English',
+            focusStreak: 15,
+            bestFocusStreak: 20,
+            taskCompletionRate: 98,
+            dailyFocusGoal: 180,
+            todayFocusMinutes: 120,
+            cognitiveLoad: 25, // Low load!
+            achievements: [
+              { id: 'deepFocusMaster', type: 'deepFocusMaster', title: 'Deep Focus Master', dateAwarded: new Date().toISOString() }
+            ],
+            createdAt: new Date().toISOString()
+          };
+          await dbService.createUserProfile(student3);
+        }
+      }
+
+      // 3. Store the demo session in localStorage
+      localStorage.setItem('los_demo_user', JSON.stringify({
+        user: { uid: demoUid, email: demoEmail, emailVerified: true },
+        profile: profileData
+      }));
+
+      // 4. Set state and views
+      setUserProfile(profileData);
+      setUserRole(role);
+      setView(role === 'student' ? 'map' : 'insights');
+
+      if (addNotification) {
+        addNotification(`Demo Session Active. Verified as ${profileData.fullName} (${role.toUpperCase()})`);
+      }
+    } catch (err: any) {
+      console.error("Demo login error:", err);
+      setErrorMessage(err.message || "Bypass sequence failed.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div className="min-h-screen w-full flex flex-col items-center justify-center p-5 md:py-16 font-sans antialiased text-on-surface overflow-x-hidden relative selection:bg-electric-cyan selection:text-white">
-      <style dangerouslySetInnerHTML={{ __html: `
+      <style dangerouslySetInnerHTML={{
+        __html: `
         .login-body {
             background-color: var(--color-void-black);
             background-image: radial-gradient(circle at 50% 50%, var(--color-nebula-purple) 0%, transparent 70%);
@@ -126,23 +300,6 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
             border-bottom-color: var(--color-primary);
             box-shadow: 0 4px 20px -10px rgba(2, 132, 199, 0.4);
         }
-        
-        .tab-active-login {
-          position: relative;
-          color: var(--color-primary);
-          text-shadow: 0 0 10px rgba(2, 132, 199, 0.2);
-        }
-        
-        .tab-active-login::after {
-          content: '';
-          position: absolute;
-          bottom: -8px;
-          left: 0;
-          width: 100%;
-          height: 2px;
-          background: var(--color-primary);
-          box-shadow: 0 0 10px rgba(2, 132, 199, 0.2);
-        }
 
         .font-geist { font-family: 'Geist', sans-serif; }
       ` }} />
@@ -170,33 +327,69 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
           {/* Subtle internal glow highlight */}
           <div className="absolute top-0 right-0 -mt-20 -mr-20 w-64 h-64 bg-electric-cyan rounded-full mix-blend-multiply filter blur-[100px] opacity-10 group-hover:opacity-20 transition-opacity duration-700 pointer-events-none"></div>
 
-          {/* Role Selector Tabs */}
-          <div className="flex border-b border-glass-stroke mb-8 pb-2 font-geist">
-            <button
-              type="button"
-              onClick={() => setActiveTab('student')}
-              className={`flex-1 text-sm md:text-base font-semibold text-center py-2 transition-colors ${activeTab === 'student'
-                ? 'tab-active-login'
-                : 'text-on-surface-variant hover:text-on-surface'
-                }`}
+          {/* Animated Header Section */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, ease: "easeOut" }}
+            className="flex flex-col items-center justify-center mb-10 font-geist"
+          >
+            <motion.div
+              initial={{ scale: 0.5, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ delay: 0.1, type: "spring", stiffness: 260, damping: 20 }}
+              className="p-3 bg-surface-variant/30 rounded-full mb-4 border border-glass-stroke shadow-sm text-on-surface"
             >
-              Student Login
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveTab('mentor')}
-              className={`flex-1 text-sm md:text-base font-semibold text-center py-2 transition-colors ${activeTab === 'mentor'
-                ? 'tab-active-login'
-                : 'text-on-surface-variant hover:text-on-surface'
-                }`}
+              <svg
+                className="w-6 h-6"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={1.5}
+                  d="M11 16l-4-4m0 0l4-4m-4 4h14m-5 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h7a3 3 0 013 3v1"
+                />
+              </svg>
+            </motion.div>
+
+            <motion.h2
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.2, duration: 0.5 }}
+              className="text-2xl md:text-3xl font-bold text-on-surface tracking-tight"
             >
-              Educator Portal
-            </button>
-          </div>
+              Welcome Back
+            </motion.h2>
 
-          {/* Login Form */}
-          <form onSubmit={handleSubmit} className="flex flex-col gap-6 font-geist relative z-10">
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="text-sm md:text-base text-on-surface-variant mt-2 text-center max-w-xs"
+            >
+              Please enter your credentials to access your account.
+            </motion.p>
 
+            <motion.div
+              initial={{ width: 0, opacity: 0 }}
+              animate={{ width: 48, opacity: 1 }}
+              transition={{ delay: 0.4, duration: 0.5, ease: "easeInOut" }}
+              className="h-1 bg-glass-stroke rounded-full mt-6"
+            />
+          </motion.div>
+
+          {/* Login Form - Added subtle fade in after header finishes */}
+          <motion.form
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 0.5, duration: 0.4 }}
+            onSubmit={handleSubmit}
+            className="flex flex-col gap-6 font-geist relative z-10"
+          >
             {errorMessage && (
               <div id="login-error-alert" className="p-3 rounded-lg bg-error-container border border-error/50 text-on-error-container font-medium text-xs flex items-center gap-2 animate-[fadeIn_0.2s_ease-out]">
                 <span className="material-symbols-outlined text-sm flex-shrink-0">report</span>
@@ -282,8 +475,33 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
                 <span>Create Signature</span>
                 <span className="material-symbols-outlined text-sm group-hover:translate-x-1 transition-transform">how_to_reg</span>
               </button>
+
+              <div className="relative flex py-2 items-center opacity-50">
+                <div className="flex-grow border-t border-glass-stroke"></div>
+                <span className="flex-shrink-0 mx-4 text-on-surface-variant font-mono text-[10px] uppercase tracking-widest font-semibold">Quick Demo Access</span>
+                <div className="flex-grow border-t border-glass-stroke"></div>
+              </div>
+
+              <div className="grid grid-cols-2 gap-3">
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('student')}
+                  className="py-3 px-2 rounded-xl bg-gradient-to-br from-electric-cyan/10 to-transparent border border-electric-cyan/30 text-electric-cyan text-[11px] font-bold uppercase tracking-wider hover:border-electric-cyan hover:bg-electric-cyan/20 hover:scale-[1.02] active:scale-95 transition-all flex flex-col items-center gap-1.5 justify-center cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base">psychology</span>
+                  <span>Demo Learner</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => handleDemoLogin('mentor')}
+                  className="py-3 px-2 rounded-xl bg-gradient-to-br from-plasma-violet/10 to-transparent border border-plasma-violet/30 text-plasma-violet text-[11px] font-bold uppercase tracking-wider hover:border-plasma-violet hover:bg-plasma-violet/20 hover:scale-[1.02] active:scale-95 transition-all flex flex-col items-center gap-1.5 justify-center cursor-pointer"
+                >
+                  <span className="material-symbols-outlined text-base">architecture</span>
+                  <span>Demo Mentor</span>
+                </button>
+              </div>
             </div>
-          </form>
+          </motion.form>
         </div>
       </main>
 

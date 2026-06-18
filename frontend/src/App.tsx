@@ -7,6 +7,7 @@ import React, { useState, useEffect } from 'react';
 import Navbar from './components/Navbar';
 import Sidebar from './components/Sidebar';
 import LandingPage from './components/LandingPage';
+import AboutPage from './components/AboutPage';
 import LoginPage from './components/LoginPage';
 import RegisterPage from './components/RegisterPage';
 import ProfilePage from './components/ProfilePage';
@@ -86,7 +87,80 @@ export default function App() {
 
   // Load current user profile and session synchronizations
   useEffect(() => {
+    // 1. Check if we have a demo session active
+    const demoUserStr = localStorage.getItem('los_demo_user');
+    if (demoUserStr) {
+      try {
+        const demoData = JSON.parse(demoUserStr);
+        setCurrentUser(demoData.user);
+        setUserProfile(demoData.profile);
+        const role = demoData.profile.role as 'student' | 'mentor';
+        setUserRole(role);
+        setCognitiveLoad(demoData.profile.cognitiveLoad || 50);
+
+        if (role === 'mentor') {
+          dbService.getStudents(demoData.profile.email).then(students => {
+            if (students.length === 0) {
+              const mockNames = ['Alex M.', 'Sarah K.', 'Elias V.', 'Jordan P.', 'Taylor S.', 'Casey R.', 'Morgan L.', 'Riley D.', 'Jamie C.', 'Quinn B.', 'Avery T.', 'Drew H.'];
+              const mockStudents = mockNames.map((name, i) => {
+                const load = i === 2 || i === 7 ? Math.floor(Math.random() * 15) + 85 : Math.floor(Math.random() * 50) + 30;
+                return {
+                  id: `mock-student-${i}`,
+                  name: name,
+                  load: load,
+                  state: load > 75 ? 'friction' : 'flow',
+                  preferredLanguage: i % 4 === 0 ? 'Spanish' : 'English',
+                  avatarSeed: `mock-${i}`,
+                  row: Math.floor(i / 6) + 1,
+                  col: (i % 6) + 1
+                };
+              });
+              setSeats(mockStudents);
+            } else {
+              setSeats(students.map((s: any, index) => ({
+                id: s.uid,
+                name: s.fullName || s.name || 'Student',
+                load: s.cognitiveLoad || 50,
+                state: (s.cognitiveLoad || 50) > 75 ? 'friction' : 'flow',
+                preferredLanguage: 'English',
+                avatarSeed: s.uid,
+                row: Math.floor(index / 6) + 1,
+                col: (index % 6) + 1
+              })));
+            }
+          });
+        } else {
+          taskService.getStudentTasks(demoData.profile.uid, demoData.profile.email, demoData.profile.fullName).then(data => {
+            setTasks(data.map((t: any) => ({
+              id: t.id || Math.random().toString(),
+              title: t.title || 'Untitled Task',
+              moduleName: t.moduleName || 'General',
+              estimatedMinutes: t.estimatedMinutes || 15,
+              completed: t.status === 'completed'
+            })));
+          });
+        }
+
+        setView(prev => {
+          if (prev === 'login' || prev === 'landing') {
+            return 'courses';
+          }
+          return prev;
+        });
+        setAuthLoading(false);
+        return; // Bypass normal Firebase listener setup
+      } catch (err) {
+        console.error("Failure restoring demo session:", err);
+      }
+    }
+
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      // If a demo user session was initiated concurrently, ignore Firebase auth changes
+      if (localStorage.getItem('los_demo_user')) {
+        setAuthLoading(false);
+        return;
+      }
+
       setCurrentUser(user);
       if (user) {
         try {
@@ -180,6 +254,7 @@ export default function App() {
 
   const handleLogout = async () => {
     try {
+      localStorage.removeItem('los_demo_user');
       await signOut(auth);
       setView('landing');
       addNotification("Session securely logged out.");
@@ -232,7 +307,7 @@ export default function App() {
       <div className="pt-20 flex min-h-[92vh]">
 
         {/* Render persistent Left Desktop Sidebar in high-fidelity control views */}
-        {currentView !== 'landing' && (
+        {currentView !== 'landing' && currentView !== 'about' && (
           <div className="hidden md:block w-64 flex-shrink-0">
             <Sidebar
               currentView={currentView}
@@ -247,12 +322,18 @@ export default function App() {
 
         {/* Dynamic Main Workspace display view */}
         <main className={`flex-1 w-full p-6 md:p-12 mx-auto max-w-[1440px] transition-all ${
-          currentView !== 'landing' ? 'md:pl-6' : ''
+          currentView !== 'landing' && currentView !== 'about' ? 'md:pl-6' : ''
         }`}>
           {currentView === 'landing' && (
             <LandingPage
               setView={setView}
               setUserRole={setUserRole}
+            />
+          )}
+
+          {currentView === 'about' && (
+            <AboutPage
+              setView={setView}
             />
           )}
 
@@ -264,6 +345,7 @@ export default function App() {
               cognitiveLoad={cognitiveLoad}
               setCognitiveLoad={setCognitiveLoad}
               onSosClick={() => setView('sos')}
+              profile={userProfile}
             />
           )}
 
@@ -322,7 +404,7 @@ export default function App() {
           )}
 
           {currentView === 'courses' && (
-            <CourseHub />
+            <CourseHub profile={userProfile} loading={authLoading} />
           )}
         </main>
       </div>
