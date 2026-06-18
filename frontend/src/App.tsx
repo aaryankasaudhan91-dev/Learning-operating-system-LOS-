@@ -13,6 +13,7 @@ import RegisterPage from './components/RegisterPage';
 import ProfilePage from './components/ProfilePage';
 import SettingsPage from './components/SettingsPage';
 import HelpChatBot from './components/HelpChatBot';
+import HelpCenter from './components/HelpCenter';
 import CourseHub from './components/CourseHub';
 import UnderConstruction from './components/UnderConstruction';
 import CognitiveMap from './components/CognitiveMap';
@@ -405,6 +406,13 @@ export default function App() {
 
           {currentView === 'courses' && (
             <CourseHub profile={userProfile} loading={authLoading} />
+          )}
+
+          {currentView === 'help' && (
+            <HelpCenter
+              setView={setView}
+              userRole={userRole}
+            />
           )}
         </main>
       </div>

@@ -183,9 +183,13 @@ export default function Sidebar({
               <Sliders className="w-4 h-4" />
             </button>
             <button 
-              onClick={() => alert(`Contacting Synapse Support...\nEmergency Breathing Assistant available 24/7. Use SOS trigger directly for immediate grounding.`)} 
-              className="text-on-surface-variant hover:text-white transition-colors"
-              title="Documentation Help"
+              onClick={() => setView('help')} 
+              className={`transition-colors p-1.5 rounded-lg border ${
+                currentView === 'help' 
+                  ? 'text-plasma-violet border-plasma-violet/40 bg-plasma-violet/10' 
+                  : 'text-on-surface-variant hover:text-white border-transparent'
+              }`}
+              title="Help Center"
             >
               <Shield className="w-4 h-4" />
             </button>

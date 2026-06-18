@@ -58,7 +58,7 @@ export interface UserProfile {
   createdAt: string;
 }
 
-export type AppView = 'splash' | 'login' | 'register' | 'landing' | 'about' | 'map' | 'chamber' | 'insights' | 'cohort' | 'sos' | 'profile' | 'settings' | 'courses';
+export type AppView = 'splash' | 'login' | 'register' | 'landing' | 'about' | 'map' | 'chamber' | 'insights' | 'cohort' | 'sos' | 'profile' | 'settings' | 'courses' | 'help';
 
 export interface StudentSeat {
   id: string;
@@ -134,6 +134,22 @@ export interface LessonStep {
   activity: string;
 }
 
+export interface QuizQuestion {
+  question: string;
+  options: string[];
+  correctOptionIndex: number;
+}
+
+export interface CustomQuiz {
+  title: string;
+  questions: QuizQuestion[];
+}
+
+export interface CustomHomework {
+  title: string;
+  questions: string[];
+}
+
 export interface Lesson {
   id: string;
   moduleId: string;
@@ -148,4 +164,9 @@ export interface Lesson {
   videoTutorial?: string;
   notes?: string;
   test?: string;
+  testType?: 'link' | 'custom';
+  testCustom?: CustomQuiz;
+  homework?: string;
+  homeworkType?: 'link' | 'custom';
+  homeworkCustom?: CustomHomework;
 }

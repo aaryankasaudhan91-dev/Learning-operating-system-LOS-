@@ -9,7 +9,7 @@ import {
   BookOpen, Video, FileText, PlayCircle, Clock,
   ChevronRight, Construction, Lock, ArrowLeft,
   Search, Book, GraduationCap, Target, ListChecks,
-  Lightbulb, Activity, Layers, Download, Users
+  Lightbulb, Activity, Layers, Download, Users, Plus
 } from 'lucide-react';
 import { useFirebase } from './FirebaseProvider';
 import { dbService } from '../services/db.service';
@@ -72,6 +72,43 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
   const [newLessonNotes, setNewLessonNotes] = useState('');
   const [newLessonTest, setNewLessonTest] = useState('');
   
+  // Custom interactive test/homework variables
+  const [newLessonTestType, setNewLessonTestType] = useState<'link' | 'custom'>('link');
+  const [newLessonTestCustom, setNewLessonTestCustom] = useState<any | null>(null);
+  const [newLessonHomework, setNewLessonHomework] = useState('');
+  const [newLessonHomeworkType, setNewLessonHomeworkType] = useState<'link' | 'custom'>('link');
+  const [newLessonHomeworkCustom, setNewLessonHomeworkCustom] = useState<any | null>(null);
+
+  const [quickLessonTestType, setQuickLessonTestType] = useState<'link' | 'custom'>('link');
+  const [quickLessonTestCustom, setQuickLessonTestCustom] = useState<any | null>(null);
+  const [quickLessonHomework, setQuickLessonHomework] = useState('');
+  const [quickLessonHomeworkType, setQuickLessonHomeworkType] = useState<'link' | 'custom'>('link');
+  const [quickLessonHomeworkCustom, setQuickLessonHomeworkCustom] = useState<any | null>(null);
+
+  // Maker Modals UI State
+  const [showTestMaker, setShowTestMaker] = useState(false);
+  const [testMakerTarget, setTestMakerTarget] = useState<'new' | 'quick'>('new');
+  const [testMakerTitle, setTestMakerTitle] = useState('');
+  const [testMakerQuestions, setTestMakerQuestions] = useState<any[]>([
+    { question: '', options: ['', '', '', ''], correctOptionIndex: 0 }
+  ]);
+  const [generatingTest, setGeneratingTest] = useState(false);
+
+  const [showHomeworkMaker, setShowHomeworkMaker] = useState(false);
+  const [homeworkMakerTarget, setHomeworkMakerTarget] = useState<'new' | 'quick'>('new');
+  const [homeworkMakerTitle, setHomeworkMakerTitle] = useState('');
+  const [homeworkMakerQuestions, setHomeworkMakerQuestions] = useState<string[]>(['']);
+  const [generatingHomework, setGeneratingHomework] = useState(false);
+
+  // Student taking states
+  const [activeTakingTest, setActiveTakingTest] = useState<any | null>(null);
+  const [activeTakingHomework, setActiveTakingHomework] = useState<any | null>(null);
+  const [studentQuizAnswers, setStudentQuizAnswers] = useState<number[]>([]);
+  const [studentHomeworkAnswers, setStudentHomeworkAnswers] = useState<string[]>([]);
+  const [quizScore, setQuizScore] = useState<{ score: number; total: number; submitted: boolean } | null>(null);
+  const [hwSubmitted, setHwSubmitted] = useState(false);
+  const [activePlayingVideo, setActivePlayingVideo] = useState<{ title: string; url: string } | null>(null);
+
   // Editable steps state for new lesson
   const [instructionalSteps, setInstructionalSteps] = useState<LessonStep[]>([
     { step: 'Hook', duration: '5 mins', activity: 'Introduce the topic with a real-world scenario.' },
@@ -177,7 +214,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
     }
     try {
       const lessonId = `les-${Date.now()}`;
-      const resourceList = [quickLessonPersonalVideo, quickLessonVideoTutorial, quickLessonNotes, quickLessonTest].filter(Boolean);
+      const resourceList = [
+        quickLessonPersonalVideo, 
+        quickLessonVideoTutorial, 
+        quickLessonNotes, 
+        quickLessonTestType === 'link' ? quickLessonTest : 'Quiz',
+        quickLessonHomeworkType === 'link' ? quickLessonHomework : 'Homework'
+      ].filter(Boolean);
       
       await dbService.createLesson(quickLessonCourseId, quickLessonModuleId, {
         id: lessonId,
@@ -191,7 +234,12 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
         personalVideo: quickLessonPersonalVideo || undefined,
         videoTutorial: quickLessonVideoTutorial || undefined,
         notes: quickLessonNotes || undefined,
-        test: quickLessonTest || undefined
+        test: quickLessonTestType === 'link' ? (quickLessonTest || undefined) : undefined,
+        testType: quickLessonTestType,
+        testCustom: quickLessonTestType === 'custom' ? (quickLessonTestCustom || undefined) : undefined,
+        homework: quickLessonHomeworkType === 'link' ? (quickLessonHomework || undefined) : undefined,
+        homeworkType: quickLessonHomeworkType,
+        homeworkCustom: quickLessonHomeworkType === 'custom' ? (quickLessonHomeworkCustom || undefined) : undefined
       });
       alert('Topic/Lesson successfully added to Student\'s Course!');
       setQuickLessonTopic('');
@@ -201,6 +249,11 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       setQuickLessonVideoTutorial('');
       setQuickLessonNotes('');
       setQuickLessonTest('');
+      setQuickLessonTestType('link');
+      setQuickLessonTestCustom(null);
+      setQuickLessonHomework('');
+      setQuickLessonHomeworkType('link');
+      setQuickLessonHomeworkCustom(null);
       
       await fetchCourses();
       if (selectedStudent) {
@@ -382,7 +435,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
     }
     try {
       const lessonId = `les-${Date.now()}`;
-      const resourceList = [newLessonPersonalVideo, newLessonVideoTutorial, newLessonNotes, newLessonTest].filter(Boolean);
+      const resourceList = [
+        newLessonPersonalVideo, 
+        newLessonVideoTutorial, 
+        newLessonNotes, 
+        newLessonTestType === 'link' ? newLessonTest : 'Quiz',
+        newLessonHomeworkType === 'link' ? newLessonHomework : 'Homework'
+      ].filter(Boolean);
       
       await dbService.createLesson(selectedCourseForLesson, selectedModuleForLesson, {
         id: lessonId,
@@ -396,7 +455,12 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
         personalVideo: newLessonPersonalVideo || undefined,
         videoTutorial: newLessonVideoTutorial || undefined,
         notes: newLessonNotes || undefined,
-        test: newLessonTest || undefined
+        test: newLessonTestType === 'link' ? (newLessonTest || undefined) : undefined,
+        testType: newLessonTestType,
+        testCustom: newLessonTestType === 'custom' ? (newLessonTestCustom || undefined) : undefined,
+        homework: newLessonHomeworkType === 'link' ? (newLessonHomework || undefined) : undefined,
+        homeworkType: newLessonHomeworkType,
+        homeworkCustom: newLessonHomeworkType === 'custom' ? (newLessonHomeworkCustom || undefined) : undefined
       });
       alert('Lesson/Topic created successfully!');
       setNewLessonTopic('');
@@ -406,6 +470,11 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       setNewLessonVideoTutorial('');
       setNewLessonNotes('');
       setNewLessonTest('');
+      setNewLessonTestType('link');
+      setNewLessonTestCustom(null);
+      setNewLessonHomework('');
+      setNewLessonHomeworkType('link');
+      setNewLessonHomeworkCustom(null);
       await fetchCourses();
     } catch (err) {
       console.error(err);
@@ -684,7 +753,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           </div>
 
           {/* Custom Teacher Resources */}
-          {(selectedLesson?.personalVideo || selectedLesson?.videoTutorial || selectedLesson?.notes || selectedLesson?.test) && (
+          {(selectedLesson?.personalVideo || selectedLesson?.videoTutorial || selectedLesson?.notes || selectedLesson?.test || selectedLesson?.testType === 'custom' || selectedLesson?.homework || selectedLesson?.homeworkType === 'custom') && (
             <div className="pt-8 border-t border-glass-stroke space-y-4">
               <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-plasma-violet">
                 <Lightbulb className="w-4 h-4" />
@@ -692,11 +761,9 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {selectedLesson.personalVideo && (
-                  <a
-                    href={selectedLesson.personalVideo}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer"
+                  <button
+                    onClick={() => setActivePlayingVideo({ title: "Personal Video", url: selectedLesson.personalVideo || "" })}
+                    className="flex items-center text-left gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer w-full focus:outline-none"
                   >
                     <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
                       <Video className="w-5 h-5" />
@@ -705,14 +772,12 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       <p className="text-xs font-bold text-white uppercase tracking-wider">Personal Video</p>
                       <p className="text-[10px] text-on-surface-variant">Watch teacher's recording</p>
                     </div>
-                  </a>
+                  </button>
                 )}
                 {selectedLesson.videoTutorial && (
-                  <a
-                    href={selectedLesson.videoTutorial}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer"
+                  <button
+                    onClick={() => setActivePlayingVideo({ title: "Video Tutorial", url: selectedLesson.videoTutorial || "" })}
+                    className="flex items-center text-left gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer w-full focus:outline-none"
                   >
                     <div className="w-10 h-10 rounded-lg bg-blue-500/10 border border-blue-500/20 flex items-center justify-center text-blue-500 group-hover:scale-110 transition-transform">
                       <PlayCircle className="w-5 h-5" />
@@ -721,7 +786,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       <p className="text-xs font-bold text-white uppercase tracking-wider">Video Tutorial</p>
                       <p className="text-[10px] text-on-surface-variant">External lesson walkthrough</p>
                     </div>
-                  </a>
+                  </button>
                 )}
                 {selectedLesson.notes && (
                   <a
@@ -739,21 +804,75 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     </div>
                   </a>
                 )}
-                {selectedLesson.test && (
-                  <a
-                    href={selectedLesson.test}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer"
+                {selectedLesson.testType === 'custom' && selectedLesson.testCustom ? (
+                  <button
+                    onClick={() => {
+                      setActiveTakingTest(selectedLesson.testCustom);
+                      setStudentQuizAnswers(new Array(selectedLesson.testCustom.questions.length).fill(-1));
+                      setQuizScore(null);
+                    }}
+                    className="flex items-center text-left gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer w-full focus:outline-none"
                   >
                     <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
                       <Target className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Test</p>
-                      <p className="text-[10px] text-on-surface-variant">Take the topic quiz</p>
+                      <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Test (Custom)</p>
+                      <p className="text-[10px] text-on-surface-variant">Take interactive quiz</p>
                     </div>
-                  </a>
+                  </button>
+                ) : (
+                  selectedLesson.test && (
+                    <a
+                      href={selectedLesson.test}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-purple-500/10 border border-purple-500/20 flex items-center justify-center text-purple-500 group-hover:scale-110 transition-transform">
+                        <Target className="w-5 h-5" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Test</p>
+                        <p className="text-[10px] text-on-surface-variant">Take the topic quiz link</p>
+                      </div>
+                    </a>
+                  )
+                )}
+                {selectedLesson.homeworkType === 'custom' && selectedLesson.homeworkCustom ? (
+                  <button
+                    onClick={() => {
+                      setActiveTakingHomework(selectedLesson.homeworkCustom);
+                      setStudentHomeworkAnswers(new Array(selectedLesson.homeworkCustom.questions.length).fill(''));
+                      setHwSubmitted(false);
+                    }}
+                    className="flex items-center text-left gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer w-full focus:outline-none"
+                  >
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                      <BookOpen className="w-5 h-5 text-orange-500" />
+                    </div>
+                    <div>
+                      <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Homework (Custom)</p>
+                      <p className="text-[10px] text-on-surface-variant">Solve interactive homework</p>
+                    </div>
+                  </button>
+                ) : (
+                  selectedLesson.homework && (
+                    <a
+                      href={selectedLesson.homework}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer"
+                    >
+                      <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
+                        <BookOpen className="w-5 h-5 text-orange-500" />
+                      </div>
+                      <div>
+                        <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Homework</p>
+                        <p className="text-[10px] text-on-surface-variant">View homework assignment</p>
+                      </div>
+                    </a>
+                  )
                 )}
               </div>
             </div>
@@ -1065,15 +1184,146 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                   className="w-full bg-white/5 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet placeholder:text-on-surface-variant/40"
                 />
               </div>
-              <div>
-                <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-2">Topic Test / Quiz Link</label>
-                <input
-                  type="url"
-                  placeholder="https://forms.google.com/quiz"
-                  value={newLessonTest}
-                  onChange={(e) => setNewLessonTest(e.target.value)}
-                  className="w-full bg-white/5 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet placeholder:text-on-surface-variant/40"
-                />
+              {/* Topic Test/Quiz */}
+              <div className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3">
+                <div className="flex justify-between items-center">
+                  <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Topic Test / Quiz Mode</label>
+                  <div className="flex gap-1.5 p-1 bg-void-black/40 rounded-lg border border-glass-stroke">
+                    <button
+                      type="button"
+                      onClick={() => setNewLessonTestType('link')}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonTestType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                    >
+                      Web Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewLessonTestType('custom');
+                        if (!newLessonTestCustom) {
+                          setTestMakerTarget('new');
+                          setTestMakerTitle(`${newLessonTopic || 'Topic'} Quiz`);
+                          setTestMakerQuestions([{ question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
+                          setShowTestMaker(true);
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonTestType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                    >
+                      Interactive Maker
+                    </button>
+                  </div>
+                </div>
+
+                {newLessonTestType === 'link' ? (
+                  <input
+                    type="url"
+                    placeholder="https://forms.google.com/quiz"
+                    value={newLessonTest}
+                    onChange={(e) => setNewLessonTest(e.target.value)}
+                    className="w-full bg-white/5 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet placeholder:text-on-surface-variant/40"
+                  />
+                ) : (
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-glass-stroke/50">
+                    <div className="text-xs">
+                      {newLessonTestCustom ? (
+                        <div>
+                          <p className="font-bold text-white">{newLessonTestCustom.title}</p>
+                          <p className="text-[10px] text-on-surface-variant">{newLessonTestCustom.questions.length} Questions configured</p>
+                        </div>
+                      ) : (
+                        <p className="text-on-surface-variant italic">No quiz created yet</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setTestMakerTarget('new');
+                        if (newLessonTestCustom) {
+                          setTestMakerTitle(newLessonTestCustom.title);
+                          setTestMakerQuestions(newLessonTestCustom.questions);
+                        } else {
+                          setTestMakerTitle(`${newLessonTopic || 'Topic'} Quiz`);
+                          setTestMakerQuestions([{ question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
+                        }
+                        setShowTestMaker(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg border border-plasma-violet/40 text-plasma-violet hover:bg-plasma-violet/10 text-[9px] font-mono font-bold uppercase tracking-wider transition-all"
+                    >
+                      {newLessonTestCustom ? 'Edit Quiz' : 'Create Custom Quiz'}
+                    </button>
+                  </div>
+                )}
+              </div>
+
+              {/* Homework Selection */}
+              <div className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3">
+                <div className="flex justify-between items-center">
+                  <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Homework Mode</label>
+                  <div className="flex gap-1.5 p-1 bg-void-black/40 rounded-lg border border-glass-stroke">
+                    <button
+                      type="button"
+                      onClick={() => setNewLessonHomeworkType('link')}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonHomeworkType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                    >
+                      Web Link
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setNewLessonHomeworkType('custom');
+                        if (!newLessonHomeworkCustom) {
+                          setHomeworkMakerTarget('new');
+                          setHomeworkMakerTitle(`${newLessonTopic || 'Topic'} Homework`);
+                          setHomeworkMakerQuestions(['']);
+                          setShowHomeworkMaker(true);
+                        }
+                      }}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonHomeworkType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                    >
+                      Interactive Maker
+                    </button>
+                  </div>
+                </div>
+
+                {newLessonHomeworkType === 'link' ? (
+                  <input
+                    type="url"
+                    placeholder="https://drive.google.com/... or assignment instructions URL"
+                    value={newLessonHomework}
+                    onChange={(e) => setNewLessonHomework(e.target.value)}
+                    className="w-full bg-white/5 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet placeholder:text-on-surface-variant/40"
+                  />
+                ) : (
+                  <div className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-glass-stroke/50">
+                    <div className="text-xs">
+                      {newLessonHomeworkCustom ? (
+                        <div>
+                          <p className="font-bold text-white">{newLessonHomeworkCustom.title}</p>
+                          <p className="text-[10px] text-on-surface-variant">{newLessonHomeworkCustom.questions.length} problems configured</p>
+                        </div>
+                      ) : (
+                        <p className="text-on-surface-variant italic">No homework created yet</p>
+                      )}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setHomeworkMakerTarget('new');
+                        if (newLessonHomeworkCustom) {
+                          setHomeworkMakerTitle(newLessonHomeworkCustom.title);
+                          setHomeworkMakerQuestions(newLessonHomeworkCustom.questions);
+                        } else {
+                          setHomeworkMakerTitle(`${newLessonTopic || 'Topic'} Homework`);
+                          setHomeworkMakerQuestions(['']);
+                        }
+                        setShowHomeworkMaker(true);
+                      }}
+                      className="px-3 py-1.5 rounded-lg border border-plasma-violet/40 text-plasma-violet hover:bg-plasma-violet/10 text-[9px] font-mono font-bold uppercase tracking-wider transition-all"
+                    >
+                      {newLessonHomeworkCustom ? 'Edit Homework' : 'Create Custom Homework'}
+                    </button>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -1365,15 +1615,146 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                         />
                       </div>
 
-                      <div>
-                        <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-1">Topic Test URL</label>
-                        <input
-                          type="url"
-                          placeholder="https://forms.google.com/quiz"
-                          value={quickLessonTest}
-                          onChange={(e) => setQuickLessonTest(e.target.value)}
-                          className="w-full bg-white/5 border border-glass-stroke rounded-xl px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
-                        />
+                      {/* Topic Test/Quiz Mode */}
+                      <div className="p-3 rounded-xl bg-white/5 border border-glass-stroke space-y-2">
+                        <div className="flex justify-between items-center">
+                          <label className="block text-[9px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Topic Test Mode</label>
+                          <div className="flex gap-1 p-0.5 bg-void-black/40 rounded border border-glass-stroke">
+                            <button
+                              type="button"
+                              onClick={() => setQuickLessonTestType('link')}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonTestType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                            >
+                              Link
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setQuickLessonTestType('custom');
+                                if (!quickLessonTestCustom) {
+                                  setTestMakerTarget('quick');
+                                  setTestMakerTitle(`${quickLessonTopic || 'Topic'} Quiz`);
+                                  setTestMakerQuestions([{ question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
+                                  setShowTestMaker(true);
+                                }
+                              }}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonTestType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                            >
+                              Custom
+                            </button>
+                          </div>
+                        </div>
+
+                        {quickLessonTestType === 'link' ? (
+                          <input
+                            type="url"
+                            placeholder="https://forms.google.com/quiz"
+                            value={quickLessonTest}
+                            onChange={(e) => setQuickLessonTest(e.target.value)}
+                            className="w-full bg-white/5 border border-glass-stroke rounded-xl px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-between p-2 rounded bg-white/5 border border-glass-stroke/50">
+                            <div className="text-[10px]">
+                              {quickLessonTestCustom ? (
+                                <div>
+                                  <p className="font-bold text-white truncate max-w-[120px]">{quickLessonTestCustom.title}</p>
+                                  <p className="text-[8px] text-on-surface-variant">{quickLessonTestCustom.questions.length} Qs</p>
+                                </div>
+                              ) : (
+                                <p className="text-on-surface-variant italic">No quiz created</p>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setTestMakerTarget('quick');
+                                if (quickLessonTestCustom) {
+                                  setTestMakerTitle(quickLessonTestCustom.title);
+                                  setTestMakerQuestions(quickLessonTestCustom.questions);
+                                } else {
+                                  setTestMakerTitle(`${quickLessonTopic || 'Topic'} Quiz`);
+                                  setTestMakerQuestions([{ question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
+                                }
+                                setShowTestMaker(true);
+                              }}
+                              className="px-2 py-1 rounded border border-plasma-violet/40 text-plasma-violet hover:bg-plasma-violet/10 text-[8px] font-mono font-bold uppercase tracking-wider transition-all"
+                            >
+                              {quickLessonTestCustom ? 'Edit' : 'Create'}
+                            </button>
+                          </div>
+                        )}
+                      </div>
+
+                      {/* Homework Mode */}
+                      <div className="p-3 rounded-xl bg-white/5 border border-glass-stroke space-y-2">
+                        <div className="flex justify-between items-center">
+                          <label className="block text-[9px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Homework Mode</label>
+                          <div className="flex gap-1 p-0.5 bg-void-black/40 rounded border border-glass-stroke">
+                            <button
+                              type="button"
+                              onClick={() => setQuickLessonHomeworkType('link')}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonHomeworkType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                            >
+                              Link
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setQuickLessonHomeworkType('custom');
+                                if (!quickLessonHomeworkCustom) {
+                                  setHomeworkMakerTarget('quick');
+                                  setHomeworkMakerTitle(`${quickLessonTopic || 'Topic'} Homework`);
+                                  setHomeworkMakerQuestions(['']);
+                                  setShowHomeworkMaker(true);
+                                }
+                              }}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonHomeworkType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                            >
+                              Custom
+                            </button>
+                          </div>
+                        </div>
+
+                        {quickLessonHomeworkType === 'link' ? (
+                          <input
+                            type="url"
+                            placeholder="https://drive.google.com/..."
+                            value={quickLessonHomework}
+                            onChange={(e) => setQuickLessonHomework(e.target.value)}
+                            className="w-full bg-white/5 border border-glass-stroke rounded-xl px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
+                          />
+                        ) : (
+                          <div className="flex items-center justify-between p-2 rounded bg-white/5 border border-glass-stroke/50">
+                            <div className="text-[10px]">
+                              {quickLessonHomeworkCustom ? (
+                                <div>
+                                  <p className="font-bold text-white truncate max-w-[120px]">{quickLessonHomeworkCustom.title}</p>
+                                  <p className="text-[8px] text-on-surface-variant">{quickLessonHomeworkCustom.questions.length} Tasks</p>
+                                </div>
+                              ) : (
+                                <p className="text-on-surface-variant italic">No homework created</p>
+                              )}
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => {
+                                setHomeworkMakerTarget('quick');
+                                if (quickLessonHomeworkCustom) {
+                                  setHomeworkMakerTitle(quickLessonHomeworkCustom.title);
+                                  setHomeworkMakerQuestions(quickLessonHomeworkCustom.questions);
+                                } else {
+                                  setHomeworkMakerTitle(`${quickLessonTopic || 'Topic'} Homework`);
+                                  setHomeworkMakerQuestions(['']);
+                                }
+                                setShowHomeworkMaker(true);
+                              }}
+                              className="px-2 py-1 rounded border border-plasma-violet/40 text-plasma-violet hover:bg-plasma-violet/10 text-[8px] font-mono font-bold uppercase tracking-wider transition-all"
+                            >
+                              {quickLessonHomeworkCustom ? 'Edit' : 'Create'}
+                            </button>
+                          </div>
+                        )}
                       </div>
 
                       <button
@@ -1397,6 +1778,673 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       )}
     </div>
   );
+
+  const handleGenerateTest = async () => {
+    const topic = testMakerTarget === 'new' ? newLessonTopic : quickLessonTopic;
+    if (!topic) {
+      alert("Please enter a Topic Name first before generating questions.");
+      return;
+    }
+    setGeneratingTest(true);
+    try {
+      const response = await fetch('/api/agent/generate-task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, type: 'quiz' })
+      });
+      if (!response.ok) {
+        throw new Error('AI Generation failed');
+      }
+      const data = await response.json();
+      if (data && data.questions) {
+        setTestMakerTitle(data.title || `${topic} Quiz`);
+        setTestMakerQuestions(data.questions);
+      } else {
+        alert("Unexpected response format from AI generator.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error generating quiz via AI. You can still create it manually.");
+    } finally {
+      setGeneratingTest(false);
+    }
+  };
+
+  const handleGenerateHomework = async () => {
+    const topic = homeworkMakerTarget === 'new' ? newLessonTopic : quickLessonTopic;
+    if (!topic) {
+      alert("Please enter a Topic Name first before generating homework.");
+      return;
+    }
+    setGeneratingHomework(true);
+    try {
+      const response = await fetch('/api/agent/generate-task', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ topic, type: 'custom-homework' })
+      });
+      if (!response.ok) {
+        throw new Error('AI Generation failed');
+      }
+      const data = await response.json();
+      if (data && data.questions) {
+        setHomeworkMakerTitle(data.title || `${topic} Homework`);
+        setHomeworkMakerQuestions(data.questions);
+      } else {
+        alert("Unexpected response format from AI generator.");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Error generating homework via AI. You can still create it manually.");
+    } finally {
+      setGeneratingHomework(false);
+    }
+  };
+
+  const renderTestMakerModal = () => {
+    if (!showTestMaker) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
+        <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+              <Target className="w-5 h-5 text-plasma-violet" />
+              Interactive Test / Quiz Maker
+            </h3>
+            <button
+              onClick={() => setShowTestMaker(false)}
+              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-1">Quiz Title</label>
+              <input
+                type="text"
+                value={testMakerTitle}
+                onChange={(e) => setTestMakerTitle(e.target.value)}
+                placeholder="e.g. Velocity and Acceleration Quiz"
+                className="w-full bg-white/5 border border-glass-stroke rounded-xl px-4 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
+              />
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Questions ({testMakerQuestions.length})</span>
+              <button
+                type="button"
+                onClick={handleGenerateTest}
+                disabled={generatingTest}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-plasma-violet/20 hover:bg-plasma-violet/30 border border-plasma-violet/40 text-plasma-violet font-mono text-[9px] font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+              >
+                {generatingTest ? (
+                  <>
+                    <div className="w-3 h-3 border border-plasma-violet/20 border-t-plasma-violet rounded-full animate-spin mr-1" />
+                    AI Generating...
+                  </>
+                ) : (
+                  <>
+                    <Lightbulb className="w-3.5 h-3.5" />
+                    AI Generate Questions
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
+              {testMakerQuestions.map((q, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3 relative">
+                  <div className="flex justify-between items-center">
+                    <span className="text-[10px] font-mono text-plasma-violet font-bold">Question {idx + 1}</span>
+                    {testMakerQuestions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...testMakerQuestions];
+                          updated.splice(idx, 1);
+                          setTestMakerQuestions(updated);
+                        }}
+                        className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+
+                  <input
+                    type="text"
+                    value={q.question}
+                    onChange={(e) => {
+                      const updated = [...testMakerQuestions];
+                      updated[idx].question = e.target.value;
+                      setTestMakerQuestions(updated);
+                    }}
+                    placeholder="Enter the question text..."
+                    className="w-full bg-white/5 border border-glass-stroke rounded-lg px-3 py-1.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
+                  />
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {q.options.map((opt: string, optIdx: number) => (
+                      <div key={optIdx} className="flex items-center gap-2">
+                        <input
+                          type="radio"
+                          name={`correct-option-${idx}`}
+                          checked={q.correctOptionIndex === optIdx}
+                          onChange={() => {
+                            const updated = [...testMakerQuestions];
+                            updated[idx].correctOptionIndex = optIdx;
+                            setTestMakerQuestions(updated);
+                          }}
+                          className="text-plasma-violet focus:ring-plasma-violet"
+                        />
+                        <input
+                          type="text"
+                          value={opt}
+                          onChange={(e) => {
+                            const updated = [...testMakerQuestions];
+                            updated[idx].options[optIdx] = e.target.value;
+                            setTestMakerQuestions(updated);
+                          }}
+                          placeholder={`Option ${optIdx + 1}`}
+                          className="flex-1 bg-white/5 border border-glass-stroke rounded px-2.5 py-1 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
+                        />
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setTestMakerQuestions([...testMakerQuestions, { question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
+              }}
+              className="w-full py-2 rounded-xl border border-dashed border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/5 text-on-surface-variant hover:text-white transition-all text-xs font-bold"
+            >
+              + Add Question
+            </button>
+          </div>
+
+          <div className="flex justify-end gap-3 border-t border-glass-stroke pt-4">
+            <button
+              type="button"
+              onClick={() => setShowTestMaker(false)}
+              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-on-surface transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!testMakerTitle.trim()) {
+                  alert("Quiz title is required.");
+                  return;
+                }
+                const invalid = testMakerQuestions.some(q => !q.question.trim() || q.options.some((o: string) => !o.trim()));
+                if (invalid) {
+                  alert("Please fill in all questions and options.");
+                  return;
+                }
+                const config = {
+                  title: testMakerTitle,
+                  questions: testMakerQuestions
+                };
+                if (testMakerTarget === 'new') {
+                  setNewLessonTestCustom(config);
+                } else {
+                  setQuickLessonTestCustom(config);
+                }
+                setShowTestMaker(false);
+              }}
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+            >
+              Save Quiz Config
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderHomeworkMakerModal = () => {
+    if (!showHomeworkMaker) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
+        <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-plasma-violet" />
+              Interactive Homework assignment Maker
+            </h3>
+            <button
+              onClick={() => setShowHomeworkMaker(false)}
+              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-4">
+            <div>
+              <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-1">Homework Title</label>
+              <input
+                type="text"
+                value={homeworkMakerTitle}
+                onChange={(e) => setHomeworkMakerTitle(e.target.value)}
+                placeholder="e.g. Kinematics Practice Problems"
+                className="w-full bg-white/5 border border-glass-stroke rounded-xl px-4 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
+              />
+            </div>
+
+            <div className="flex justify-between items-center">
+              <span className="text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold">Problems / Prompts ({homeworkMakerQuestions.length})</span>
+              <button
+                type="button"
+                onClick={handleGenerateHomework}
+                disabled={generatingHomework}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-plasma-violet/20 hover:bg-plasma-violet/30 border border-plasma-violet/40 text-plasma-violet font-mono text-[9px] font-bold uppercase tracking-wider transition-all disabled:opacity-50"
+              >
+                {generatingHomework ? (
+                  <>
+                    <div className="w-3 h-3 border border-plasma-violet/20 border-t-plasma-violet rounded-full animate-spin mr-1" />
+                    AI Generating...
+                  </>
+                ) : (
+                  <>
+                    <Lightbulb className="w-3.5 h-3.5" />
+                    AI Generate Homework
+                  </>
+                )}
+              </button>
+            </div>
+
+            <div className="space-y-4 max-h-[40vh] overflow-y-auto pr-2">
+              {homeworkMakerQuestions.map((q, idx) => (
+                <div key={idx} className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-2 relative">
+                  <div className="flex justify-between items-center mb-1">
+                    <span className="text-[10px] font-mono text-plasma-violet font-bold">Problem {idx + 1}</span>
+                    {homeworkMakerQuestions.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const updated = [...homeworkMakerQuestions];
+                          updated.splice(idx, 1);
+                          setHomeworkMakerQuestions(updated);
+                        }}
+                        className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase"
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+
+                  <textarea
+                    rows={2}
+                    value={q}
+                    onChange={(e) => {
+                      const updated = [...homeworkMakerQuestions];
+                      updated[idx] = e.target.value;
+                      setHomeworkMakerQuestions(updated);
+                    }}
+                    placeholder="Enter homework prompt/question details..."
+                    className="w-full bg-white/5 border border-glass-stroke rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet resize-none"
+                  />
+                </div>
+              ))}
+            </div>
+
+            <button
+              type="button"
+              onClick={() => {
+                setHomeworkMakerQuestions([...homeworkMakerQuestions, '']);
+              }}
+              className="w-full py-2 rounded-xl border border-dashed border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/5 text-on-surface-variant hover:text-white transition-all text-xs font-bold"
+            >
+              + Add Problem Task
+            </button>
+          </div>
+
+          <div className="flex justify-end gap-3 border-t border-glass-stroke pt-4">
+            <button
+              type="button"
+              onClick={() => setShowHomeworkMaker(false)}
+              className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-on-surface transition-all"
+            >
+              Cancel
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                if (!homeworkMakerTitle.trim()) {
+                  alert("Homework title is required.");
+                  return;
+                }
+                const invalid = homeworkMakerQuestions.some(q => !q.trim());
+                if (invalid) {
+                  alert("Please fill in all problem prompts.");
+                  return;
+                }
+                const config = {
+                  title: homeworkMakerTitle,
+                  questions: homeworkMakerQuestions
+                };
+                if (homeworkMakerTarget === 'new') {
+                  setNewLessonHomeworkCustom(config);
+                } else {
+                  setQuickLessonHomeworkCustom(config);
+                }
+                setShowHomeworkMaker(false);
+              }}
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+            >
+              Save Homework Config
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStudentTestTakerModal = () => {
+    if (!activeTakingTest) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
+        <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+              <Target className="w-5 h-5 text-plasma-violet" />
+              {activeTakingTest.title}
+            </h3>
+            <button
+              onClick={() => setActiveTakingTest(null)}
+              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-6 overflow-y-auto max-h-[50vh] pr-2">
+            {activeTakingTest.questions.map((q: any, idx: number) => {
+              const hasSubmitted = quizScore !== null;
+              const selectedIdx = studentQuizAnswers[idx];
+              const isCorrect = q.correctOptionIndex === selectedIdx;
+
+              return (
+                <div key={idx} className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3">
+                  <p className="text-sm font-bold text-white font-sans">
+                    {idx + 1}. {q.question}
+                  </p>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-1">
+                    {q.options.map((opt: string, optIdx: number) => {
+                      let btnStyle = "bg-white/5 border-glass-stroke text-on-surface-variant";
+                      if (hasSubmitted) {
+                        if (optIdx === q.correctOptionIndex) {
+                          btnStyle = "bg-green-500/20 border-green-500/50 text-green-400 font-bold";
+                        } else if (optIdx === selectedIdx && !isCorrect) {
+                          btnStyle = "bg-red-500/20 border-red-500/50 text-red-400 font-bold";
+                        }
+                      } else {
+                        if (selectedIdx === optIdx) {
+                          btnStyle = "bg-plasma-violet/20 border-plasma-violet text-white font-bold";
+                        }
+                      }
+
+                      return (
+                        <button
+                          key={optIdx}
+                          type="button"
+                          disabled={hasSubmitted}
+                          onClick={() => {
+                            const updated = [...studentQuizAnswers];
+                            updated[idx] = optIdx;
+                            setStudentQuizAnswers(updated);
+                          }}
+                          className={`flex items-center text-left gap-3 px-4 py-2.5 rounded-xl border text-xs transition-all w-full focus:outline-none ${btnStyle} ${!hasSubmitted && 'hover:bg-white/10 hover:border-white/20'}`}
+                        >
+                          <span className="w-5 h-5 rounded-full border border-current flex items-center justify-center text-[9px] font-mono shrink-0">
+                            {String.fromCharCode(65 + optIdx)}
+                          </span>
+                          <span>{opt}</span>
+                        </button>
+                      );
+                    })}
+                  </div>
+
+                  {hasSubmitted && (
+                    <div className="text-[10px] font-sans flex items-center gap-1.5 mt-2">
+                      {isCorrect ? (
+                        <span className="text-green-400 font-bold">✓ Correct Answer</span>
+                      ) : (
+                        <span className="text-red-400 font-bold">✗ Incorrect (Correct: {q.options[q.correctOptionIndex]})</span>
+                      )}
+                    </div>
+                  )}
+                </div>
+              );
+            })}
+          </div>
+
+          {quizScore && (
+            <div className="p-4 rounded-xl bg-plasma-violet/10 border border-plasma-violet/30 text-center space-y-2">
+              <p className="text-xs uppercase font-mono tracking-widest text-plasma-violet font-bold">Quiz Results</p>
+              <h4 className="text-3xl font-extrabold text-white">
+                {quizScore.score} / {quizScore.total}
+              </h4>
+              <p className="text-xs text-on-surface-variant italic">
+                You scored {Math.round(quizScore.score / quizScore.total * 100)}% on this quiz task.
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 border-t border-glass-stroke pt-4">
+            {quizScore ? (
+              <button
+                type="button"
+                onClick={() => setActiveTakingTest(null)}
+                className="px-6 py-2 rounded-xl bg-plasma-violet text-white text-xs font-bold uppercase tracking-wider transition-all"
+              >
+                Close Results
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveTakingTest(null)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-on-surface transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const unanswered = studentQuizAnswers.some(ans => ans === -1);
+                    if (unanswered) {
+                      if (!confirm("You have unanswered questions. Submit anyway?")) {
+                        return;
+                      }
+                    }
+                    let score = 0;
+                    activeTakingTest.questions.forEach((q: any, idx: number) => {
+                      if (studentQuizAnswers[idx] === q.correctOptionIndex) {
+                        score++;
+                      }
+                    });
+                    setQuizScore({
+                      score,
+                      total: activeTakingTest.questions.length,
+                      submitted: true
+                    });
+                  }}
+                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+                >
+                  Submit Quiz
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const renderStudentHomeworkTakerModal = () => {
+    if (!activeTakingHomework) return null;
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
+        <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
+          <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
+            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+              <BookOpen className="w-5 h-5 text-plasma-violet" />
+              {activeTakingHomework.title}
+            </h3>
+            <button
+              onClick={() => setActiveTakingHomework(null)}
+              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+            >
+              ✕
+            </button>
+          </div>
+
+          <div className="space-y-6 overflow-y-auto max-h-[50vh] pr-2">
+            {activeTakingHomework.questions.map((q: string, idx: number) => (
+              <div key={idx} className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3">
+                <p className="text-sm font-bold text-white font-sans leading-relaxed">
+                  {idx + 1}. {q}
+                </p>
+
+                <textarea
+                  rows={3}
+                  disabled={hwSubmitted}
+                  value={studentHomeworkAnswers[idx] || ''}
+                  onChange={(e) => {
+                    const updated = [...studentHomeworkAnswers];
+                    updated[idx] = e.target.value;
+                    setStudentHomeworkAnswers(updated);
+                  }}
+                  placeholder={hwSubmitted ? "No response provided" : "Write your response details here..."}
+                  className="w-full bg-white/5 border border-glass-stroke rounded-lg px-3 py-2 text-xs text-on-surface focus:outline-none focus:border-plasma-violet resize-none placeholder:text-on-surface-variant/40"
+                />
+              </div>
+            ))}
+          </div>
+
+          {hwSubmitted && (
+            <div className="p-4 rounded-xl bg-green-500/10 border border-green-500/30 text-center space-y-1">
+              <p className="text-xs uppercase font-mono tracking-widest text-green-400 font-bold">Submission Received</p>
+              <p className="text-xs text-on-surface-variant italic">
+                Your homework answers have been uploaded and saved successfully.
+              </p>
+            </div>
+          )}
+
+          <div className="flex justify-end gap-3 border-t border-glass-stroke pt-4">
+            {hwSubmitted ? (
+              <button
+                type="button"
+                onClick={() => setActiveTakingHomework(null)}
+                className="px-6 py-2 rounded-xl bg-green-600 text-white text-xs font-bold uppercase tracking-wider transition-all"
+              >
+                Done
+              </button>
+            ) : (
+              <>
+                <button
+                  type="button"
+                  onClick={() => setActiveTakingHomework(null)}
+                  className="px-4 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-xs text-on-surface transition-all"
+                >
+                  Cancel
+                </button>
+                <button
+                  type="button"
+                  onClick={() => {
+                    const invalid = studentHomeworkAnswers.some(ans => !ans.trim());
+                    if (invalid) {
+                      if (!confirm("You have incomplete answers. Submit anyway?")) {
+                        return;
+                      }
+                    }
+                    setHwSubmitted(true);
+                  }}
+                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+                >
+                  Submit Homework
+                </button>
+              </>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
+  const getYouTubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+    const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
+    const match = url.match(regExp);
+    if (match && match[2].length === 11) {
+      return `https://www.youtube.com/embed/${match[2]}`;
+    }
+    return null;
+  };
+
+  const renderVideoPlayerModal = () => {
+    if (!activePlayingVideo) return null;
+
+    const ytEmbedUrl = getYouTubeEmbedUrl(activePlayingVideo.url);
+
+    return (
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/90 backdrop-blur-md p-4">
+        <div className="relative w-full max-w-4xl bg-void-black border border-glass-stroke rounded-2xl overflow-hidden shadow-2xl space-y-4 p-4">
+          <div className="flex justify-between items-center border-b border-glass-stroke pb-2">
+            <h3 className="text-xs font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+              <PlayCircle className="w-5 h-5 text-plasma-violet" />
+              {activePlayingVideo.title}
+            </h3>
+            <button
+              onClick={() => setActivePlayingVideo(null)}
+              className="text-on-surface-variant hover:text-white transition-colors text-xs font-bold p-1"
+            >
+              ✕ Close
+            </button>
+          </div>
+
+          <div className="relative aspect-video w-full bg-black/40 rounded-xl overflow-hidden border border-glass-stroke">
+            {ytEmbedUrl ? (
+              <iframe
+                src={ytEmbedUrl}
+                title={activePlayingVideo.title}
+                className="absolute inset-0 w-full h-full border-0"
+                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                allowFullScreen
+              />
+            ) : (
+              <video
+                src={activePlayingVideo.url}
+                controls
+                autoPlay
+                className="absolute inset-0 w-full h-full object-contain"
+              />
+            )}
+          </div>
+
+          <div className="flex justify-between items-center text-[10px] text-on-surface-variant font-mono">
+            <span className="truncate max-w-[70%]">Source: {activePlayingVideo.url}</span>
+            <button
+              onClick={() => window.open(activePlayingVideo.url, '_blank')}
+              className="text-plasma-violet hover:underline shrink-0"
+            >
+              Open in New Tab ↗
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <div className="animate-in fade-in slide-in-from-bottom-4 duration-700">
@@ -1469,6 +2517,12 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           </div>
         )}
       </AnimatePresence>
+
+      {renderTestMakerModal()}
+      {renderHomeworkMakerModal()}
+      {renderStudentTestTakerModal()}
+      {renderStudentHomeworkTakerModal()}
+      {renderVideoPlayerModal()}
     </div>
   );
 }
