@@ -18,6 +18,7 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
     { role: 'bot', text: `Welcome to the Synapse Help Center. I am your cognitive navigation assistant. What system modules are you having trouble with?` }
   ]);
   const [chatInput, setChatInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   // Auto-scroll chat
@@ -25,21 +26,61 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages]);
+  }, [messages, isTyping]);
 
   const handleSendChat = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!chatInput.trim()) return;
+    if (!chatInput.trim() || isTyping) return;
 
-    submitUserQuestion(chatInput);
+    const text = chatInput;
     setChatInput('');
+    submitUserQuestion(text);
   };
 
-  const submitUserQuestion = (text: string) => {
-    setMessages(prev => [...prev, { role: 'user', text }]);
+  const submitUserQuestion = async (text: string) => {
+    if (isTyping) return;
+    const updatedMessages = [...messages, { role: 'user' as const, text }];
+    setMessages(updatedMessages);
+    setIsTyping(true);
 
-    // Smart responses matching the Synapse/LOS theme
-    setTimeout(() => {
+    try {
+      const response = await fetch('/api/agent/guide-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatHistory: updatedMessages })
+      });
+
+      if (!response.ok) {
+        throw new Error('Response not OK');
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let streamStarted = false;
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+          
+          if (!streamStarted) {
+            streamStarted = true;
+            setIsTyping(false); // Hide the loading dots once streaming starts
+            setMessages(prev => [...prev, { role: 'bot' as const, text: chunk }]);
+          } else {
+            setMessages(prev => {
+              const newMessages = [...prev];
+              const lastItem = newMessages[newMessages.length - 1];
+              newMessages[newMessages.length - 1] = { ...lastItem, text: lastItem.text + chunk };
+              return newMessages;
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      // Smart responses matching the Synapse/LOS theme as a fallback
       let reply = "";
       const lower = text.toLowerCase();
       if (lower.includes('cognitive') || lower.includes('load')) {
@@ -51,10 +92,12 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
       } else if (lower.includes('agent') || lower.includes('ai')) {
         reply = "Synapse runs multi-agent AI (using ChatGPT, Claude, Nvidia, and Gemini) to generate personalized test questions, monitor mental states, and deliver cognitive suggestions.";
       } else {
-        reply = "Telemetry received. I've routed this request to the Synapse core router. Let me know if you want to explore the Silent Chamber, Custom Test taking, or Seat Matrix details.";
+        reply = "I've encountered a connection interruption with the Synapse Guide node. Please make sure the backend is active, or feel free to check the System Guidebook FAQ tab.";
       }
-      setMessages(prev => [...prev, { role: 'bot', text: reply }]);
-    }, 800);
+      setMessages(prev => [...prev, { role: 'bot' as const, text: reply }]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   const handleTicketSubmit = (e: React.FormEvent) => {
@@ -246,6 +289,18 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
                   </div>
                 </div>
               ))}
+              {isTyping && (
+                <div className="flex items-start gap-3">
+                  <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 border bg-plasma-violet/10 border-plasma-violet/20 text-plasma-violet">
+                    <Shield className="w-4 h-4" />
+                  </div>
+                  <div className="p-3.5 rounded-2xl text-xs leading-relaxed bg-white/5 border border-glass-stroke text-white rounded-tl-none font-sans flex items-center gap-1.5 h-10">
+                    <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse"></span>
+                    <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-150"></span>
+                    <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-300"></span>
+                  </div>
+                </div>
+              )}
               <div ref={chatEndRef} />
             </div>
 
@@ -253,19 +308,22 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
             <div className="p-3 bg-white/5 border-t border-glass-stroke flex flex-wrap gap-2">
               <button 
                 onClick={() => submitUserQuestion("What is cognitive load?")}
-                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer"
+                disabled={isTyping}
+                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
               >
                 What is cognitive load?
               </button>
               <button 
                 onClick={() => submitUserQuestion("How do I take a custom quiz?")}
-                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer"
+                disabled={isTyping}
+                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
               >
                 How to take a quiz?
               </button>
               <button 
                 onClick={() => submitUserQuestion("What does the SOS panel do?")}
-                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer"
+                disabled={isTyping}
+                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
               >
                 What does SOS panel do?
               </button>
@@ -277,12 +335,13 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
                 type="text"
                 value={chatInput}
                 onChange={e => setChatInput(e.target.value)}
+                disabled={isTyping}
                 placeholder="Ask assistance node about Course Hub, tests, or silent chamber..."
-                className="flex-1 bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet transition-colors"
+                className="flex-1 bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet transition-colors disabled:opacity-50"
               />
               <button
                 type="submit"
-                disabled={!chatInput.trim()}
+                disabled={!chatInput.trim() || isTyping}
                 className="px-4 rounded-xl bg-plasma-violet text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:scale-102 transition-transform disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5" />

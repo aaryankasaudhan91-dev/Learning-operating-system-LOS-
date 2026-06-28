@@ -7,26 +7,73 @@ export default function HelpChatBot() {
     { role: 'bot', text: 'Hello! I am the Synapse Assistant. How can I help you navigate the cognitive space?' }
   ]);
   const [input, setInput] = useState('');
+  const [isTyping, setIsTyping] = useState(false);
   const chatEndRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (chatEndRef.current) {
       chatEndRef.current.scrollIntoView({ behavior: 'smooth' });
     }
-  }, [messages, isOpen]);
+  }, [messages, isOpen, isTyping]);
 
-  const handleSend = (e: React.FormEvent) => {
+  const handleSend = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!input.trim()) return;
+    if (!input.trim() || isTyping) return;
 
-    setMessages(prev => [...prev, { role: 'user', text: input }]);
     const currentInput = input;
     setInput('');
+    const updatedMessages = [...messages, { role: 'user' as const, text: currentInput }];
+    setMessages(updatedMessages);
+    setIsTyping(true);
 
-    // Simulate bot reply
-    setTimeout(() => {
-      setMessages(prev => [...prev, { role: 'bot', text: `I understand you're asking about "${currentInput}". As an AI assistant, I'm analyzing the network to provide the best telemetry for your request.` }]);
-    }, 1000);
+    try {
+      const response = await fetch('/api/agent/guide-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ chatHistory: updatedMessages })
+      });
+
+      if (!response.ok) {
+        throw new Error('Response not OK');
+      }
+
+      const reader = response.body?.getReader();
+      const decoder = new TextDecoder();
+      let streamStarted = false;
+
+      if (reader) {
+        while (true) {
+          const { done, value } = await reader.read();
+          if (done) break;
+          const chunk = decoder.decode(value, { stream: true });
+
+          if (!streamStarted) {
+            streamStarted = true;
+            setIsTyping(false);
+            setMessages(prev => [...prev, { role: 'bot' as const, text: chunk }]);
+          } else {
+            setMessages(prev => {
+              const newMessages = [...prev];
+              const lastItem = newMessages[newMessages.length - 1];
+              newMessages[newMessages.length - 1] = { ...lastItem, text: lastItem.text + chunk };
+              return newMessages;
+            });
+          }
+        }
+      }
+    } catch (err) {
+      console.error(err);
+      // Local fallback simulator if API fails
+      setMessages(prev => [
+        ...prev, 
+        { 
+          role: 'bot' as const, 
+          text: `I'm having trouble connecting to the live Synapse guide node. For your query "${currentInput}", you can refer to the Help & Diagnostic Center inside the dashboard for detailed offline guidebooks.` 
+        }
+      ]);
+    } finally {
+      setIsTyping(false);
+    }
   };
 
   return (
@@ -74,6 +121,18 @@ export default function HelpChatBot() {
               </div>
             </div>
           ))}
+          {isTyping && (
+            <div className="flex items-end gap-2">
+              <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-electric-cyan/20 text-electric-cyan">
+                <Bot className="w-3 h-3" />
+              </div>
+              <div className="p-3 rounded-2xl bg-white/5 border border-glass-stroke text-white rounded-bl-sm flex items-center gap-1.5 h-8">
+                <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse"></span>
+                <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-150"></span>
+                <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-300"></span>
+              </div>
+            </div>
+          )}
           <div ref={chatEndRef} />
         </div>
 
@@ -83,12 +142,13 @@ export default function HelpChatBot() {
             type="text" 
             value={input}
             onChange={(e) => setInput(e.target.value)}
+            disabled={isTyping}
             placeholder="Ask about your dashboard..."
-            className="flex-1 bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2 text-sm text-on-surface focus:outline-none focus:border-electric-cyan transition-colors"
+            className="flex-1 bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2 text-sm text-on-surface focus:outline-none focus:border-electric-cyan transition-colors disabled:opacity-50"
           />
           <button 
             type="submit"
-            disabled={!input.trim()}
+            disabled={!input.trim() || isTyping}
             className="w-10 h-10 rounded-xl bg-electric-cyan/20 text-electric-cyan flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed hover:bg-electric-cyan/30 transition-colors"
           >
             <Send className="w-4 h-4 ml-0.5" />
