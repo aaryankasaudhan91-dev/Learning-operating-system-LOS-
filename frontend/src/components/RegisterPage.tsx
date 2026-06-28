@@ -157,41 +157,41 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
       <style dangerouslySetInnerHTML={{ __html: `
         .register-body {
             background-color: var(--color-void-black);
-            background-image: radial-gradient(circle at 50% 50%, var(--color-nebula-purple) 0%, transparent 70%);
+            background-image: radial-gradient(circle at 50% 50%, var(--color-nebula-purple) 0%, transparent 80%);
             background-attachment: fixed;
             background-size: 200vw 200vh;
             background-position: center;
-        }
+         }
 
         .glass-panel-reg {
-            background: rgba(255, 255, 255, 0.65);
+            background: rgba(255, 255, 255, 0.7);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
-            border: 1px solid var(--color-glass-stroke);
-            box-shadow: 0 4px 30px rgba(15, 23, 42, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04);
         }
 
         .ambient-glow-violet {
-            box-shadow: 0 0 40px rgba(124, 58, 237, 0.2);
+            box-shadow: 0 0 40px rgba(124, 58, 237, 0.15);
         }
         
         .ambient-glow-violet-active:active {
-            box-shadow: 0 0 60px rgba(124, 58, 237, 0.4);
+            box-shadow: 0 0 60px rgba(124, 58, 237, 0.25);
             transform: scale(0.98);
         }
 
         .glass-input-reg {
-            background: rgba(255, 255, 255, 0.6);
+            background: rgba(255, 255, 255, 0.85);
             color: var(--color-on-surface);
-            border: none;
-            border-bottom: 1px solid var(--color-outline-variant);
+            border: 1px solid rgba(15, 23, 42, 0.08);
+            border-radius: 8px;
             transition: all 0.3s ease;
         }
 
         .glass-input-reg:focus {
             outline: none;
-            border-bottom-color: var(--color-plasma-violet);
-            box-shadow: 0 4px 20px -10px rgba(124, 58, 237, 0.4);
+            border-color: var(--color-plasma-violet);
+            box-shadow: 0 0 15px rgba(124, 58, 237, 0.2);
         }
         
         /* Font scaling specific to registration based on user's HTML payload */

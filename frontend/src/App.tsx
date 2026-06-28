@@ -52,6 +52,7 @@ export default function App() {
 
   // Show customized action toast banner message
   const addNotification = (msg: string) => {
+    if (currentView === 'chamber') return; // Stop notifications in focus mode
     setActiveNotification(msg);
   };
 
@@ -64,6 +65,13 @@ export default function App() {
       return () => clearTimeout(timer);
     }
   }, [activeNotification]);
+
+  // Clear active notifications when entering Focus mode
+  useEffect(() => {
+    if (currentView === 'chamber') {
+      setActiveNotification(null);
+    }
+  }, [currentView]);
 
   // Synchronise Student workload changes dynamically into visual seats array to show deep sync
   // Realtime updates handled via components or services
@@ -420,7 +428,7 @@ export default function App() {
       <HelpChatBot />
 
       {/* FLOATING ACTION NOTIFICATION TOAST FEEDBACKS BANNER */}
-      {activeNotification && (
+      {activeNotification && currentView !== 'chamber' && (
         <div className="fixed bottom-6 left-6 z-50 glass-panel p-4 rounded-xl border-l-4 border-l-electric-cyan max-w-sm animate-[fadeIn_0.3s_ease-out] flex gap-3 shadow-lg shadow-electric-cyan/15 items-start justify-between">
           <div className="flex gap-2.5">
             <div className="w-8 h-8 rounded-full bg-electric-cyan/20 flex items-center justify-center flex-shrink-0">
