@@ -253,6 +253,40 @@ async function startServer() {
     }
   });
 
+  app.get("/api/db/telemetry", async (req, res) => {
+    try {
+      const state = mongoose.connection.readyState;
+      const states = ["Disconnected", "Connected", "Connecting", "Disconnecting"];
+      const connectionStatus = states[state] || "Unknown";
+
+      let counts = {
+        users: 0,
+        tasks: 0,
+        courses: 0,
+        modules: 0,
+        lessons: 0
+      };
+
+      if (state === 1) {
+        counts.users = await UserProfileModel.countDocuments();
+        counts.tasks = await TaskModel.countDocuments();
+        counts.courses = await CourseModel.countDocuments();
+        counts.modules = await ModuleModel.countDocuments();
+        counts.lessons = await LessonModel.countDocuments();
+      }
+
+      res.json({
+        status: connectionStatus,
+        uri: process.env.MONGODB_URI ? "mongodb://***" + process.env.MONGODB_URI.substring(process.env.MONGODB_URI.indexOf("@")) : "Not Configured",
+        dbName: mongoose.connection.db?.databaseName || "Unknown",
+        counts
+      });
+    } catch (err: any) {
+      console.error("Error in GET /api/db/telemetry:", err);
+      res.status(500).json({ error: err.message });
+    }
+  });
+
   // Courses
   app.get("/api/courses", async (req, res) => {
     try {

@@ -40,6 +40,7 @@ export default function App() {
   // Shared Live Simulation States
   const [cognitiveLoad, setCognitiveLoad] = useState<number>(42); // Student default load
   const [activeNotification, setActiveNotification] = useState<string | null>(null);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(true);
 
   // Student Tasks Checklist
   const [tasks, setTasks] = useState<SynthesisTask[]>([]);
@@ -317,7 +318,7 @@ export default function App() {
 
         {/* Render persistent Left Desktop Sidebar in high-fidelity control views */}
         {currentView !== 'landing' && currentView !== 'about' && (
-          <div className="hidden md:block w-64 flex-shrink-0">
+          <div className={`hidden md:block flex-shrink-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'w-64' : 'w-20'}`}>
             <Sidebar
               currentView={currentView}
               setView={setView}
@@ -325,6 +326,8 @@ export default function App() {
               cognitiveLoad={cognitiveLoad}
               userName={userProfile?.fullName}
               onLogout={handleLogout}
+              isOpen={isSidebarOpen}
+              setIsOpen={setIsSidebarOpen}
             />
           </div>
         )}

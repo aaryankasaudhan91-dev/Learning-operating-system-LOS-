@@ -1,5 +1,6 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Shield, HelpCircle, Send, Terminal, Cpu, Layers, Wifi, AlertTriangle, CheckCircle2, MessageSquare, BookOpen, Sliders, Play, Sparkles } from 'lucide-react';
+import ManualModal from './ManualModal';
 
 interface HelpCenterProps {
   setView: (view: any) => void;
@@ -13,6 +14,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
   const [ticketCategory, setTicketCategory] = useState('General support');
   const [ticketDescription, setTicketDescription] = useState('');
   const [ticketSubmitted, setTicketSubmitted] = useState(false);
+  const [isManualOpen, setIsManualOpen] = useState(false);
 
   // Chatbot State
   const [messages, setMessages] = useState<{ role: 'bot' | 'user'; text: string }[]>([
@@ -249,6 +251,14 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                     <p className="text-[11px] text-white">2. Launch study guide & review lesson notes.</p>
                     <p className="text-[11px] text-white">3. Tackle custom interactive tests assigned by your mentor.</p>
                   </div>
+                  <div className="pt-2">
+                    <button
+                      onClick={() => setIsManualOpen(true)}
+                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all text-center cursor-pointer"
+                    >
+                      Open Full Manual ({userRole === 'student' ? 'Student Guide' : 'Mentor Guide'})
+                    </button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -431,6 +441,12 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
           </div>
         )}
       </div>
+
+      <ManualModal
+        isOpen={isManualOpen}
+        onClose={() => setIsManualOpen(false)}
+        userRole={userRole}
+      />
     </div>
   );
 }
