@@ -420,12 +420,13 @@ export default function App() {
             <HelpCenter
               setView={setView}
               userRole={userRole}
+              uid={currentUser?.uid}
             />
           )}
         </main>
       </div>
 
-      <HelpChatBot />
+      <HelpChatBot uid={currentUser?.uid} />
 
       {/* FLOATING ACTION NOTIFICATION TOAST FEEDBACKS BANNER */}
       {activeNotification && currentView !== 'chamber' && (

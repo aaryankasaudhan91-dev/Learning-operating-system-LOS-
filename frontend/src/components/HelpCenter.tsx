@@ -4,9 +4,10 @@ import { Shield, HelpCircle, Send, Terminal, Cpu, Layers, Wifi, AlertTriangle, C
 interface HelpCenterProps {
   setView: (view: any) => void;
   userRole: 'student' | 'mentor';
+  uid?: string;
 }
 
-export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
+export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) {
   const [activeTab, setActiveTab] = useState<'faq' | 'ticket' | 'chat'>('faq');
   const [ticketSubject, setTicketSubject] = useState('');
   const [ticketCategory, setTicketCategory] = useState('General support');
@@ -47,7 +48,7 @@ export default function HelpCenter({ setView, userRole }: HelpCenterProps) {
       const response = await fetch('/api/agent/guide-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatHistory: updatedMessages })
+        body: JSON.stringify({ chatHistory: updatedMessages, uid })
       });
 
       if (!response.ok) {

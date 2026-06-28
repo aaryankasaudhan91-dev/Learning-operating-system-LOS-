@@ -1,7 +1,11 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User } from 'lucide-react';
 
-export default function HelpChatBot() {
+interface HelpChatBotProps {
+  uid?: string;
+}
+
+export default function HelpChatBot({ uid }: HelpChatBotProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<{role: 'bot' | 'user', text: string}[]>([
     { role: 'bot', text: 'Hello! I am the Synapse Assistant. How can I help you navigate the cognitive space?' }
@@ -30,7 +34,7 @@ export default function HelpChatBot() {
       const response = await fetch('/api/agent/guide-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ chatHistory: updatedMessages })
+        body: JSON.stringify({ chatHistory: updatedMessages, uid })
       });
 
       if (!response.ok) {
