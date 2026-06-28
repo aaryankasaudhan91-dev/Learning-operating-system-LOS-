@@ -4,7 +4,7 @@
  */
 
 import React, { useState, useEffect, useRef } from 'react';
-import { Rocket, Star, ShieldAlert, Music, Users, LogOut, Sparkles, Brain, Smile, Volume2, VolumeX } from 'lucide-react';
+import { Rocket, Star, ShieldAlert, Music, Users, LogOut, Sparkles, Brain, Smile, Volume2, VolumeX, Pause, Play, Compass } from 'lucide-react';
 import { AppView } from '../types';
 
 interface SpaceMissionProps {
@@ -13,7 +13,8 @@ interface SpaceMissionProps {
 }
 
 export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMissionProps) {
-  const [secondsRemaining, setSecondsRemaining] = useState<number>(15 * 60);
+  const TOTAL_DURATION = 15 * 60; // 15 minutes
+  const [secondsRemaining, setSecondsRemaining] = useState<number>(TOTAL_DURATION);
   const [timerRunning, setTimerRunning] = useState<boolean>(false);
   const [musicPlaying, setMusicPlaying] = useState<boolean>(false);
 
@@ -24,7 +25,7 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
   const [missionComplete, setMissionComplete] = useState<boolean>(false);
   const [subject, setSubject] = useState<string>("Reading Time");
 
-  const [botMessage, setBotMessage] = useState<string>("Ready for liftoff! Let's focus on our mission.");
+  const [botMessage, setBotMessage] = useState<string>("Welcome to the Focus Sanctuary. Ready to sync your cognitive stream?");
 
   // --- AUDIO SETUP ---
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -34,7 +35,7 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
     // It acts like white noise, which is proven to help kids with ADHD/focus issues.
     audioRef.current = new Audio('https://actions.google.com/sounds/v1/science_fiction/space_room_hum.ogg');
     audioRef.current.loop = true;
-    audioRef.current.volume = 0.4;
+    audioRef.current.volume = 0.3;
 
     return () => {
       audioRef.current?.pause();
@@ -66,15 +67,15 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
   useEffect(() => {
     if (!timerRunning) return;
     const messages = [
-      "You are doing a great job! Keep it up! 🌟",
-      "Your brain is getting stronger every minute! 🧠",
-      "Almost there, space cadet! 👨‍🚀",
-      "Wow, look at you focus! 🚀",
-      "Cruising through the galaxy of learning! ✨"
+      "Your concentration is exceptional. Breathe and keep focus. ✨",
+      "Synapses firing in perfect rhythm. You are doing great! 🧠",
+      "Almost at the milestone, explorer. Stay with it! 🚀",
+      "Great work. Every minute strengthens your core clarity. 🌟",
+      "Deep study in progress. Distractions shielded. 🛡️"
     ];
     const interval = setInterval(() => {
       setBotMessage(messages[Math.floor(Math.random() * messages.length)]);
-    }, 120000); // Change every 2 minutes
+    }, 90000); // Change every 1.5 minutes
     return () => clearInterval(interval);
   }, [timerRunning]);
 
@@ -107,40 +108,52 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
     setView('map');
   };
 
-  return (
-    // Deep Space Background with radial gradient
-    <div className="relative w-full min-h-[85vh] flex flex-col justify-start bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-indigo-900 via-slate-900 to-black select-none p-6 rounded-3xl font-sans overflow-hidden border-8 border-indigo-950 shadow-2xl">
+  // SVG Progress Ring calculations
+  const radius = 135;
+  const stroke = 8;
+  const normalizedRadius = radius - stroke * 2;
+  const circumference = normalizedRadius * 2 * Math.PI;
+  const strokeDashoffset = circumference - (secondsRemaining / TOTAL_DURATION) * circumference;
 
-      {/* Decorative Floating Stars Background */}
-      <div className="absolute inset-0 z-0 pointer-events-none opacity-40">
-        {[...Array(10)].map((_, i) => (
+  return (
+    // Premium light-themed Zen layout
+    <div className="relative w-full min-h-[85vh] flex flex-col justify-start bg-gradient-to-b from-white/90 via-surface-dim/70 to-surface-container-low/90 select-none p-6 rounded-3xl font-sans overflow-hidden border border-outline-variant shadow-2xl relative z-10 transition-colors duration-500">
+      
+      {/* Subtle Ethereal Ambient Orbs */}
+      <div className="absolute top-1/4 left-1/4 w-[40vw] h-[40vw] bg-primary/10 rounded-full filter blur-[120px] pointer-events-none -z-10 animate-pulse" />
+      <div className="absolute bottom-1/4 right-1/4 w-[40vw] h-[40vw] bg-secondary/10 rounded-full filter blur-[120px] pointer-events-none -z-10 animate-pulse" />
+
+      {/* Decorative Floating Stars Background (Soft & light) */}
+      <div className="absolute inset-0 z-0 pointer-events-none opacity-20">
+        {[...Array(8)].map((_, i) => (
           <Star
             key={i}
-            className={`absolute text-yellow-200 animate-pulse`}
+            className="absolute text-primary animate-pulse"
             style={{
               top: `${Math.random() * 100}%`,
               left: `${Math.random() * 100}%`,
-              width: `${Math.random() * 20 + 10}px`,
-              animationDuration: `${Math.random() * 3 + 2}s`
+              width: `${Math.random() * 16 + 8}px`,
+              animationDuration: `${Math.random() * 4 + 3}s`
             }}
           />
         ))}
       </div>
 
       {/* Top Bar: Dashboard Status */}
-      <div className="relative z-10 flex justify-between items-center mb-8 bg-white/10 backdrop-blur-md p-4 rounded-2xl border-4 border-indigo-500/50 shadow-lg">
-        <div className="flex items-center gap-3 bg-indigo-900/80 px-6 py-2 rounded-xl border-2 border-indigo-400">
-          <Star className="w-8 h-8 text-yellow-400 fill-yellow-400 animate-[spin_4s_linear_infinite]" />
-          <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-yellow-300 to-yellow-500">
+      <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/80 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
+        <div className="flex items-center gap-3 bg-primary-container/40 px-5 py-2 rounded-xl border border-primary/10 shadow-sm">
+          <Star className="w-6 h-6 text-amber-500 fill-amber-400 animate-[spin_8s_linear_infinite]" />
+          <span className="text-lg font-bold text-primary-on-primary-container">
             Stars: {starsEarned}
           </span>
         </div>
+        
         <div className="flex items-center gap-3">
-          <span className="text-indigo-200 font-black tracking-wider uppercase text-sm">Mission Log:</span>
+          <span className="text-on-surface-variant font-mono text-xs uppercase tracking-widest font-bold">Focus Stream:</span>
           <select
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="bg-indigo-600 hover:bg-indigo-500 text-white rounded-xl px-4 py-3 font-black outline-none border-b-4 border-indigo-800 cursor-pointer transition-colors shadow-inner"
+            className="bg-white hover:bg-slate-50 text-on-surface rounded-xl px-4 py-2 font-bold text-sm outline-none border border-outline-variant shadow-sm cursor-pointer transition-all duration-200"
           >
             <option>📖 Reading Time</option>
             <option>➕ Math Practice</option>
@@ -152,103 +165,160 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
 
       {/* Overlay Alerts */}
       {offTrackAlert && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-md rounded-2xl">
-          <div className="bg-gradient-to-b from-orange-500 to-red-600 border-8 border-white rounded-[2rem] p-10 max-w-lg text-center shadow-[0_0_50px_rgba(249,115,22,0.6)]">
-            <ShieldAlert className="w-24 h-24 text-white mx-auto mb-6 animate-bounce" />
-            <h3 className="text-4xl font-black text-white mb-4 drop-shadow-md">Spaceship Drifting!</h3>
-            <p className="text-white/90 text-2xl font-bold mb-8">Looks like you left the dashboard. Let's get back to {subject}!</p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-3xl p-6">
+          <div className="bg-white border border-outline-variant rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
+            <div className="w-20 h-20 bg-error-container/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-error/20">
+              <ShieldAlert className="w-10 h-10 text-error animate-bounce" />
+            </div>
+            <h3 className="text-2xl font-black text-on-surface mb-2">Focus Stream Paused</h3>
+            <p className="text-on-surface-variant text-base mb-8">
+              System detected a window change. Let's redirect our cognitive load back to <strong className="text-primary font-bold">{subject}</strong>.
+            </p>
             <button
               onClick={() => { setOffTrackAlert(false); setTimerRunning(true); }}
-              className="px-10 py-4 bg-white text-red-600 rounded-full font-black text-2xl border-b-8 border-gray-300 hover:border-b-4 hover:translate-y-1 active:border-b-0 active:translate-y-2 transition-all"
+              className="w-full py-4 bg-primary text-white rounded-full font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
             >
-              🚀 Back to Mission!
+              Resume Study Session
             </button>
           </div>
         </div>
       )}
 
       {missionComplete && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-indigo-900/95 backdrop-blur-md rounded-2xl">
-          <div className="bg-gradient-to-b from-yellow-300 to-yellow-500 border-8 border-white rounded-[2rem] p-10 max-w-lg text-center shadow-[0_0_50px_rgba(253,224,71,0.6)]">
-            <Sparkles className="w-24 h-24 text-white mx-auto mb-4 animate-spin" />
-            <h3 className="text-5xl font-black text-indigo-900 mb-4 drop-shadow-sm">MISSION ACCOMPLISHED!</h3>
-            <p className="text-indigo-900 text-2xl font-bold mb-2 bg-white/30 rounded-xl py-2">+3 Star Coins Earned!</p>
-            <p className="text-indigo-800 text-lg font-bold mb-8">Your brain power grew so much today.</p>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-3xl p-6">
+          <div className="bg-white border border-outline-variant rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
+            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-200">
+              <Sparkles className="w-10 h-10 text-amber-500 animate-[spin_5s_linear_infinite]" />
+            </div>
+            <h3 className="text-3xl font-black text-on-surface mb-2">Session Accomplished!</h3>
+            <p className="text-on-surface-variant text-base mb-6">
+              Fantastic work. You earned <strong className="text-amber-500 font-bold">+3 Star Coins</strong> for this achievement.
+            </p>
+            <div className="py-2.5 px-4 bg-amber-50 rounded-xl inline-block mb-8 border border-amber-100 text-amber-800 font-bold text-sm">
+              Cognitive performance optimized
+            </div>
             <button
               onClick={() => setShowReflection(true)}
-              className="px-10 py-4 bg-indigo-600 text-white rounded-full font-black text-2xl border-b-8 border-indigo-900 hover:border-b-4 hover:translate-y-1 active:border-b-0 active:translate-y-2 transition-all"
+              className="w-full py-4 bg-primary text-white rounded-full font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
             >
-              🎁 Claim Rewards!
+              Log Session Reflection
             </button>
           </div>
         </div>
       )}
 
       {showReflection && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/95 backdrop-blur-md rounded-2xl">
-          <div className="bg-slate-800 border-8 border-indigo-500 rounded-[2rem] p-10 max-w-lg text-center shadow-2xl">
-            <Brain className="w-20 h-20 text-pink-400 mx-auto mb-6" />
-            <h3 className="text-3xl font-black text-white mb-8">How did {subject} feel today?</h3>
-            <div className="flex justify-center gap-6 mb-6">
-              <button onClick={() => submitReflection('easy')} className="flex flex-col items-center group">
-                <div className="text-6xl bg-slate-700 p-6 rounded-3xl border-b-8 border-slate-900 group-hover:border-b-4 group-hover:translate-y-1 group-active:border-b-0 group-active:translate-y-2 group-hover:bg-green-500/20 transition-all">😁</div>
-                <span className="text-xl text-green-400 font-black mt-4">Easy!</span>
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-3xl p-6">
+          <div className="bg-white border border-outline-variant rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
+            <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-100">
+              <Brain className="w-8 h-8 text-purple-600" />
+            </div>
+            <h3 className="text-2xl font-black text-on-surface mb-2">Reflect on Your Session</h3>
+            <p className="text-on-surface-variant text-sm mb-8">How did focusing on {subject} feel to you?</p>
+            <div className="grid grid-cols-3 gap-4 mb-4">
+              <button 
+                onClick={() => submitReflection('easy')} 
+                className="flex flex-col items-center p-4 rounded-2xl border border-outline-variant hover:border-primary hover:bg-primary-container/10 active:scale-95 transition-all cursor-pointer"
+              >
+                <div className="text-4xl">😁</div>
+                <span className="text-xs font-bold text-on-surface mt-2">Flow Mode</span>
               </button>
-              <button onClick={() => submitReflection('good')} className="flex flex-col items-center group">
-                <div className="text-6xl bg-slate-700 p-6 rounded-3xl border-b-8 border-slate-900 group-hover:border-b-4 group-hover:translate-y-1 group-active:border-b-0 group-active:translate-y-2 group-hover:bg-yellow-500/20 transition-all">🙂</div>
-                <span className="text-xl text-yellow-400 font-black mt-4">Good</span>
+              <button 
+                onClick={() => submitReflection('good')} 
+                className="flex flex-col items-center p-4 rounded-2xl border border-outline-variant hover:border-primary hover:bg-primary-container/10 active:scale-95 transition-all cursor-pointer"
+              >
+                <div className="text-4xl">🙂</div>
+                <span className="text-xs font-bold text-on-surface mt-2">Engaged</span>
               </button>
-              <button onClick={() => submitReflection('hard')} className="flex flex-col items-center group">
-                <div className="text-6xl bg-slate-700 p-6 rounded-3xl border-b-8 border-slate-900 group-hover:border-b-4 group-hover:translate-y-1 group-active:border-b-0 group-active:translate-y-2 group-hover:bg-red-500/20 transition-all">🏋️</div>
-                <span className="text-xl text-red-400 font-black mt-4">Hard work</span>
+              <button 
+                onClick={() => submitReflection('hard')} 
+                className="flex flex-col items-center p-4 rounded-2xl border border-outline-variant hover:border-primary hover:bg-primary-container/10 active:scale-95 transition-all cursor-pointer"
+              >
+                <div className="text-4xl">🏋️</div>
+                <span className="text-xs font-bold text-on-surface mt-2">Challenging</span>
               </button>
             </div>
           </div>
         </div>
       )}
 
-      <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-center justify-center flex-1 w-full max-w-5xl mx-auto">
+      {/* Main Focus Chamber Content Layout */}
+      <div className="relative z-10 flex flex-col lg:flex-row gap-12 items-center justify-center flex-1 w-full max-w-5xl mx-auto py-6">
 
         {/* LEFT: Central Orb Timer */}
-        <div className="flex-1 flex flex-col items-center justify-center space-y-10">
+        <div className="flex-1 flex flex-col items-center justify-center space-y-8">
 
-          {/* Glowing Window/Orb */}
-          <div className={`relative w-80 h-80 flex items-center justify-center rounded-full border-[12px] shadow-[0_0_60px_rgba(0,0,0,0.5)] transition-all duration-700 ${timerRunning ? 'bg-indigo-900 border-green-400 shadow-[0_0_80px_rgba(74,222,128,0.4)]' : 'bg-slate-800 border-slate-600'}`}>
+          {/* Glowing Timer Circle */}
+          <div className="relative w-80 h-80 flex items-center justify-center">
+            
+            {/* SVG Progress Ring */}
+            <svg className="absolute w-full h-full transform -rotate-90" viewBox="0 0 280 280">
+              {/* Back track */}
+              <circle
+                className="text-slate-100"
+                strokeWidth="6"
+                stroke="currentColor"
+                fill="transparent"
+                r={normalizedRadius}
+                cx="140"
+                cy="140"
+              />
+              {/* Active track */}
+              <circle
+                className="text-primary transition-all duration-300 ease-linear"
+                strokeWidth={stroke}
+                strokeDasharray={circumference + ' ' + circumference}
+                style={{ strokeDashoffset }}
+                strokeLinecap="round"
+                stroke="currentColor"
+                fill="transparent"
+                r={normalizedRadius}
+                cx="140"
+                cy="140"
+              />
+            </svg>
 
-            {/* Inner glass reflection */}
-            <div className="absolute inset-2 rounded-full border-2 border-white/10 bg-gradient-to-br from-white/10 to-transparent pointer-events-none"></div>
-
-            <div className="text-center z-10 flex flex-col items-center transform transition-transform">
+            {/* Inner Ethereal Glow Panel */}
+            <div className={`w-[230px] h-[230px] flex flex-col items-center justify-center rounded-full border border-white/60 bg-white/75 backdrop-blur-xl shadow-lg transition-all duration-700 ${timerRunning ? 'scale-105 shadow-[0_8px_32px_rgba(2,132,199,0.08)]' : ''}`}>
               {timerRunning ? (
-                <Rocket className="w-16 h-16 text-green-300 mb-2 animate-[bounce_2s_ease-in-out_infinite]" />
+                <Compass className="w-8 h-8 text-primary mb-1 animate-spin" style={{ animationDuration: '6s' }} />
               ) : (
-                <Rocket className="w-16 h-16 text-slate-500 mb-2 opacity-50" />
+                <Brain className="w-8 h-8 text-slate-400 mb-1 opacity-60" />
               )}
 
-              <div className="font-black text-[5.5rem] leading-none text-white tracking-widest drop-shadow-[0_4px_4px_rgba(0,0,0,0.5)]">
+              <div className="font-extrabold text-5xl leading-none text-on-surface tracking-tight font-mono select-all">
                 {formatTime(secondsRemaining)}
               </div>
 
-              <div className={`mt-4 px-6 py-2 rounded-full font-black uppercase tracking-widest text-sm ${timerRunning ? 'bg-green-500/20 text-green-300' : 'bg-slate-700 text-slate-400'}`}>
-                {timerRunning ? 'Engine Firing' : 'Ready on pad'}
+              <div className={`mt-3 px-3 py-1 rounded-full font-bold uppercase tracking-widest text-[9px] ${timerRunning ? 'bg-primary-container text-primary-on-primary-container' : 'bg-slate-100 text-slate-500'}`}>
+                {timerRunning ? 'Focus Shield Active' : 'Sanctuary Standby'}
               </div>
             </div>
           </div>
 
-          {/* 3D Action Button */}
-          <button
-            onClick={() => {
-              setTimerRunning(!timerRunning);
-              // Auto-start music if they launch for the first time
-              if (!timerRunning && !musicPlaying) setMusicPlaying(true);
-            }}
-            className={`w-72 py-5 rounded-[2rem] font-black text-3xl uppercase tracking-wider transition-all duration-200 active:border-b-0 active:translate-y-4 shadow-2xl ${timerRunning
-                ? 'bg-red-500 text-white border-b-[12px] border-red-700 hover:bg-red-400 hover:border-b-8 hover:translate-y-1'
-                : 'bg-green-500 text-white border-b-[12px] border-green-700 hover:bg-green-400 hover:border-b-8 hover:translate-y-1'
-              }`}
-          >
-            {timerRunning ? 'Stop Engine' : 'LAUNCH! 🚀'}
-          </button>
+          {/* Action Trigger Buttons */}
+          <div className="flex gap-4">
+            <button
+              onClick={() => {
+                setTimerRunning(!timerRunning);
+                if (!timerRunning && !musicPlaying) setMusicPlaying(true);
+              }}
+              className={`px-8 py-3.5 rounded-full font-bold text-lg flex items-center gap-2 transition-all cursor-pointer hover:-translate-y-0.5 active:translate-y-0 ${timerRunning
+                  ? 'bg-red-500 text-white shadow-md shadow-red-500/10 hover:bg-red-600'
+                  : 'bg-primary text-white shadow-md shadow-primary/10 hover:bg-primary/95'
+                }`}
+            >
+              {timerRunning ? (
+                <>
+                  <Pause className="w-5 h-5" /> Pause Session
+                </>
+              ) : (
+                <>
+                  <Play className="w-5 h-5 fill-current" /> Begin Sync
+                </>
+              )}
+            </button>
+          </div>
 
         </div>
 
@@ -256,54 +326,58 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
         <div className="flex-1 w-full max-w-md space-y-6">
 
           {/* Helper Bot Context */}
-          <div className="bg-white/10 backdrop-blur-md border-4 border-indigo-400/50 rounded-3xl p-6 shadow-xl relative mt-8">
-            <div className="absolute -top-10 -left-6 bg-gradient-to-b from-yellow-300 to-yellow-500 w-20 h-20 rounded-full border-4 border-indigo-900 flex items-center justify-center shadow-[0_0_20px_rgba(253,224,71,0.5)] animate-[bounce_4s_ease-in-out_infinite]">
-              <Smile className="w-12 h-12 text-indigo-900" />
-            </div>
-            <h3 className="text-indigo-200 font-black text-xl mb-3 ml-12 uppercase tracking-wide">Helper Bot</h3>
-            <div className="bg-indigo-950/50 p-4 rounded-2xl border-2 border-indigo-500/30">
-              <p className="text-white font-bold text-xl leading-snug">
-                "{botMessage}"
-              </p>
+          <div className="bg-white/60 backdrop-blur-md border border-white rounded-3xl p-6 shadow-sm relative">
+            <div className="flex items-start gap-4">
+              <div className="bg-primary-container/40 p-3.5 rounded-2xl border border-primary/10 text-primary flex-shrink-0 shadow-inner">
+                <Smile className="w-8 h-8" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h3 className="text-on-surface font-extrabold text-lg mb-1">Sanctuary Guide</h3>
+                <div className="bg-slate-50 border border-outline-variant p-4 rounded-2xl">
+                  <p className="text-on-surface-variant font-medium text-sm leading-relaxed">
+                    "{botMessage}"
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
           {/* Real Audio Toggle */}
-          <div className="bg-white/10 backdrop-blur-md border-4 border-indigo-400/50 rounded-3xl p-5 flex justify-between items-center group">
+          <div className="bg-white/60 backdrop-blur-md border border-white rounded-3xl p-5 flex justify-between items-center shadow-sm">
             <div className="flex items-center gap-4">
-              <div className={`p-3 rounded-full ${musicPlaying ? 'bg-indigo-500 text-white animate-pulse' : 'bg-slate-700 text-slate-400'}`}>
+              <div className={`p-3 rounded-2xl ${musicPlaying ? 'bg-primary-container text-primary animate-pulse' : 'bg-slate-100 text-slate-500'}`}>
                 <Music className="w-6 h-6" />
               </div>
               <div>
-                <span className="block font-black text-white text-xl">Space Ambience</span>
-                <span className="block text-indigo-200 text-sm font-bold">Helps brains focus</span>
+                <span className="block font-bold text-on-surface text-base">Ambient Shield</span>
+                <span className="block text-on-surface-variant text-xs font-medium">Binaural space hum to block clutter</span>
               </div>
             </div>
 
             <button
               onClick={() => setMusicPlaying(!musicPlaying)}
-              className={`p-4 rounded-2xl font-black transition-all active:translate-y-2 active:border-b-0 ${musicPlaying
-                  ? 'bg-indigo-500 border-b-8 border-indigo-700 text-white hover:border-b-4 hover:translate-y-1'
-                  : 'bg-slate-700 border-b-8 border-slate-900 text-slate-300 hover:border-b-4 hover:translate-y-1'
+              className={`p-3 rounded-xl transition-all cursor-pointer hover:bg-slate-50 active:scale-95 border border-outline-variant ${musicPlaying
+                  ? 'bg-primary/10 border-primary text-primary'
+                  : 'bg-white text-slate-600'
                 }`}
             >
-              {musicPlaying ? <Volume2 className="w-6 h-6" /> : <VolumeX className="w-6 h-6" />}
+              {musicPlaying ? <Volume2 className="w-5 h-5" /> : <VolumeX className="w-5 h-5" />}
             </button>
           </div>
 
           {/* Space Co-Pilots (Peers) */}
-          <div className="bg-white/10 backdrop-blur-md border-4 border-indigo-400/50 rounded-3xl p-5 flex items-center gap-5">
-            <div className="bg-gradient-to-br from-cyan-400 to-blue-600 p-4 rounded-2xl shadow-inner border-2 border-cyan-300">
-              <Users className="w-8 h-8 text-white" />
+          <div className="bg-white/60 backdrop-blur-md border border-white rounded-3xl p-5 flex items-center gap-4 shadow-sm">
+            <div className="bg-purple-50 p-3 rounded-2xl border border-purple-100 text-purple-600 flex-shrink-0">
+              <Users className="w-6 h-6" />
             </div>
             <div>
-              <p className="text-white font-black text-xl mb-1">Co-Pilots Online</p>
-              <div className="flex items-center gap-2">
-                <span className="flex h-3 w-3 relative">
+              <p className="text-on-surface font-bold text-base">Active Co-Pilots</p>
+              <div className="flex items-center gap-2 mt-0.5">
+                <span className="flex h-2 w-2 relative">
                   <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-                  <span className="relative inline-flex rounded-full h-3 w-3 bg-green-500"></span>
+                  <span className="relative inline-flex rounded-full h-2 w-2 bg-green-500"></span>
                 </span>
-                <p className="text-cyan-200 text-base font-bold">4 friends studying right now!</p>
+                <p className="text-on-surface-variant text-xs font-semibold">4 active learners in this cluster</p>
               </div>
             </div>
           </div>
@@ -312,17 +386,17 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
       </div>
 
       {/* Exit Button */}
-      <div className="relative z-10 mt-10 flex justify-center w-full pb-4">
+      <div className="relative z-10 mt-6 flex justify-center w-full pb-2">
         <button
           onClick={() => {
             setTimerRunning(false);
             setMusicPlaying(false);
             setShowReflection(true);
           }}
-          className="bg-slate-800/80 backdrop-blur border-4 border-slate-600 px-8 py-4 rounded-2xl flex items-center gap-3 hover:bg-slate-700 hover:-translate-y-1 active:translate-y-1 text-slate-300 transition-all font-black text-lg"
+          className="bg-transparent border border-outline-variant hover:border-error/20 hover:bg-error-container/20 hover:text-error px-6 py-3 rounded-full flex items-center gap-2 text-on-surface-variant text-sm font-bold transition-all cursor-pointer"
         >
-          <LogOut className="w-6 h-6" />
-          <span>Exit Spaceship Early</span>
+          <LogOut className="w-4 h-4" />
+          <span>Exit Focus Chamber</span>
         </button>
       </div>
 

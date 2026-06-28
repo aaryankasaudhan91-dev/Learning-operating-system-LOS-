@@ -1,7 +1,7 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import { defineConfig } from 'vite';
 
 export default defineConfig(() => {
   return {
@@ -12,6 +12,9 @@ export default defineConfig(() => {
       },
     },
     server: {
+      allowedHosts: [
+        'shu-waviest-sachiko.ngrok-free.dev'
+      ],
       port: 5173,
       strictPort: true,
       proxy: {
