@@ -78,7 +78,7 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
     }
   ];
 
-  // Track scroll and update active section
+  // Track scroll and update active section using nearest-center distance calculation
   useEffect(() => {
     const handleScroll = () => {
       const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
@@ -86,21 +86,25 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
         setScrollProgress(window.scrollY / scrollTotal);
       }
 
-      // Check which section is in the viewport
+      // Check which section is closest to viewport active trigger zone
       const sectionElements = sections.map(sec => document.getElementById(`sec-${sec.id}`));
-      let currentActive = 'intro';
-      const triggerBound = window.innerHeight * 0.45; // trigger halfway up screen
+      const triggerPoint = window.innerHeight * 0.45;
+      let closestSection = sections[0].id;
+      let minDistance = Infinity;
 
       sectionElements.forEach((el, index) => {
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= triggerBound && rect.bottom >= triggerBound) {
-            currentActive = sections[index].id;
+          const sectionCenter = (rect.top + rect.bottom) / 2;
+          const distance = Math.abs(sectionCenter - triggerPoint);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestSection = sections[index].id;
           }
         }
       });
 
-      setActiveSection(currentActive);
+      setActiveSection(closestSection);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
