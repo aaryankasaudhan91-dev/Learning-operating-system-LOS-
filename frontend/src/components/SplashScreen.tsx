@@ -33,6 +33,7 @@ export default function SplashScreen({ onFinish }: { onFinish: () => void }) {
         autoPlay
         muted
         playsInline
+        preload="metadata"
         onEnded={handleFinish}
         className="w-full h-full object-cover"
         onError={handleFinish} // Skip splash if video errors

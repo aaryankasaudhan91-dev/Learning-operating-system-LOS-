@@ -55,9 +55,13 @@ export default function Sidebar({
           >
             <div className="absolute inset-0 bg-gradient-to-tr from-plasma-violet/20 to-electric-cyan/20 animate-pulse" />
             <img 
-              alt="System Avatar" 
+              alt="User Cognitive Profile Avatar" 
               className="w-full h-full object-cover relative z-10 transition-transform duration-500 group-hover:scale-110" 
-              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=80&w=200"
+              src="https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&q=75&w=96"
+              width="48"
+              height="48"
+              loading="lazy"
+              decoding="async"
             />
           </div>
           
