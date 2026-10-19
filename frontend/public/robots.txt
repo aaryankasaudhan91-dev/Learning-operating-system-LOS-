@@ -1,0 +1,22 @@
+# robots.txt for Learner Operating System (LOS)
+# Website: https://learner-os.web.app
+
+User-agent: *
+Allow: /
+Allow: /about
+Allow: /courses
+Allow: /privacy
+Allow: /terms
+
+# Disallow authenticated private student & mentor views and internal APIs
+Disallow: /api/
+Disallow: /map
+Disallow: /chamber
+Disallow: /cohort
+Disallow: /insights
+Disallow: /sos
+Disallow: /profile
+Disallow: /settings
+
+# Canonical Sitemap
+Sitemap: https://learner-os.web.app/sitemap.xml

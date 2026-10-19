@@ -1,0 +1,34 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" fill="none">
+  <defs>
+    <linearGradient id="los-fav-left" x1="20" y1="20" x2="50" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00E5FF" />
+      <stop offset="1" stop-color="#0284C7" />
+    </linearGradient>
+    <linearGradient id="los-fav-right" x1="80" y1="20" x2="50" y2="90" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#00FFA3" />
+      <stop offset="1" stop-color="#059669" />
+    </linearGradient>
+    <filter id="glow" x="-20%" y="-20%" width="140%" height="140%">
+      <feGaussianBlur stdDeviation="3" result="blur" />
+      <feComposite in="SourceGraphic" in2="blur" operator="over" />
+    </filter>
+  </defs>
+
+  <!-- Background rounded squircle for modern favicon clarity -->
+  <rect width="100" height="100" rx="24" fill="#090d16" />
+  
+  <!-- Left Wing / Circuit Page -->
+  <g filter="url(#glow)">
+    <path d="M50 82 L24 58 L24 32 L38 22 L38 48 L50 62 L50 82 Z" fill="url(#los-fav-left)" />
+    <path d="M24 48 L14 56" stroke="#00E5FF" stroke-width="3" stroke-linecap="round" />
+    <circle cx="14" cy="56" r="3.5" fill="#00E5FF" />
+
+    <!-- Right Wing / Circuit Page -->
+    <path d="M50 82 L76 58 L76 40 L62 30 L62 48 L50 62 L50 82 Z" fill="url(#los-fav-right)" />
+    <path d="M76 48 L86 40" stroke="#00FFA3" stroke-width="3" stroke-linecap="round" />
+    <circle cx="86" cy="40" r="3.5" fill="#00FFA3" />
+    
+    <!-- Central Synapse Core Node -->
+    <circle cx="50" cy="78" r="4.5" fill="#A855F7" />
+  </g>
+</svg>

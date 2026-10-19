@@ -90,6 +90,18 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
+  // Enforce HTTPS in production environments
+  app.use((req, res, next) => {
+    if (process.env.NODE_ENV === 'production' && req.headers['x-forwarded-proto'] && req.headers['x-forwarded-proto'] !== 'https') {
+      return res.redirect(301, `https://${req.hostname}${req.originalUrl}`);
+    }
+    // Security headers: HSTS in production
+    if (process.env.NODE_ENV === 'production') {
+      res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+    }
+    next();
+  });
+
   app.use(cors());
   app.use(express.json());
 
