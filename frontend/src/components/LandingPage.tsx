@@ -4,9 +4,10 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Compass, MousePointer, Activity, Brain, Heart, ChevronDown } from 'lucide-react';
+import { ArrowRight, Compass, MousePointer, Activity, Brain, Heart, ChevronDown, Sparkles, CheckCircle2 } from 'lucide-react';
 import { AppView } from '../types';
 import { AppLogo } from './AppLogo';
+import Footer from './Footer';
 
 interface LandingPageProps {
   setView: (view: AppView) => void;
@@ -361,23 +362,40 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
             An ethereal operating system for your mind. Synchronize your cognitive state, calibrate working memory, and master profound focus.
           </p>
 
-          {/* Interactive CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-10 w-full max-w-md mx-auto">
-            <button
-              onClick={() => setView('login')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-white font-extrabold text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all duration-300 group cursor-pointer"
-            >
-              <span>Initialize Sync</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
+          {/* Clear Primary Call to Action (CTA) */}
+          <div className="pt-6 max-w-lg mx-auto flex flex-col items-center">
             <button
               onClick={() => setView('register')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-glass-stroke backdrop-blur-md text-on-surface font-extrabold text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/5 hover:border-electric-cyan hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,229,255,0.15)] active:scale-95 transition-all duration-300 group cursor-pointer"
+              className="w-full sm:w-auto px-10 py-5 rounded-full bg-gradient-to-r from-electric-cyan via-plasma-violet to-synapse-green text-white font-black text-sm md:text-base uppercase tracking-widest flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(2,132,199,0.4)] hover:shadow-[0_0_60px_rgba(2,132,199,0.6)] hover:scale-[1.04] active:scale-95 transition-all duration-300 group cursor-pointer border border-white/20"
             >
-              <span>Register Identity</span>
-              <Compass className="w-4 h-4 text-electric-cyan group-hover:rotate-45 transition-transform duration-500" />
+              <Sparkles className="w-5 h-5 text-yellow-300 animate-spin" style={{ animationDuration: '6s' }} />
+              <span>Initialize Cognitive OS — Start Free</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
             </button>
+
+            {/* Secondary navigation action & trust proof */}
+            <div className="flex items-center gap-4 mt-4 text-xs font-semibold text-on-surface-variant">
+              <span>Already registered?</span>
+              <button
+                onClick={() => setView('login')}
+                className="text-electric-cyan hover:underline font-bold uppercase tracking-wider cursor-pointer"
+              >
+                Sign In
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setView('courses')}
+                className="hover:text-on-surface transition-colors cursor-pointer"
+              >
+                Explore Curriculum
+              </button>
+            </div>
+
+            {/* Trust statement */}
+            <p className="font-mono text-[11px] text-on-surface-variant/80 mt-3 flex items-center gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-synapse-green inline" />
+              <span>Free for students &amp; schools • No credit card required • NEP 2020 Aligned</span>
+            </p>
           </div>
         </div>
 
@@ -454,35 +472,42 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
         </div>
       </section>
 
-      {/* CALL TO ACTION SECTION */}
+      {/* CLEAR PRIMARY CALL TO ACTION SECTION */}
       <section className="max-w-4xl mx-auto px-6 mt-40 text-center relative z-10">
-        <div className="glass-panel rounded-3xl p-12 md:p-16 border border-glass-stroke bg-white/5 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-electric-cyan/5 via-plasma-violet/5 to-transparent pointer-events-none" />
+        <div className="glass-panel-heavy rounded-3xl p-12 md:p-16 border border-glass-stroke shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-electric-cyan/10 via-plasma-violet/10 to-transparent pointer-events-none" />
           
-          <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase italic mb-6">
-            Synchronize Your Reality
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-electric-cyan px-3 py-1 rounded-full bg-electric-cyan/10 inline-block mb-4">
+            Next-Gen Cognitive Learning
+          </span>
+
+          <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase tracking-tight mb-6">
+            Synchronize Your Mind With LOS
           </h2>
           
           <p className="font-sans text-base md:text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed mb-10">
-            Step beyond chaotic cognitive friction. Initialize your signature, connect with authorized mentors, and achieve sustainable flow.
+            Step beyond chaotic cognitive friction. Experience real-time load balancing, spaced memory consolidation, and personalized mentorship.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md mx-auto">
             <button
-              onClick={() => setView('login')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-white font-extrabold text-sm uppercase tracking-widest hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all cursor-pointer"
+              onClick={() => setView('register')}
+              className="w-full sm:w-auto px-10 py-5 rounded-full bg-gradient-to-r from-electric-cyan via-plasma-violet to-synapse-green text-white font-extrabold text-sm md:text-base uppercase tracking-widest hover:scale-[1.04] shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all cursor-pointer border border-white/20"
             >
-              Enter Portal
+              Get Started Free &rarr;
             </button>
             <button
-              onClick={() => setView('register')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-glass-stroke text-on-surface font-extrabold text-sm uppercase tracking-widest hover:bg-white/5 hover:border-electric-cyan transition-all cursor-pointer"
+              onClick={() => setView('login')}
+              className="w-full sm:w-auto px-8 py-5 rounded-full bg-white/5 border border-glass-stroke text-on-surface font-extrabold text-sm uppercase tracking-widest hover:bg-white/10 hover:border-electric-cyan transition-all cursor-pointer"
             >
-              Register Signature
+              Existing Sign-In
             </button>
           </div>
         </div>
       </section>
+
+      {/* GLOBAL FOOTER */}
+      <Footer setView={setView} />
     </div>
   );
 }

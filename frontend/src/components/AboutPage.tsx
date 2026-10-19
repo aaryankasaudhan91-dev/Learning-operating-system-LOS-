@@ -7,6 +7,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import { ArrowRight, Brain, ShieldCheck, HelpCircle, Users, Activity, ChevronDown } from 'lucide-react';
 import { AppView } from '../types';
 import { AppLogo } from './AppLogo';
+import Footer from './Footer';
 
 interface AboutPageProps {
   setView: (view: AppView) => void;
@@ -464,6 +465,9 @@ export default function AboutPage({ setView }: AboutPageProps) {
           </div>
         </div>
       </section>
+
+      {/* GLOBAL FOOTER */}
+      <Footer setView={setView} />
     </div>
   );
 }
