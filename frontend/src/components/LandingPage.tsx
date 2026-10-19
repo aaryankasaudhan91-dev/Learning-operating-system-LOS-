@@ -339,13 +339,14 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
 
   return (
     <div ref={containerRef} className="relative min-h-screen bg-void-black text-on-surface select-none pb-24">
-      {/* Scroll Progress Bar */}
+      {/* Scroll Progress Bar (hidden when resting on hero section) */}
       <div 
-        className="fixed top-20 left-0 h-1 z-50 transition-all duration-100"
+        className="fixed top-20 left-0 h-1.5 z-50 transition-all duration-150"
         style={{ 
           width: `${scrollProgress * 100}%`,
-          backgroundColor: activeColor,
-          boxShadow: `0 0 8px ${activeColor}`
+          opacity: scrollProgress > 0.02 ? 1 : 0,
+          background: 'linear-gradient(90deg, #0284c7, #7c3aed, #059669)',
+          boxShadow: '0 0 12px rgba(2, 132, 199, 0.6)'
         }}
       />
 
@@ -415,60 +416,68 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
         <div className="flex flex-col md:flex-row gap-12 items-start">
           
           {/* Scrollable Story Content (Left side) */}
-          <div className="w-full md:w-1/2 space-y-[45vh] pr-0 md:pr-10 relative z-10">
-            {sections.map((sec, idx) => (
-              <div 
-                key={sec.id} 
-                id={`sec-${sec.id}`}
-                className={`transition-all duration-700 min-h-[55vh] flex flex-col justify-center text-left ${
-                  activeSection === sec.id ? 'opacity-100 translate-x-0' : 'opacity-25 md:scale-95'
-                }`}
-              >
-                <div className="space-y-4">
-                  <span className={`font-mono text-xs font-bold tracking-[0.3em] uppercase ${sec.color} px-3 py-1 rounded-full ${sec.bgColor} w-fit block`}>
-                    {sec.phase}
-                  </span>
-                  
-                  <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface leading-tight uppercase">
-                    {sec.title}
-                  </h2>
-                  
-                  <h3 className="font-sans font-extrabold text-lg md:text-xl text-on-surface-variant italic">
-                    {sec.subtitle}
-                  </h3>
+          <div className="w-full md:w-1/2 space-y-10 md:space-y-14 pr-0 md:pr-10 relative z-10">
+            {sections.map((sec) => {
+              const isActive = activeSection === sec.id;
+              return (
+                <div 
+                  key={sec.id} 
+                  id={`sec-${sec.id}`}
+                  className={`transition-all duration-500 min-h-[48vh] flex flex-col justify-center text-left p-6 md:p-8 rounded-3xl ${
+                    isActive 
+                      ? 'bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 shadow-xl shadow-slate-200/60 dark:shadow-none translate-x-2' 
+                      : 'opacity-40 hover:opacity-75 bg-transparent border-2 border-transparent'
+                  }`}
+                >
+                  <div className="space-y-3.5">
+                    <span className={`font-mono text-xs font-bold tracking-[0.25em] uppercase ${sec.color} px-3.5 py-1.5 rounded-full ${sec.bgColor} w-fit inline-flex items-center gap-2 border border-current/20`}>
+                      <span className={`w-2 h-2 rounded-full ${isActive ? 'animate-ping' : ''}`} style={{ backgroundColor: sec.accentColor }} />
+                      {sec.phase}
+                    </span>
+                    
+                    <h2 className="font-sans font-black text-2xl md:text-4xl text-on-surface leading-tight uppercase tracking-tight">
+                      {sec.title}
+                    </h2>
+                    
+                    <h3 className="font-sans font-bold text-base md:text-lg text-on-surface-variant italic">
+                      {sec.subtitle}
+                    </h3>
 
-                  <p className="font-sans text-base md:text-lg text-on-surface-variant leading-relaxed pt-2">
-                    {sec.description}
-                  </p>
+                    <p className="font-sans text-sm md:text-base text-on-surface-variant leading-relaxed pt-1">
+                      {sec.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Sticky Canvas Visualizer Panel (Right side) */}
-          <div className="hidden md:block w-1/2 sticky top-32 h-[80vh] flex-shrink-0 z-0">
-            <div className="glass-panel rounded-3xl w-full h-[60vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-white/5 border border-glass-stroke shadow-2xl">
+          <div className="hidden md:block w-1/2 sticky top-28 h-[78vh] flex-shrink-0 z-0">
+            <div className="rounded-3xl w-full h-[68vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-[#070b14] border-2 border-slate-800 shadow-2xl">
               {/* Internal glow backdrop reflecting the active state */}
               <div 
-                className="absolute inset-0 opacity-10 blur-[100px] rounded-full transition-all duration-700 pointer-events-none"
+                className="absolute inset-0 opacity-25 blur-[100px] rounded-full transition-all duration-700 pointer-events-none"
                 style={{ 
                   backgroundColor: activeColor,
-                  transform: 'scale(1.2)' 
+                  transform: 'scale(1.3)' 
                 }} 
               />
               
               <canvas 
                 ref={canvasRef} 
-                className="max-w-full max-h-full aspect-square z-10 transition-transform duration-700" 
+                className="max-w-full max-h-full aspect-square z-10 transition-transform duration-700 relative" 
               />
 
               {/* Status HUD readout at bottom */}
-              <div className="absolute bottom-6 left-8 right-8 flex justify-between items-center font-mono text-[9px] text-on-surface-variant uppercase tracking-widest border-t border-glass-stroke pt-4 z-20">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-electric-cyan animate-ping" />
-                  Telemetry: Active
+              <div className="absolute bottom-5 left-7 right-7 flex justify-between items-center font-mono text-[10px] text-slate-300 uppercase tracking-widest border-t border-slate-800/80 pt-3.5 z-20 bg-[#070b14]/90 backdrop-blur-md px-2">
+                <span className="flex items-center gap-2 font-bold text-cyan-400">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  Neural Telemetry: Active
                 </span>
-                <span>Mode: {activeSection}</span>
+                <span className="text-slate-300 font-semibold px-2.5 py-1 rounded bg-slate-800/80 border border-slate-700">
+                  Phase: {activeSection.toUpperCase()}
+                </span>
               </div>
             </div>
           </div>

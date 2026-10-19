@@ -6,7 +6,7 @@
   --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
 
   --color-void-black: #f8fafc;
-  --color-nebula-purple: #eef2ff;
+  --color-nebula-purple: #f1f5f9;
   --color-surface: #ffffff;
   --color-surface-dim: #f1f5f9;
   --color-surface-bright: #ffffff;
@@ -17,19 +17,19 @@
   --color-surface-container-highest: #cbd5e1;
   
   --color-on-surface: #0f172a;
-  --color-on-surface-variant: #475569;
+  --color-on-surface-variant: #334155;
   
-  --color-outline: #94a3b8;
-  --color-outline-variant: #e2e8f0;
-  --color-surface-variant: #f1f5f9;
+  --color-outline: #64748b;
+  --color-outline-variant: #cbd5e1;
+  --color-surface-variant: #e2e8f0;
   
-  --color-glass-stroke: rgba(255, 255, 255, 0.6);
+  --color-glass-stroke: rgba(15, 23, 42, 0.12);
 
   --color-primary: #0284c7;
   --color-electric-cyan: #0284c7;
   --color-secondary: #7c3aed;
   --color-plasma-violet: #7c3aed;
-  --color-tertiary: #10b981;
+  --color-tertiary: #059669;
   --color-synapse-green: #059669;
 
   --color-primary-container: #e0f2fe;
@@ -49,13 +49,13 @@
 
   --color-inverse-surface: #0f172a;
   --color-inverse-on-surface: #f8fafc;
-  --color-inverse-primary: #0284c7;
+  --color-inverse-primary: #38bdf8;
 }
 
 @layer base {
   body {
     background-color: var(--color-void-black);
-    background-image: radial-gradient(circle at 50% 50%, var(--color-nebula-purple) 0%, var(--color-void-black) 80%);
+    background-image: radial-gradient(circle at 50% 50%, #f1f5f9 0%, #f8fafc 85%);
     background-attachment: fixed;
     color: var(--color-on-surface);
     overflow-x: hidden;
@@ -66,21 +66,19 @@
 
 /* Custom interactive styles */
 .glass-panel {
-  background: rgba(255, 255, 255, 0.55);
-  backdrop-filter: blur(24px);
-  -webkit-backdrop-filter: blur(24px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.4) 0%, rgba(255, 255, 255, 0.1) 100%);
-  box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.04), inset 0 1px 0 rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.88);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(203, 213, 225, 0.8);
+  box-shadow: 0 8px 30px -4px rgba(15, 23, 42, 0.06), 0 2px 6px -1px rgba(15, 23, 42, 0.04);
 }
 
 .glass-panel-heavy {
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(40px);
-  -webkit-backdrop-filter: blur(40px);
-  border: 1px solid rgba(255, 255, 255, 0.6);
-  background-image: linear-gradient(135deg, rgba(255, 255, 255, 0.6) 0%, rgba(255, 255, 255, 0.2) 100%);
-  box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.08), inset 0 1px 0 rgba(255, 255, 255, 0.6);
+  background: rgba(255, 255, 255, 0.96);
+  backdrop-filter: blur(32px);
+  -webkit-backdrop-filter: blur(32px);
+  border: 1px solid rgba(203, 213, 225, 0.9);
+  box-shadow: 0 12px 35px -4px rgba(15, 23, 42, 0.08), 0 4px 12px -2px rgba(15, 23, 42, 0.05);
 }
 
 .glow-active {

@@ -59,7 +59,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
     }
   ];
 
-  // Track scroll and update active section
+  // Track scroll and update active section using nearest-center distance calculation
   useEffect(() => {
     const handleScroll = () => {
       const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
@@ -67,20 +67,25 @@ export default function AboutPage({ setView }: AboutPageProps) {
         setScrollProgress(window.scrollY / scrollTotal);
       }
 
+      // Check which section is closest to viewport active trigger zone
       const sectionElements = sections.map(sec => document.getElementById(`sec-${sec.id}`));
-      let currentActive = 'genesis';
-      const triggerBound = window.innerHeight * 0.45;
+      const triggerPoint = window.innerHeight * 0.45;
+      let closestSection = sections[0].id;
+      let minDistance = Infinity;
 
       sectionElements.forEach((el, index) => {
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= triggerBound && rect.bottom >= triggerBound) {
-            currentActive = sections[index].id;
+          const sectionCenter = (rect.top + rect.bottom) / 2;
+          const distance = Math.abs(sectionCenter - triggerPoint);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestSection = sections[index].id;
           }
         }
       });
 
-      setActiveSection(currentActive);
+      setActiveSection(closestSection);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -341,18 +346,19 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
   return (
     <div ref={containerRef} className="relative min-h-screen bg-void-black text-on-surface select-none pb-24">
-      {/* Scroll Progress Bar */}
+      {/* Scroll Progress Bar (hidden on hero section) */}
       <div 
-        className="fixed top-20 left-0 h-1 z-50 transition-all duration-100"
+        className="fixed top-20 left-0 h-1.5 z-50 transition-all duration-150"
         style={{ 
           width: `${scrollProgress * 100}%`,
-          backgroundColor: activeColor,
-          boxShadow: `0 0 8px ${activeColor}`
+          opacity: scrollProgress > 0.02 ? 1 : 0,
+          background: 'linear-gradient(90deg, #00e5ff, #7c3aed, #10b981)',
+          boxShadow: '0 0 12px rgba(0, 229, 255, 0.6)'
         }}
       />
 
-      {/* Hero Header */}
-      <section className="min-h-[50vh] flex flex-col items-center justify-center text-center px-6 pt-24 pb-12 animate-[fadeIn_0.5s_ease-out]">
+      {/* Hero Header with relative positioning */}
+      <section className="relative min-h-[50vh] flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 animate-[fadeIn_0.5s_ease-out]">
         <div className="max-w-3xl space-y-4">
           <span className="font-mono text-xs font-bold tracking-[0.3em] text-electric-cyan uppercase">
             Cognitive Architects
@@ -365,7 +371,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
           </p>
         </div>
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-on-surface-variant animate-bounce opacity-50">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-on-surface-variant animate-bounce opacity-50">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em]">Our Story</span>
           <ChevronDown className="w-4 h-4" />
         </div>
@@ -376,59 +382,67 @@ export default function AboutPage({ setView }: AboutPageProps) {
         <div className="flex flex-col md:flex-row gap-12 items-start">
           
           {/* Scrollable Story Content (Left side) */}
-          <div className="w-full md:w-1/2 space-y-[45vh] pr-0 md:pr-10 relative z-10">
-            {sections.map((sec, idx) => (
-              <div 
-                key={sec.id} 
-                id={`sec-${sec.id}`}
-                className={`transition-all duration-700 min-h-[50vh] flex flex-col justify-center text-left ${
-                  activeSection === sec.id ? 'opacity-100 translate-x-0' : 'opacity-25 md:scale-95'
-                }`}
-              >
-                <div className="space-y-4">
-                  <span className={`font-mono text-[10px] font-bold tracking-[0.3em] uppercase ${sec.color} px-3 py-1 rounded-full ${sec.bgColor} w-fit block`}>
-                    {(idx + 1).toString().padStart(2, '0')} / {sections.length.toString().padStart(2, '0')}
-                  </span>
-                  
-                  <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase">
-                    {sec.title}
-                  </h2>
-                  
-                  <h3 className="font-sans font-extrabold text-lg md:text-xl text-on-surface-variant italic">
-                    {sec.subtitle}
-                  </h3>
+          <div className="w-full md:w-1/2 space-y-10 md:space-y-14 pr-0 md:pr-10 relative z-10">
+            {sections.map((sec, idx) => {
+              const isActive = activeSection === sec.id;
+              return (
+                <div 
+                  key={sec.id} 
+                  id={`sec-${sec.id}`}
+                  className={`transition-all duration-500 min-h-[48vh] flex flex-col justify-center text-left p-6 md:p-8 rounded-3xl ${
+                    isActive 
+                      ? 'bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 shadow-xl shadow-slate-200/60 dark:shadow-none translate-x-2' 
+                      : 'opacity-40 hover:opacity-75 bg-transparent border-2 border-transparent'
+                  }`}
+                >
+                  <div className="space-y-3.5">
+                    <span className={`font-mono text-[10px] font-bold tracking-[0.3em] uppercase ${sec.color} px-3.5 py-1.5 rounded-full ${sec.bgColor} w-fit inline-flex items-center gap-2 border border-current/20`}>
+                      <span className={`w-2 h-2 rounded-full ${isActive ? 'animate-ping' : ''}`} style={{ backgroundColor: sec.accentColor }} />
+                      {(idx + 1).toString().padStart(2, '0')} / {sections.length.toString().padStart(2, '0')} • {sec.id.toUpperCase()}
+                    </span>
+                    
+                    <h2 className="font-sans font-black text-2xl md:text-4xl text-on-surface uppercase tracking-tight">
+                      {sec.title}
+                    </h2>
+                    
+                    <h3 className="font-sans font-bold text-base md:text-lg text-on-surface-variant italic">
+                      {sec.subtitle}
+                    </h3>
 
-                  <p className="font-sans text-base md:text-lg text-on-surface-variant leading-relaxed pt-2">
-                    {sec.description}
-                  </p>
+                    <p className="font-sans text-sm md:text-base text-on-surface-variant leading-relaxed pt-1">
+                      {sec.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Sticky Canvas Visualizer Panel (Right side) */}
-          <div className="hidden md:block w-1/2 sticky top-32 h-[80vh] flex-shrink-0 z-0">
-            <div className="glass-panel rounded-3xl w-full h-[60vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-white/5 border border-glass-stroke shadow-2xl">
+          <div className="hidden md:block w-1/2 sticky top-28 h-[78vh] flex-shrink-0 z-0">
+            <div className="rounded-3xl w-full h-[68vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-[#070b14] border-2 border-slate-800 shadow-2xl">
               {/* Backglow panel */}
               <div 
-                className="absolute inset-0 opacity-10 blur-[100px] rounded-full transition-all duration-700 pointer-events-none"
+                className="absolute inset-0 opacity-25 blur-[100px] rounded-full transition-all duration-700 pointer-events-none"
                 style={{ 
                   backgroundColor: activeColor,
-                  transform: 'scale(1.2)' 
+                  transform: 'scale(1.3)' 
                 }} 
               />
               
               <canvas 
                 ref={canvasRef} 
-                className="max-w-full max-h-full aspect-square z-10 transition-transform duration-700" 
+                className="max-w-full max-h-full aspect-square z-10 transition-transform duration-700 relative" 
               />
 
-              <div className="absolute bottom-6 left-8 right-8 flex justify-between items-center font-mono text-[9px] text-on-surface-variant uppercase tracking-widest border-t border-glass-stroke pt-4 z-20">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-electric-cyan animate-ping" />
+              <div className="absolute bottom-5 left-7 right-7 flex justify-between items-center font-mono text-[10px] text-slate-300 uppercase tracking-widest border-t border-slate-800/80 pt-3.5 z-20 bg-[#070b14]/90 backdrop-blur-md px-2">
+                <span className="flex items-center gap-2 font-bold text-cyan-400">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
                   Telemetry Active
                 </span>
-                <span>Module: {activeSection}</span>
+                <span className="text-slate-300 font-semibold px-2.5 py-1 rounded bg-slate-800/80 border border-slate-700">
+                  Module: {activeSection.toUpperCase()}
+                </span>
               </div>
             </div>
           </div>
