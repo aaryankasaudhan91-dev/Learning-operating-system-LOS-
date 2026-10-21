@@ -156,6 +156,8 @@ export default function App() {
     return () => window.removeEventListener('hashchange', handleHash);
   }, []);
 
+  useEffect(() => { window.scrollTo({top:0, behavior:"instant"}); }, [currentView]);
+
   // Track pageviews & synchronize hash when currentView changes
   useEffect(() => {
     analytics.trackPageView(currentView);

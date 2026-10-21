@@ -9,7 +9,7 @@ export default defineConfig(({ mode }) => {
 
   return {
     base: './',
-    envDir: path.resolve(__dirname, '..'),
+    envDir: __dirname,
     plugins: [react(), tailwindcss()],
     resolve: {
       alias: {

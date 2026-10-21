@@ -245,19 +245,24 @@ export default function InsightsHub({
   };
 
   return (
-    <div className="space-y-8 select-none">
+    <div className="professional-workspace space-y-8">
       
       {/* HEADER SECTION */}
       <header className="mb-4">
         <h1 className="font-sans font-extrabold text-3xl text-on-surface flex items-center gap-3">
           <ShieldAlert className="w-8 h-8 text-electric-cyan" />
-          Feature 17: Asymmetric Mentor Dashboard Insights
+          Your classroom, at a glance
         </h1>
         <p className="font-sans text-base text-on-surface-variant max-w-3xl leading-relaxed mt-1">
-          Real-time multi-dimensional analysis of cohort performance, cognitive load, and linguistic variance.
+          Review your linked learners, plan your next lesson, and follow up where support may help.
         </p>
       </header>
 
+      <section className="professional-stats" aria-label="Classroom summary">
+        <article><span>LINKED LEARNERS</span><strong>{seats.length}</strong><small>In this classroom view</small></article>
+        <article><span>SUPPORT FOLLOW-UPS</span><strong>{alerts.length}</strong><small>Review before taking action</small></article>
+        <article><span>TEACHING WORKSPACE</span><strong>Plan your next step</strong><button onClick={() => setView('courses')}>Open courses →</button></article>
+      </section>
       {/* TAB NAVIGATION */}
       <div className="flex border-b border-glass-stroke mb-8">
         <button 
