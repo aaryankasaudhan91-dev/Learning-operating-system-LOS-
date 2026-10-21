@@ -1,597 +1,460 @@
 <p align="center">
-  <img src="https://img.shields.io/badge/Status-Active%20Development-brightgreen?style=for-the-badge" alt="Status" />
-  <img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge" alt="License" />
-  <img src="https://img.shields.io/badge/Node.js-v18+-339933?style=for-the-badge&logo=node.js&logoColor=white" alt="Node" />
-  <img src="https://img.shields.io/badge/React-19-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
+  <img src="https://img.shields.io/badge/Version-2.0.0--v2-8A2BE2?style=for-the-badge&logo=rocket" alt="Version 2.0" />
+  <img src="https://img.shields.io/badge/Status-Production--Ready-brightgreen?style=for-the-badge" alt="Status" />
+  <img src="https://img.shields.io/badge/Platforms-Web%20%7C%20Electron%20Desktop%20%7C%20Capacitor%20Mobile-blueviolet?style=for-the-badge" alt="Platforms" />
+  <img src="https://img.shields.io/badge/AI%20Core-Gemini%20%7C%20Claude%20%7C%20GPT--4o%20%7C%20NVIDIA-00b894?style=for-the-badge" alt="AI Core" />
+  <img src="https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=white" alt="React" />
   <img src="https://img.shields.io/badge/TypeScript-5.8-3178C6?style=for-the-badge&logo=typescript&logoColor=white" alt="TypeScript" />
+  <img src="https://img.shields.io/badge/License-Apache%202.0-blue?style=for-the-badge" alt="License" />
 </p>
 
-# 🧠 Synapse — Learner Operating System (LOS)
+# 🧠 Synapse — Learner Operating System (LOS) `v2.0`
 
-> **An adaptive, AI-powered cognitive education platform that dynamically calibrates learning experiences based on real-time student mental states.**
+> **An adaptive, multi-platform cognitive education cockpit that synchronizes learning experiences with real-time student mental states, leveraging a resilient 6-agent AI architecture.**
 
-Synapse LOS is a next-generation education cockpit designed to reduce student burnout and maximize flow states. It integrates multi-model AI agents, real-time cognitive telemetry, an NEP 2020 & CBSE-aligned curriculum framework, and empathetic SOS tools — all within a premium glassmorphic dark-mode interface.
+Synapse LOS is an intelligent educational operating system engineered to close the effectiveness gap in modern schooling. Built according to **NEP 2020** & **CBSE** pedagogical principles, Synapse mitigates student burnout, predicts cognitive friction, and induces flow states through real-time telemetry, adaptive instructional scaffolding, empathetic crisis intervention, and cross-platform native execution.
+
+---
+
+## ⚡ What's New in Version 2.0 (`v2.0`)
+
+Synapse `v2.0` elevates the platform from a web prototype to an enterprise-grade, tri-target cross-platform system:
+
+1. **Cross-Platform Tri-Target Runtime**:
+   - 🖥️ **Desktop App (Electron 42)**: Native desktop application bundle with system window chrome, auto-hiding menus, sandboxed process isolation, and cross-platform builders (Windows NSIS installer, macOS DMG, Linux AppImage).
+   - 📱 **Mobile App (Capacitor 8)**: Native wrappers for Android and iOS with tactile touch states, safe-area boundary handling, and dedicated bottom navigation (`MobileNavigation`).
+   - 🌐 **Web App (React 19 + Vite 6)**: Ultrafast responsive Single-Page Application optimized for modern desktop and tablet displays.
+2. **Unified Design Architecture (`app-design.css`)**:
+   - Shared design system across web, desktop, and mobile with glassmorphic depth, dynamic theme tokens, smooth hardware-accelerated animations, and responsive touch ergonomics.
+3. **Streamlined Navigation & UX Refresh**:
+   - **Student Cockpit**: Re-engineered with intuitive gamified quests (*My Adventure*, *Learning Quests*, *Focus Zone*, *Take a Breath*).
+   - **Mentor Suite**: Mission-control layout (*Courses*, *My Classroom*, *Class Progress*).
+4. **Enhanced Diagnostic & Compliance Suite**:
+   - Integrated **Help & Diagnostics Center** (`HelpCenter.tsx`) featuring real-time connection status, automated test diagnostics, interactive FAQ guidebook, embedded support chatbot, and instant ticket dispatch.
+   - Comprehensive **Privacy Policy** and **Terms & Conditions** compliance modules.
+5. **Resilient HTTP & Offline Fallbacks (`http.ts`)**:
+   - Centralized network layer with automatic failover to intelligent mock data when offline or when external AI API keys are unconfigured.
 
 ---
 
 ## 📑 Table of Contents
 
-- [Features Overview](#-features-overview)
-- [Architecture](#-architecture)
+- [What's New in Version 2.0](#-whats-new-in-version-20-v20)
+- [System Architecture](#-system-architecture)
+- [Key Features](#-key-features)
+  - [For Students](#for-students)
+  - [For Mentors & Educators](#for-mentors--educators)
+  - [Platform & Cross-Device Infrastructure](#platform--cross-device-infrastructure)
+- [6-Agent AI Architecture](#-6-agent-ai-architecture)
 - [Tech Stack](#-tech-stack)
-- [Project Structure](#-project-structure)
-- [AI Agent Pipeline](#-ai-agent-pipeline)
-- [Frontend Components](#-frontend-components)
+- [Project Directory Structure](#-project-directory-structure)
+- [Installation & Quick Start](#-installation--quick-start)
+  - [1. Web & Backend Development](#1-web--backend-development)
+  - [2. Desktop App (Electron)](#2-desktop-app-electron)
+  - [3. Mobile App (Capacitor Android / iOS)](#3-mobile-app-capacitor-android--ios)
+- [Environment Configuration](#-environment-configuration)
+- [Zero-Config Demo Accounts](#-zero-config-demo-accounts)
 - [Backend API Reference](#-backend-api-reference)
-- [Database Schema](#-database-schema)
-- [Getting Started](#-getting-started)
-- [Environment Variables](#-environment-variables)
-- [Demo Accounts](#-demo-accounts)
-- [Screenshots & Views](#-screenshots--views)
+- [Database Schema (MongoDB Atlas)](#-database-schema-mongodb-atlas)
+- [Author & Engineering Team](#-author--engineering-team)
 - [Roadmap](#-roadmap)
 - [License](#-license)
 
 ---
 
-## ✨ Features Overview
+## 🏗 System Architecture
 
-### For Students
-| Feature | Description |
-|---|---|
-| **Course Hub** | Browse CBSE/NEP 2020 aligned courses, modules, and lessons with subject-wise breakdown |
-| **Inline Video Player** | Watch personal teacher recordings or YouTube tutorials directly inside the app (embedded iframe/HTML5 player) |
-| **Custom Test Taker** | Take interactive multiple-choice quizzes assigned by mentors — auto-scored with instant color-coded results |
-| **Custom Homework Taker** | Submit freeform answers to structured homework questions assigned by mentors |
-| **Cognitive Map** | Visual dashboard showing cognitive load, task board, peer insights, daily milestones, and achievement badges |
-| **Focus Chamber** | Distraction-free study mode with timer, ambient soundscapes, content modes (text/audio/visual), and AI-generated analogies |
-| **SOS Toolkit** | Emergency panel with box-breathing exercises, grounding techniques, and an empathetic AI therapist powered by Gemini |
-| **Help Center** | Full-page support hub with system diagnostics, FAQ guidebook, embedded AI assistant, and support ticket form |
-
-### For Mentors/Teachers
-| Feature | Description |
-|---|---|
-| **Course Creator** | Create courses, modules, and lessons with instructional flow templates (Hook → Direct Instruction → Practice → Closure) |
-| **Quick Lesson Assign** | Rapidly assign lessons with video, notes, and test/homework to specific students from the student management panel |
-| **Custom Test Maker** | Build interactive multiple-choice quizzes (manual or AI-generated via Claude) with configurable correct answers |
-| **Custom Homework Maker** | Create structured homework question sets (manual or AI-generated) |
-| **Google Form Integration** | Option to link external Google Forms for tests and homework alongside the built-in maker |
-| **Seat Matrix (Insights Hub)** | Real-time heatmap grid showing every student's cognitive load state — friction detection with AI intervention suggestions |
-| **Cohort Telemetry** | Aggregate analytics, broadcast prompts to student cohorts, and monitor class-wide engagement patterns |
-| **Intervention Center** | AI-powered intervention suggestions (via Claude) based on individual student cognitive states |
-
-### Platform-Wide
-| Feature | Description |
-|---|---|
-| **Multi-AI Agent Pipeline** | 6 specialized AI agents using 4 different providers (OpenAI, Anthropic, NVIDIA, Google Gemini) |
-| **Firebase Authentication** | Email/password auth with role-based registration (student or mentor) |
-| **Demo Accounts** | Pre-configured demo student and mentor accounts — no Firebase auth required |
-| **MongoDB Persistence** | All user profiles, courses, tasks, and lessons persisted to MongoDB Atlas |
-| **Responsive Design** | Full desktop sidebar + mobile bottom navigation bar |
-| **Glassmorphic UI** | Premium dark-mode design system with plasma-violet/electric-cyan/synapse-green accent palette |
+```
+┌────────────────────────────────────────────────────────────────────────┐
+│                        SYNAPSE CROSS-PLATFORM CLIENT                   │
+│                                                                        │
+│   ┌─────────────────────┐  ┌─────────────────────┐  ┌───────────────┐ │
+│   │   Web (Vite 6 SPA)   │  │ Desktop (Electron)  │  │Mobile (Capacitor)│
+│   └──────────┬──────────┘  └──────────┬──────────┘  └───────┬───────┘ │
+│              └────────────────────────┼─────────────────────┘         │
+│                                       ▼                                │
+│                     Shared React 19 + TypeScript UI                    │
+│   ┌───────────────────┬───────────────────┬────────────────────────┐  │
+│   │ Student Cockpit   │ Mentor Console    │ Diagnostics & Support  │  │
+│   │ • Cognitive Map   │ • Insights Matrix │ • Help Center          │  │
+│   │ • Course Quests   │ • Cohort Stream   │ • AI Support Chatbot   │  │
+│   │ • Focus Chamber   │ • Test Creator    │ • Privacy & Compliance │  │
+│   │ • SOS Calibrator  │ • Intervention Ctr│ • Diagnostic Telemetry │  │
+│   └───────────────────┴───────────────────┴────────────────────────┘  │
+│                                       │                                │
+│          Services: http.ts ─ db.service ─ task.service ─ auth.service  │
+└───────────────────────────────────────┬────────────────────────────────┘
+                                        │ REST / JSON Streaming
+                                        ▼
+┌────────────────────────────────────────────────────────────────────────┐
+│                     BACKEND ENGINE (Node.js + Express)                 │
+│                                                                        │
+│  ┌───────────────────────── AI Agent Router ────────────────────────┐ │
+│  │                                                                  │ │
+│  │  1. Focus Agent        2. Insights Agent      3. Intervention    │ │
+│  │     (OpenAI GPT-4o)       (NVIDIA Nemotron)      (Claude 3.5)    │ │
+│  │                                                                  │ │
+│  │  4. SOS Chat Agent     5. Task Hint Agent     6. Task Generator  │ │
+│  │     (Gemini 2.5 Flash)    (OpenAI GPT-4o)        (Claude 3.5)    │ │
+│  │                                                                  │ │
+│  └──────────────────────────────────────────────────────────────────┘ │
+│                                                                        │
+│  API Gateway: /api/users ─ /api/courses ─ /api/tasks ─ /api/prompts    │
+│  Persistence: Mongoose 9.6 ODM ──► MongoDB Atlas Cloud Database        │
+└────────────────────────────────────────────────────────────────────────┘
+```
 
 ---
 
-## 🏗 Architecture
+## ✨ Key Features
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     FRONTEND (Vite + React 19)              │
-│  ┌────────┐ ┌──────────┐ ┌────────────┐ ┌───────────────┐  │
-│  │Landing │ │ Course   │ │ Cognitive  │ │  Focus        │  │
-│  │Page    │ │ Hub      │ │ Map        │ │  Chamber      │  │
-│  └────────┘ └──────────┘ └────────────┘ └───────────────┘  │
-│  ┌────────┐ ┌──────────┐ ┌────────────┐ ┌───────────────┐  │
-│  │SOS     │ │ Insights │ │ Cohort     │ │  Help         │  │
-│  │Toolkit │ │ Hub      │ │ Telemetry  │ │  Center       │  │
-│  └────────┘ └──────────┘ └────────────┘ └───────────────┘  │
-│                                                             │
-│  Services: db.service ─ task.service ─ auth.service ─ api   │
-│  Auth: Firebase ─ Demo Fallback                             │
-└──────────────────────────┬──────────────────────────────────┘
-                           │ REST API (fetch)
-┌──────────────────────────┴──────────────────────────────────┐
-│                     BACKEND (Express + TypeScript)           │
-│                                                              │
-│  ┌─────────────────── AI Agent Router ───────────────────┐   │
-│  │ Focus Agent    │ SOS Agent     │ Task Hint Agent      │   │
-│  │ (OpenAI GPT)   │ (Gemini)      │ (OpenAI GPT)         │   │
-│  ├────────────────┼───────────────┼──────────────────────┤   │
-│  │ Insights Agent │ Intervention  │ Task Generator Agent │   │
-│  │ (NVIDIA)       │ Agent (Claude)│ (Claude)             │   │
-│  └───────────────────────────────────────────────────────┘   │
-│                                                              │
-│  REST Routes: /api/users ─ /api/courses ─ /api/tasks         │
-│  Database: Mongoose ODM → MongoDB Atlas                      │
-└──────────────────────────────────────────────────────────────┘
-```
+### For Students
+| Feature | Details |
+|---|---|
+| **Cognitive Map (My Adventure)** | Real-time cognitive load gauge, gamified milestone tracking, task board with status filtering, and peer accolade badges. |
+| **Learning Quests (Course Hub)** | Curriculum browser aligned with CBSE & NEP 2020. Modular units with instructional flows (Hook, Direct Instruction, Guided Practice, Closure). |
+| **Interactive Video & Media Player** | In-app playback for personal instructor lectures and curated YouTube tutorials with distraction-free presentation. |
+| **Custom Test & Homework Takers** | Instant-scoring multiple-choice assessments with color-coded reviews and freeform homework response submissions. |
+| **Focus Chamber (Focus Zone)** | Pomodoro timer, ambient soundscapes, sensory modes (text/audio/visual), real-world analogies, and AI step-down complexity simplifiers. |
+| **SOS Toolkit (Take a Breath)** | Guided box-breathing, 5-4-3-2-1 sensory grounding, and a real-time streaming conversational AI therapist powered by Gemini. |
+| **Help & Diagnostics Center** | System health verification, FAQ directory, embedded AI assistant bubble, and formal support ticket logging. |
+
+### For Mentors & Educators
+| Feature | Details |
+|---|---|
+| **Seat Matrix (My Classroom)** | Live classroom heatmap visually tracking student cognitive load and friction in real time. |
+| **AI Intervention Engine** | Instant AI-generated pedagogical intervention recommendations based on individual learner telemetry. |
+| **Cohort Telemetry (Class Progress)**| Class-wide aggregate metrics, engagement trends, and instant broadcasting of metacognitive prompts. |
+| **Curriculum Builder & Quick Assign**| Author structured courses, modules, and lessons. Rapidly assign targeted lessons and assessments to individual students. |
+| **AI Test & Homework Generator** | One-click automatic generation of MCQ quizzes with answer keys and structured homework prompts via Anthropic Claude. |
+| **Google Form Integration** | Flexibility to embed native custom quizzes or link external Google Forms for evaluations. |
+
+### Platform & Cross-Device Infrastructure
+| Capability | Details |
+|---|---|
+| **Electron Desktop Application** | Dedicated desktop shell with background optimization, OS window handling, and zero web browser chrome distractions. |
+| **Capacitor Mobile Architecture** | Native iOS and Android readiness with mobile bottom navigation bar and gesture ergonomics. |
+| **Role-Based Authentication** | Secure Firebase Auth (email/password) paired with instant zero-credential demo logins for rapid testing. |
+| **Zero-Config Fallbacks** | Smart mock responders ensure complete platform functionality even without external API credentials. |
+
+---
+
+## 🤖 6-Agent AI Architecture
+
+Synapse deploys an ensemble of 6 specialized AI agents across 4 distinct frontier model providers:
+
+| # | Agent | Endpoint | Provider | Model | Functional Role |
+|---|---|---|---|---|---|
+| 1 | **Focus Agent** | `POST /api/agent/focus` | OpenAI | `gpt-4o-mini` | Dynamically distills study material into text/audio/visual summaries, real-world analogies, and stepped-down explanations. |
+| 2 | **Insights Agent** | `POST /api/agent/insights-prompt` | NVIDIA | `llama-3.1-nemotron-51b` | Generates deep metacognitive prompts for cohort reflection to solidify conceptual retention. |
+| 3 | **Intervention Agent** | `POST /api/agent/intervention-suggestion` | Anthropic | `claude-3-5-sonnet` | Analyzes learner friction telemetry to craft actionable pedagogical interventions for instructors. |
+| 4 | **SOS Chat Agent** | `POST /api/agent/sos-chat` | Google | `gemini-2.5-flash` | Empathetic, de-escalating mental wellness counselor that streams reassuring dialogue during distress. |
+| 5 | **Task Hint Agent** | `POST /api/agent/task-hint` | OpenAI | `gpt-4o-mini` | Delivers Socratic scaffolding hints for difficult homework tasks without disclosing answers. |
+| 6 | **Task Generator Agent** | `POST /api/agent/generate-task` | Anthropic | `claude-3-5-sonnet` | Autonomously formulates structured syllabus tasks, multiple-choice quizzes with answer keys, and homework prompts. |
 
 ---
 
 ## 🛠 Tech Stack
 
-### Frontend
-| Technology | Version | Purpose |
-|---|---|---|
-| **React** | 19.0.1 | Component UI framework |
-| **TypeScript** | 5.8 | Type safety |
-| **Vite** | 6.2 | Dev server & bundler |
-| **Tailwind CSS** | 4.1 | Utility-first styling with custom design tokens |
-| **Motion (Framer)** | 12.x | View transitions and animations |
-| **Recharts** | 3.8 | Data visualization charts |
-| **Lucide React** | 0.546 | Icon library (28 component files use ~60+ unique icons) |
-| **Firebase** | 12.14 | Authentication (email/password) |
-| **jsPDF** | 4.2 | PDF report generation |
+### Client Side (Web, Desktop, Mobile)
+- **Framework**: [React 19](https://react.dev/) + [TypeScript 5.8](https://www.typescriptlang.org/)
+- **Bundler & Tooling**: [Vite 6.2](https://vitejs.dev/) + [esbuild](https://esbuild.github.io/)
+- **Desktop Runtime**: [Electron 42](https://www.electronjs.org/) + [electron-builder 26](https://www.electron.build/)
+- **Mobile Runtime**: [Capacitor 8](https://capacitorjs.com/) (Android & iOS)
+- **Styling**: [Tailwind CSS 4.1](https://tailwindcss.com/) + Custom Glassmorphic Token Engine
+- **Motion & Visuals**: [Motion (Framer Motion 12)](https://motion.dev/), [Anime.js 4](https://animejs.com/)
+- **Data Visualization**: [Recharts 3.8](https://recharts.org/)
+- **Icons**: [Lucide React](https://lucide.dev/) (60+ specialized icons)
+- **Export Utility**: [jsPDF 4.2](https://github.com/parallax/jsPDF) + `jspdf-autotable`
 
-### Backend
-| Technology | Version | Purpose |
-|---|---|---|
-| **Express** | 4.21 | HTTP server & REST API routing |
-| **TypeScript** | 5.8 | Type safety |
-| **Mongoose** | 9.6 | MongoDB ODM for schema-based models |
-| **@google/genai** | 2.8 | Google Gemini AI SDK (streaming SOS agent) |
-| **dotenv** | 17.2 | Environment variable management |
-| **tsx** | 4.21 | TypeScript execution (dev mode) |
-| **esbuild** | 0.25 | Production bundling |
-
-### External AI Services
-| Provider | Model | Agent(s) |
-|---|---|---|
-| **OpenAI** | `gpt-4o-mini` | Focus Agent, Task Hint Agent |
-| **Anthropic** | `claude-3-5-sonnet-20241022` | Intervention Agent, Task Generator Agent |
-| **NVIDIA** | `llama-3.1-nemotron-51b-instruct` | Insights Agent |
-| **Google** | `gemini-2.5-flash` | SOS Chat Agent (streaming) |
-
-### Database & Auth
-| Service | Purpose |
-|---|---|
-| **MongoDB Atlas** | Primary data store for users, courses, modules, lessons, tasks |
-| **Firebase Auth** | User authentication (email + password), role-based access |
+### Server Side & AI Engine
+- **Runtime**: [Node.js](https://nodejs.org/) (v20+ / v22 recommended)
+- **Framework**: [Express 4.21](https://expressjs.com/) with TypeScript execution via `tsx`
+- **Database & ODM**: [MongoDB Atlas](https://www.mongodb.com/atlas) with [Mongoose 9.6](https://mongoosejs.com/)
+- **Authentication**: [Firebase Auth 12.14](https://firebase.google.com/)
+- **AI SDKs**: `@google/genai` (Gemini), Anthropic Claude API, OpenAI API, NVIDIA AI Foundation Endpoints
 
 ---
 
-## 📂 Project Structure
+## 📂 Project Directory Structure
 
 ```
-LOS/
-├── package.json                    # Workspace root (npm workspaces)
-├── .env                            # Root environment variables
+Learning-operating-system-LOS-/
+├── package.json                    # Workspace root (npm workspaces: frontend, backend)
+├── APP_SETUP.md                    # Cross-platform installation and device notes
+├── .env                            # Root client/server environment configuration
 │
-├── backend/
-│   ├── package.json
-│   ├── .env                        # Backend-specific env (API keys, MongoDB URI)
-│   ├── src/
-│   │   ├── server.ts               # Express server, Mongoose models, REST routes
-│   │   └── agents/
-│   │       ├── index.ts            # Agent router setup (mounts all 6 agents)
-│   │       ├── focusAgent.ts       # ChatGPT-powered focus content generator
-│   │       ├── insightsAgent.ts    # NVIDIA-powered metacognitive prompt generator
-│   │       ├── interventionAgent.ts# Claude-powered mentor intervention suggestions
-│   │       ├── sosAgent.ts         # Gemini-powered empathetic therapist (streaming)
-│   │       ├── taskHintAgent.ts    # ChatGPT-powered task hint/scaffolding
-│   │       ├── taskGeneratorAgent.ts# Claude-powered test/homework/task generator
-│   │       └── utils.ts            # Shared sanitization & response cleaning
-│   └── dist/                       # Production build output
+├── desktop/                        # Electron desktop runtime
+│   ├── main.ts                     # Electron main process (window lifecycle, security sandboxing)
+│   └── build.mjs                   # Fast esbuild bundle script for desktop entrypoint
+├── desktop-dist/                   # Compiled Electron output (`main.cjs`)
 │
-├── frontend/
+├── frontend/                       # React 19 Single Page Application & Mobile Shell
 │   ├── package.json
-│   ├── vite.config.ts
+│   ├── vite.config.ts              # Vite configuration
+│   ├── capacitor.config.ts         # Capacitor iOS/Android configuration
 │   ├── index.html
 │   └── src/
-│       ├── App.tsx                 # Root component, view router, auth state manager
-│       ├── main.tsx                # React entry point
-│       ├── index.css               # Design system tokens (colors, glass effects)
-│       ├── types.ts                # TypeScript interfaces & type definitions
+│       ├── App.tsx                 # Root component, view router, authentication state
+│       ├── main.tsx                # Client bootstrapper
+│       ├── index.css               # Core CSS and custom theme design tokens
+│       ├── app-design.css          # Cross-platform touch, viewport, and glass utility styles
+│       ├── types.ts                # Master TypeScript interface definitions
 │       │
 │       ├── lib/
-│       │   └── firebase.ts         # Firebase app initialization & auth export
+│       │   └── firebase.ts         # Firebase client initialization
 │       │
 │       ├── services/
-│       │   ├── api.ts              # Base API URL configuration
-│       │   ├── auth.service.ts     # Firebase auth helpers (login, register, logout)
-│       │   ├── db.service.ts       # Database CRUD service (users, courses, modules, lessons)
-│       │   └── task.service.ts     # Task CRUD service (student tasks)
+│       │   ├── api.ts              # API URL endpoint resolver
+│       │   ├── http.ts             # Resilient HTTP request helper with error handling
+│       │   ├── auth.service.ts     # Firebase authentication service
+│       │   ├── db.service.ts       # Database CRUD service (Courses, Modules, Lessons, Users)
+│       │   └── task.service.ts     # Student task CRUD service
 │       │
 │       └── components/
-│           ├── LandingPage.tsx     # Scrollytelling hero with morphing neural canvas
-│           ├── AboutPage.tsx       # Project philosophy & team info
-│           ├── LoginPage.tsx       # Firebase + Demo account login
-│           ├── RegisterPage.tsx    # Role-based registration (student/mentor)
-│           ├── Navbar.tsx          # Top navigation bar with alerts
-│           ├── Sidebar.tsx         # Left sidebar with role-based nav links
+│           ├── navigation.ts       # Central navigation registry for students & mentors
+│           ├── MobileNavigation.tsx# Native bottom navigation bar for mobile devices
+│           ├── Navbar.tsx          # Desktop header bar with alerts and quick profile menu
+│           ├── Sidebar.tsx         # Desktop responsive sidebar navigation
 │           ├── SplashScreen.tsx    # Animated boot splash screen
+│           ├── LandingPage.tsx     # Scrollytelling hero presentation with neural canvas
+│           ├── AboutPage.tsx       # Pedagogical philosophy & development story
+│           ├── LoginPage.tsx       # Firebase credentials & instant demo login
+│           ├── RegisterPage.tsx    # Role selection (Student / Mentor) registration
 │           │
-│           ├── CourseHub.tsx        # Full curriculum manager (128KB — largest component)
-│           │                         • Course/Module/Lesson browser (student)
-│           │                         • Course/Module/Lesson creator (mentor)
-│           │                         • Student management & quick assign panel
-│           │                         • Test Maker + Homework Maker modals
-│           │                         • Test Taker + Homework Taker modals
-│           │                         • Embedded video player modal
+│           ├── CourseHub.tsx       # Unified curriculum manager (Quests, tests, video player)
+│           ├── CognitiveMap.tsx    # Student dashboard (Load gauge, milestones, badges)
+│           ├── FocusChamber.tsx    # Deep focus room with timer & multimodal AI content
+│           ├── SOSToolkit.tsx      # Breathing exercises & real-time streaming AI therapist
+│           ├── InsightsHub.tsx     # Mentor seat matrix heatmap & AI intervention dispatch
+│           ├── CohortTelemetry.tsx # Cohort analytics & metacognitive broadcast prompts
+│           ├── HelpCenter.tsx      # Support center with live diagnostics & support ticket form
+│           ├── HelpChatBot.tsx     # Floating AI help companion
 │           │
-│           ├── CognitiveMap.tsx     # Student dashboard with load gauge, tasks, milestones
-│           ├── FocusChamber.tsx     # Silent study room with AI content modes
-│           ├── SOSToolkit.tsx       # Emergency grounding exercises + AI therapist
-│           ├── InsightsHub.tsx      # Mentor seat matrix heatmap + interventions
-│           ├── CohortTelemetry.tsx  # Mentor cohort analytics + broadcast prompts
-│           ├── HelpCenter.tsx       # Help & diagnostics center page
-│           │
-│           ├── ProfilePage.tsx      # User profile display
-│           ├── SettingsPage.tsx     # User preferences
-│           ├── HelpChatBot.tsx      # Floating AI chat bubble (bottom-right)
-│           │
-│           ├── ClassroomHeatmap.tsx  # Visual heatmap grid sub-component
-│           ├── InterventionCenter.tsx# AI intervention alerts sub-component
-│           ├── StudentTaskBoard.tsx  # Task checklist sub-component
-│           ├── TaskCenter.tsx        # Advanced task management sub-component
-│           ├── DailyMilestone.tsx    # Daily focus progress tracker
-│           ├── PeerInsight.tsx       # Peer badges & social feedback
-│           ├── AchievementGallery.tsx# Badge showcase gallery
-│           ├── AudioNotes.tsx        # Text-to-speech notes player
-│           ├── AppLogo.tsx           # SVG logo component
-│           ├── FirebaseProvider.tsx  # Firebase context provider wrapper
-│           └── UnderConstruction.tsx # Placeholder for unreleased features
+│           ├── ProfilePage.tsx     # User account profile
+│           ├── SettingsPage.tsx    # App preferences & notifications
+│           ├── PrivacyPolicy.tsx   # Privacy & data safety statement
+│           ├── TermsConditions.tsx # Terms of service documentation
+│           └── NotFoundPage.tsx    # 404 state screen
+│
+└── backend/                        # Express API & Multi-Agent Server
+    ├── package.json
+    ├── .env                        # Server credentials (API keys, MongoDB connection)
+    └── src/
+        ├── server.ts               # Express server, Mongoose models, and REST endpoints
+        └── agents/
+            ├── index.ts            # AI Router registering all 6 agents
+            ├── focusAgent.ts       # OpenAI-powered study content synthesizer
+            ├── insightsAgent.ts    # NVIDIA-powered metacognitive prompt generator
+            ├── interventionAgent.ts# Claude-powered mentor intervention architect
+            ├── sosAgent.ts         # Google Gemini streaming empathetic therapist
+            ├── taskHintAgent.ts    # OpenAI-powered scaffolding hint generator
+            ├── taskGeneratorAgent.ts# Claude-powered quiz & homework builder
+            └── utils.ts            # Sanitization & response parsing utilities
 ```
 
 ---
 
-## 🤖 AI Agent Pipeline
+## 🚀 Installation & Quick Start
 
-Each agent runs on a dedicated AI model from a different provider, ensuring diversity, resilience, and specialization:
+### Prerequisites
+- **Node.js**: `v20.x` or `v22.x` (recommended)
+- **npm**: `v9.x` or newer
+- **MongoDB**: MongoDB Atlas URI or local instance (defaults gracefully if not present)
 
-### Agent Details
+### 1. Web & Backend Development
 
-| # | Agent | Route | AI Provider | Model | Purpose |
-|---|---|---|---|---|---|
-| 1 | **Focus Agent** | `POST /api/agent/focus` | OpenAI | `gpt-4o-mini` | Generates concise study content — supports text, audio, visual modes plus real-world analogies and simplified explanations |
-| 2 | **Insights Agent** | `POST /api/agent/insights-prompt` | NVIDIA | `llama-3.1-nemotron-51b` | Creates metacognitive reflection prompts for student cohorts to encourage deeper learning |
-| 3 | **Intervention Agent** | `POST /api/agent/intervention-suggestion` | Anthropic | `claude-3-5-sonnet` | Generates actionable intervention suggestions for mentors based on a student's name, cognitive state, and load percentage |
-| 4 | **SOS Chat Agent** | `POST /api/agent/sos-chat` | Google | `gemini-2.5-flash` | Empathetic AI therapist that streams calming, supportive responses for students in distress (chunked transfer) |
-| 5 | **Task Hint Agent** | `POST /api/agent/task-hint` | OpenAI | `gpt-4o-mini` | Provides strategic hints and scaffolding for students stuck on tasks without giving away the answer |
-| 6 | **Task Generator** | `POST /api/agent/generate-task` | Anthropic | `claude-3-5-sonnet` | Generates structured tasks, custom quizzes (MCQ with correct answers), homework question sets, and study roadmaps |
+```bash
+# 1. Clone repository
+git clone https://github.com/aaryankasaudhan91-dev/Learning-operating-system-LOS-.git
+cd Learning-operating-system-LOS-
 
-### Fallback Behavior
+# 2. Install workspace dependencies
+npm install
 
-Every agent has built-in **mock fallback responses** when the corresponding API key is not configured. This allows the entire application to run fully functional in demo mode without any AI API keys.
+# 3. Start development servers concurrently (Frontend + Backend)
+npm run dev
+```
+
+- **Frontend Application**: `http://localhost:5173`
+- **Backend API Server**: `http://localhost:3000`
+
+### 2. Desktop App (Electron)
+
+```bash
+# Run the desktop app locally with native window frame
+npm run desktop
+
+# Package unpacked desktop binary
+npm run desktop:package
+
+# Generate cross-platform installers (NSIS installer for Windows, DMG for macOS, AppImage for Linux)
+npm run desktop:installer
+```
+*Compiled desktop binaries and installers are generated in the `release/` directory.*
+
+### 3. Mobile App (Capacitor Android / iOS)
+
+```bash
+# 1. Build the production web bundle
+npm run build -w frontend
+
+# 2. Add Android platform (run once)
+cd frontend && npx cap add android && cd ..
+
+# 3. Synchronize assets to native platforms
+npm run mobile:sync
+
+# 4. Open in Android Studio to run on an emulator or physical device
+npm run mobile:android -w frontend
+
+# For iOS (on macOS with Xcode):
+# cd frontend && npx cap add ios && cd ..
+# npm run mobile:ios -w frontend
+```
 
 ---
 
-## 🖥 Frontend Components
+## 🔑 Environment Configuration
 
-### Core Views (routed via `AppView` state)
+Create or update `backend/.env` with your credentials:
 
-| View Key | Component | Role Access | Description |
+```env
+# -------------------------------------------------------------
+# Database Configuration
+# -------------------------------------------------------------
+MONGODB_URI="mongodb+srv://<username>:<password>@<cluster>.mongodb.net/synapse?retryWrites=true&w=majority"
+
+# -------------------------------------------------------------
+# AI Agent API Credentials (Optional - Mock fallbacks active)
+# -------------------------------------------------------------
+# Google Gemini (SOS Chat Agent + Multimodal AI SDK)
+GEMINI_API_KEY="your-gemini-api-key"
+
+# OpenAI (Focus Agent + Task Hint Agent)
+OPENAI_API_KEY="your-openai-api-key"
+
+# Anthropic Claude (Intervention Agent + Task Generator Agent)
+ANTHROPIC_API_KEY="your-anthropic-api-key"
+
+# NVIDIA NIM (Insights Metacognitive Prompt Agent)
+NVIDIA_API_KEY="your-nvidia-api-key"
+
+# -------------------------------------------------------------
+# Server Settings
+# -------------------------------------------------------------
+PORT=3000
+```
+
+> **Smart Mock Fallback Engine**: If any AI API key is missing or omitted, Synapse activates its built-in fallback system, allowing full offline testing, evaluation, and demonstration without third-party fees.
+
+---
+
+## 👤 Zero-Config Demo Accounts
+
+Skip registration and evaluate with pre-loaded profiles:
+
+| Role | Profile Name | Purpose | Features Tested |
 |---|---|---|---|
-| `landing` | `LandingPage` | Public | Scrollytelling hero with 4-phase neural canvas (chaos → calibration → sync → flow) |
-| `about` | `AboutPage` | Public | Project philosophy and mission statement |
-| `login` | `LoginPage` | Public | Firebase auth + demo account buttons |
-| `register` | `RegisterPage` | Public | Student/mentor registration with teacher email linkage |
-| `courses` | `CourseHub` | Both | Full curriculum management — browsing, creating, assigning, test/homework taking |
-| `map` | `CognitiveMap` | Student | Cognitive load gauge, task board, daily milestones, peer insights, achievements |
-| `chamber` | `FocusChamber` | Student | Distraction-free study with AI-generated content, timer, and ambient sounds |
-| `sos` | `SOSToolkit` | Student | Emergency grounding with box breathing + streaming AI therapist |
-| `insights` | `InsightsHub` | Mentor | Seat matrix heatmap, cognitive load monitoring, AI intervention center |
-| `cohort` | `CohortTelemetry` | Mentor | Class-wide analytics, broadcast prompts, engagement monitoring |
-| `profile` | `ProfilePage` | Both | User profile overview |
-| `settings` | `SettingsPage` | Both | User preferences |
-| `help` | `HelpCenter` | Both | System diagnostics, FAQ guidebook, embedded AI assistant, support tickets |
+| **Student** | **Arjun Patel** | Real-time student perspective | Cognitive load gauge, active tasks, study quests, MCQ quiz taker, SOS breathing & chat |
+| **Mentor** | **Dr. Kavita Sharma** | Educator command cockpit | Seat matrix heatmap, student quick-assignment, Claude-generated tests, cohort broadcasts |
 
-### Design System
-
-The UI is built on a custom dark-mode design system defined in `index.css`:
-
-| Token | Value | Usage |
-|---|---|---|
-| `--void-black` | `#0a0a0f` | Primary background |
-| `--plasma-violet` | `#7c3aed` | Primary accent (headings, active states) |
-| `--electric-cyan` | `#0284c7` | Secondary accent (CTAs, highlights) |
-| `--synapse-green` | `#059669` | Success states, active indicators |
-| `--glass-stroke` | `rgba(255,255,255,0.08)` | Glassmorphic borders |
-| `--surface-container` | Dark elevated surfaces | Cards, panels |
+*Demo accounts authenticate instantly with one click and maintain state within browser/desktop storage.*
 
 ---
 
 ## 📡 Backend API Reference
 
-### User Routes
+### Core REST Endpoints
 
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/users` | List users (filterable by `?role=`, `?email=`, `?teacherEmail=`) |
-| `GET` | `/api/users/:uid` | Get user profile by UID |
-| `POST` | `/api/users/:uid` | Create or update user profile (upsert) |
-
-### Course Routes
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/courses` | List all courses (auto-seeds demo data if empty) |
-| `POST` | `/api/courses` | Create or update a course (upsert by `id`) |
-| `GET` | `/api/courses/:courseId/modules` | List modules for a course |
-| `POST` | `/api/courses/:courseId/modules` | Create or update a module |
-| `GET` | `/api/courses/:courseId/modules/:moduleId/lessons` | List lessons for a module |
-| `POST` | `/api/courses/:courseId/modules/:moduleId/lessons` | Create or update a lesson |
-| `GET` | `/api/courses/:courseId/modules/:moduleId/lessons/:lessonId` | Get single lesson detail |
-
-### Task Routes
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `GET` | `/api/tasks` | List tasks (filterable by `?studentId=`) |
-| `POST` | `/api/tasks` | Create a new task |
-| `PUT` | `/api/tasks/:id` | Update task by ID |
-| `DELETE` | `/api/tasks/:id` | Delete task by ID |
-
-### Prompt Routes
-
-| Method | Endpoint | Description |
-|---|---|---|
-| `POST` | `/api/prompts/broadcast` | Broadcast a metacognitive prompt to a cohort |
-| `GET` | `/api/prompts/latest` | Get the most recent broadcast prompt |
-
-### AI Agent Routes
-
-All mounted under `/api/agent/`:
-
-| Method | Endpoint | Body | Response |
+| Category | Method | Endpoint | Description |
 |---|---|---|---|
-| `POST` | `/api/agent/focus` | `{ topic, contentMode, analogyMode, complexitySteppedDown }` | `{ content }` |
-| `POST` | `/api/agent/insights-prompt` | `{ cohort }` | `{ prompt }` |
-| `POST` | `/api/agent/intervention-suggestion` | `{ name, state, load }` | `{ suggestion }` |
-| `POST` | `/api/agent/sos-chat` | `{ chatHistory }` | Streamed text (chunked) |
-| `POST` | `/api/agent/task-hint` | `{ title, description }` | `{ hint }` |
-| `POST` | `/api/agent/generate-task` | `{ topic, type }` | `{ title, description }` or `{ title, questions }` |
+| **Users** | `GET` | `/api/users` | List users (`?role=`, `?teacherEmail=`) |
+| | `GET` | `/api/users/:uid` | Retrieve individual user profile |
+| | `POST` | `/api/users/:uid` | Upsert user telemetry and profile data |
+| **Courses** | `GET` | `/api/courses` | List all available curriculum courses |
+| | `POST` | `/api/courses` | Create or update a course entity |
+| **Modules** | `GET` | `/api/courses/:courseId/modules` | Fetch all modules in a course |
+| | `POST` | `/api/courses/:courseId/modules` | Create or update a module |
+| **Lessons** | `GET` | `/api/courses/:courseId/modules/:moduleId/lessons` | List lessons within a module |
+| | `POST` | `/api/courses/:courseId/modules/:moduleId/lessons` | Create/update lesson (videos, tests, homework) |
+| **Tasks** | `GET` | `/api/tasks` | Retrieve student tasks (`?studentId=`) |
+| | `POST` | `/api/tasks` | Create new learning task |
+| | `PUT` | `/api/tasks/:id` | Update task status or completion |
+| | `DELETE`| `/api/tasks/:id` | Delete task item |
+| **Prompts** | `POST` | `/api/prompts/broadcast` | Broadcast metacognitive prompt to cohort |
+| | `GET` | `/api/prompts/latest` | Fetch active cohort reflection prompt |
+
+### AI Agent Endpoints (`/api/agent/*`)
+
+- `POST /api/agent/focus` — Synthesize study topics with analogies and stepped-down complexity.
+- `POST /api/agent/insights-prompt` — Generate cohort reflection prompts using NVIDIA Nemotron.
+- `POST /api/agent/intervention-suggestion` — Generate actionable student intervention steps using Claude.
+- `POST /api/agent/sos-chat` — Stream calming, de-escalating therapist dialogue via Gemini.
+- `POST /api/agent/task-hint` — Deliver Socratic hints for challenging coursework using GPT-4o.
+- `POST /api/agent/generate-task` — Generate syllabus-aligned MCQ tests with answer keys and homework assignments.
 
 ---
 
-## 🗄 Database Schema
+## 🗄 Database Schema (MongoDB Atlas)
 
-### MongoDB Collections (via Mongoose)
-
-#### `UserProfile`
-```javascript
-{
-  uid: String,           // Unique user identifier
-  name: String,
-  role: 'student' | 'mentor',
-  teacherEmail: String,  // Links student to their mentor
-  dailyFocusGoal: Number,     // Default: 120 minutes
-  todayFocusMinutes: Number,  // Default: 0
-  taskCompletionRate: Number, // Default: 0
-  peerBadges: Object,
-  cognitiveLoad: Number,      // Default: 50 (percentage)
-  lastActive: String,
-  badges: [String],
-  courses: [String]
-}
-```
-
-#### `Course`
-```javascript
-{
-  id: String,
-  classLevel: String,    // e.g., "Class 10"
-  subject: String,       // e.g., "Physics"
-  title: String,
-  description: String,
-  order: Number
-}
-```
-
-#### `Module`
-```javascript
-{
-  id: String,
-  courseId: String,       // References Course.id
-  term: String,          // e.g., "Term 1"
-  title: String,
-  learningObjectives: [String],
-  order: Number
-}
-```
-
-#### `Lesson`
-```javascript
-{
-  id: String,
-  moduleId: String,      // References Module.id
-  month: String,
-  theme: String,
-  topic: String,
-  learningOutcome: String,
-  instructionalFlow: [{ step, duration, activity }],
-  resources: [String],
-  order: Number,
-  personalVideo: String,     // URL to teacher's personal recording
-  videoTutorial: String,     // URL to YouTube/external tutorial
-  notes: String,             // URL to study notes
-  test: String,              // URL for external test (Google Form)
-  testType: 'link' | 'custom',
-  testCustom: {              // Interactive MCQ quiz
-    title: String,
-    questions: [{
-      question: String,
-      options: [String],       // 4 options
-      correctOptionIndex: Number
-    }]
-  },
-  homework: String,          // URL for external homework
-  homeworkType: 'link' | 'custom',
-  homeworkCustom: {          // Interactive homework questions
-    title: String,
-    questions: [String]
-  }
-}
-```
-
-#### `Task`
-```javascript
-{
-  id: String,
-  studentId: String,
-  title: String,
-  status: String,
-  difficulty: String,
-  estimatedMinutes: Number,
-  createdAt: String,
-  type: String,
-  description: String,
-  points: Number
-}
-```
-
-#### `BroadcastPrompt`
-```javascript
-{
-  id: String,
-  mentorId: String,
-  text: String,
-  cohort: String,
-  createdAt: Date
-}
-```
+- **`UserProfile`**: User metadata, role (`student` \| `mentor`), assigned mentor email, daily focus goals, minutes studied, cognitive load index, and earned badges.
+- **`Course`**: Subject, class grade level (e.g., Class 10), title, syllabus description, and sequence order.
+- **`Module`**: Academic term, module title, specific learning competencies, and module order.
+- **`Lesson`**: Monthly theme, topic, learning outcomes, 4-step instructional flow, personal lecture video link, YouTube tutorial URL, notes resource, and embedded interactive test (`testCustom`) & homework (`homeworkCustom`).
+- **`Task`**: Student assignment items, difficulty level, estimated completion minutes, points, and current status.
+- **`BroadcastPrompt`**: Cohort broadcast history, mentor identifier, and prompt body.
 
 ---
 
-## 🚀 Getting Started
+## 👨‍💻 Author & Engineering Team
 
-### Prerequisites
+Synapse Learner Operating System was conceived, architected, and engineered by:
 
-- **Node.js** ≥ 18.x
-- **npm** ≥ 9.x
-- **MongoDB Atlas** account (or local MongoDB instance)
-- **Firebase** project (for authentication — optional with demo accounts)
+### **Aaryan Rajkumar Kasaudhan**
+*Full-Stack Software Engineer & AI System Architect*
 
-### Installation
-
-```bash
-# 1. Clone the repository
-git clone https://github.com/aaryankasaudhan91-dev/Learning-operating-system-LOS-.git
-cd Learning-operating-system-LOS-
-
-# 2. Install all dependencies (uses npm workspaces)
-npm install
-
-# 3. Configure environment variables (see section below)
-# Edit backend/.env with your keys
-
-# 4. Start both frontend & backend concurrently
-npm run dev
-```
-
-This starts:
-- **Frontend** on `http://localhost:5173` (Vite dev server)
-- **Backend** on `http://localhost:3000` (Express API server)
-
-### Individual Commands
-
-```bash
-# Frontend only
-npm run dev:frontend
-
-# Backend only
-npm run dev:backend
-
-# Build frontend for production
-cd frontend && npm run build
-
-# Build backend for production
-cd backend && npm run build
-
-# Start production backend
-cd backend && npm start
-```
-
----
-
-## 🔑 Environment Variables
-
-Create/edit `backend/.env` with the following:
-
-```env
-# Required — MongoDB connection string
-MONGODB_URI="mongodb+srv://<user>:<password>@<cluster>.mongodb.net/<db>"
-
-# Required — Google Gemini API Key (used for SOS Chat Agent + AI SDK init)
-GEMINI_API_KEY="your-gemini-api-key"
-
-# Optional — OpenAI API Key (Focus Agent + Task Hint Agent)
-# Falls back to mock responses if empty
-OPENAI_API_KEY="your-openai-api-key"
-
-# Optional — NVIDIA API Key (Insights Agent)
-# Falls back to mock responses if empty
-NVIDIA_API_KEY="your-nvidia-api-key"
-
-# Optional — Anthropic/Claude API Key (Intervention Agent + Task Generator Agent)
-# Falls back to mock responses if empty
-ANTHROPIC_API_KEY="your-anthropic-api-key"
-```
-
-> **Note:** All AI agents have intelligent mock fallback responses built in. The application runs fully functional with zero API keys configured — perfect for development and demos.
-
----
-
-## 👤 Demo Accounts
-
-The login page provides instant-access demo accounts that bypass Firebase authentication entirely:
-
-| Account Type | Name | Description |
-|---|---|---|
-| **Demo Student** | Arjun Patel | Pre-configured student account with sample cognitive data, courses, and tasks |
-| **Demo Mentor** | Dr. Kavita Sharma | Pre-configured mentor account with mock student cohort and full course management |
-
-These demo accounts persist session data in `localStorage` and provide full access to all features without requiring any Firebase setup or real API keys.
-
----
-
-## 🖼 Screenshots & Views
-
-### Landing Page
-Scrollytelling experience with 4 phases (Cognitive Crisis → Dynamic Calibration → Synapse Loop → Peak Flow), each morphing a neural network canvas visualization in real time.
-
-### Course Hub (Student)
-Browse courses by class level and subject, drill into modules and lessons, watch embedded videos, take interactive tests, and submit homework — all without leaving the app.
-
-### Course Hub (Mentor)
-Create courses/modules/lessons with instructional flow templates, manage individual students, quick-assign lessons with custom tests and homework, and leverage AI to auto-generate quiz questions.
-
-### Cognitive Map
-Real-time dashboard with a circular cognitive load gauge, task checklist with drag-to-complete, daily focus milestones, peer badges, and achievement gallery.
-
-### Focus Chamber
-Minimal distraction study environment with Pomodoro-style timer, AI-generated content (text/audio/visual modes), real-world analogies, and complexity step-down explanations.
-
-### SOS Toolkit
-Emergency mental health panel with animated box-breathing exercise, grounding techniques, and a streaming AI therapist (Gemini-powered) that responds with empathetic, calming guidance.
-
-### Seat Matrix (Insights Hub)
-Color-coded heatmap grid showing all students in a mentor's class. Red = high cognitive friction. Click any student to trigger an AI-powered intervention suggestion.
-
-### Help Center
-System diagnostics dashboard, interactive FAQ, embedded support chatbot with quick-reply chips, and a support ticket submission form.
+- 🎓 **Education**: B.Tech in Computer Science & Engineering (AI & ML) — *Lokmanya Tilak College of Engineering (LTCE), University of Mumbai* (2025 – Present)
+- 📍 **Location**: Thane, Maharashtra, India
+- ✉️ **Email**: [aaryankasaudhan91@gmail.com](mailto:aaryankasaudhan91@gmail.com)
+- 📞 **Phone**: [+91 8591095318](tel:+918591095318)
+- 🌐 **GitHub**: [@aaryankasaudhan91-dev](https://github.com/aaryankasaudhan91-dev)
+- 🏆 **Hackathon & Engineering Accolades**:
+  - **First Runner-up**: *Pitchathon 1.0*
+  - **Second Runner-up**: *Genesis 1.0 (Google Developer Groups - GDG LTCE)*
+  - **Second Runner-up**: *Code of Spades*
+- 💡 **Core Expertise**: Multi-Agent AI Orchestration (Gemini, Claude, GPT-4o, NVIDIA), Full-Stack Systems (React 19, TypeScript, Express, FastAPI), Scalable Cloud & Native Platforms (Electron, Capacitor, MongoDB Atlas, Firebase).
 
 ---
 
 ## 🗺 Roadmap
 
-- [ ] WebSocket real-time cognitive load sync between students and mentors
-- [ ] Spaced repetition engine with memory decay timers
-- [ ] PDF report generation for student progress
-- [ ] Mobile-native app (React Native)
-- [ ] Voice-controlled Focus Chamber commands
-- [ ] LMS integration (Google Classroom, Canvas)
-- [ ] Multi-language support (Hindi, Spanish, French)
-- [ ] Advanced analytics dashboard with historical trend graphs
+- [x] **v1.0**: Core Learner Operating System, 6-Agent AI Pipeline, CBSE/NEP 2020 Course Framework.
+- [x] **v2.0**: Native Electron Desktop app, Capacitor Mobile deployment, refined navigation, Help & Diagnostics Center.
+- [ ] **v2.1**: Real-time bi-directional WebSockets for live cognitive load sync between students and mentors.
+- [ ] **v2.2**: Spaced-repetition review scheduler with predictive memory decay modeling.
+- [ ] **v2.3**: Offline local SQLite sync for uninterrupted learning in low-connectivity areas.
+- [ ] **v2.4**: Multi-lingual localized audio synthesis (Hindi, Marathi, Spanish, French).
 
 ---
 
 ## 📄 License
 
-This project is licensed under the **Apache License 2.0** — see the [LICENSE](LICENSE) file for details.
+This project is open-source under the **[Apache License 2.0](LICENSE)**.
+
+```
+Copyright 2026 Aaryan Rajkumar Kasaudhan & The Synapse LOS Contributors
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+```
 
 ---
 
 <p align="center">
-  <strong>Built with 🧠 by the LOS Development Team</strong><br/>
-  <em>Designed to close the effectiveness gap in education.</em>
+  <strong>Built with 🧠 by Aaryan Rajkumar Kasaudhan</strong><br/>
+  <em>Dedicated to empowering learners, minimizing cognitive friction, and advancing education through empathetic AI.</em>
 </p>

@@ -27,7 +27,7 @@ const ProfilePage = lazy(() => import('./components/ProfilePage'));
 const SettingsPage = lazy(() => import('./components/SettingsPage'));
 const HelpCenter = lazy(() => import('./components/HelpCenter'));
 const CourseHub = lazy(() => import('./components/CourseHub'));
-const CognitiveMap = lazy(() => import('./components/CognitiveMap'));
+const CognitiveMap = lazy(() => import('./components/LearningDashboard')); 
 const FocusChamber = lazy(() => import('./components/FocusChamber'));
 const SOSToolkit = lazy(() => import('./components/SOSToolkit'));
 const InsightsHub = lazy(() => import('./components/InsightsHub'));
@@ -318,7 +318,7 @@ export default function App() {
         }`}>
           <Suspense fallback={<ViewLoadingFallback />}>
             {currentView === 'landing' && (
-              <LandingPage setView={setView} setUserRole={setUserRole} />
+              <LandingPage setView={setView} setUserRole={setUserRole} theme={theme} />
             )}
 
             {currentView === 'about' && (
