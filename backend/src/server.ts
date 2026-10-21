@@ -1,3 +1,5 @@
+import { createServer } from 'node:http';
+import { attachRealtime } from './realtime';
 import dotenv from "dotenv";
 dotenv.config({ override: true });
 import express from "express";
@@ -108,6 +110,8 @@ promptSchema.index({ mentorId: 1, createdAt: -1 });
 
 async function startServer() {
   const app = express();
+  const httpServer = createServer(app);
+  attachRealtime(app, httpServer);
   const PORT = 3000;
 
   // Enforce HTTPS in production environments
@@ -598,7 +602,7 @@ async function startServer() {
     });
   }
 
-  app.listen(PORT, "0.0.0.0", () => {
+  httpServer.listen(PORT, "0.0.0.0", () => {
     console.log(`Server running on http://0.0.0.0:${PORT}`);
   });
 }

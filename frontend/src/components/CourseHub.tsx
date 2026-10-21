@@ -1,3 +1,4 @@
+import { watchResource } from '../services/realtime';
 import { apiFetch } from '../services/http';
 /**
  * @license
@@ -305,6 +306,12 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       fetchCourses();
     }
   }, [profile, firebaseLoading, userClass]);
+
+  useEffect(() => watchResource(['courses'], () => {
+    if(firebaseLoading)return;
+    void fetchCourses();
+    if(selectedCourse)void dbService.getCourseModules(selectedCourse.id).then(setModules);
+  }), [profile, firebaseLoading, userClass, selectedCourse?.id]);
 
   useEffect(() => {
     if (classes.length === 1 && !selectedClass) {

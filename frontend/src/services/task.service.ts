@@ -1,3 +1,4 @@
+import { realtimeSocket, watchResource } from './realtime';
 import { apiFetch } from './http';
 import { auth } from '../lib/firebase';
 import { HomeworkTask, TaskStatus } from '../types';
@@ -28,18 +29,17 @@ export const taskService = {
    * Subscribe to tasks using polling
    */
   subscribeToStudentTasks(uid: string, email: string, name: string, callback: (tasks: HomeworkTask[]) => void) {
-    const poll = async () => {
-      const tasks = await this.getStudentTasks(uid, email, name);
-      callback(tasks);
+    let active=true;
+    let loading=false;
+    const poll=async()=>{
+      if(loading)return;
+      loading=true;
+      try{const tasks=await this.getStudentTasks(uid,email,name);if(active)callback(tasks)}finally{loading=false}
     };
-
-    poll();
-
-    const intervalId = setInterval(poll, 5000);
-
-    return () => {
-      clearInterval(intervalId);
-    };
+    void poll();
+    const unwatch=watchResource(['tasks'],()=>{void poll()});
+    const timer=setInterval(()=>{void poll()},30000);
+    return ()=>{active=false;unwatch();clearInterval(timer)};
   },
 
   /**

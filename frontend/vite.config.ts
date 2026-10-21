@@ -21,6 +21,7 @@ export default defineConfig(({ mode }) => {
       hmr: process.env.DISABLE_HMR !== 'true',
       watch: process.env.DISABLE_HMR === 'true' ? null : {},
       proxy: {
+        '/socket.io': { target: backendUrl, ws: true, changeOrigin: true },
         '/api': {
           target: backendUrl,
           changeOrigin: true,
