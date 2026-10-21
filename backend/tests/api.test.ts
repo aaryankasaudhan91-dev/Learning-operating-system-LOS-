@@ -8,6 +8,7 @@ import {createApp} from '../src/app';
 import {CourseModel as Course,UserProfileModel as User,SubmissionModel as Submission,LessonModel as Lesson,FocusSessionModel as Focus,ProgressModel as Progress} from '../src/models';
 
 test('real API persistence and authorization boundaries',async t=>{
+ const configKeys=['AI_PROVIDER','AI_MODEL','TURNSTILE_SECRET_KEY','TURNSTILE_HOSTNAME','FIREBASE_WEB_API_KEY'];const previous=Object.fromEntries(configKeys.map(key=>[key,process.env[key]]));for(const key of configKeys)delete process.env[key];t.after(()=>{for(const key of configKeys){if(previous[key]===undefined)delete process.env[key];else process.env[key]=previous[key]}});
  const db=await MongoMemoryServer.create({binary:{version:'7.0.14'}});await mongoose.connect(db.getUri());
  await Session.init();
  await Promise.all([User.init(),Course.init(),Submission.init(),Lesson.init(),Focus.init(),Progress.init()]);

@@ -1,4 +1,4 @@
-import express,type {Express} from 'express';
+import express,{type Express} from 'express';
 import path from 'node:path';
 import {existsSync} from 'node:fs';
 export function setupWebsite(app:Express,directory:string){const root=path.resolve(directory);app.use((req,res,next)=>{if(!['GET','HEAD'].includes(req.method)||req.acceptsEncodings('gzip')!=='gzip')return next();let file:string;try{file=path.resolve(root,'.'+decodeURIComponent(req.path))}catch{return next()}if(!file.startsWith(root+path.sep)||!/\.(?:js|css|svg|json)$/.test(file)||!existsSync(file+'.gz'))return next();res.vary('Accept-Encoding');res.type(path.extname(file));res.setHeader('Content-Encoding','gzip');res.sendFile(file+'.gz')});app.use(express.static(root,{index:false}));app.get('*',(req,res)=>{const pathname=req.path.replace(/\/$/,'')||'/';if(!['/','/privacy','/terms'].includes(pathname))res.status(404);res.sendFile(path.join(root,'index.html'))})}

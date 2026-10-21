@@ -1,0 +1,10 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import express from 'express';
+import {createServer} from 'node:http';
+import {mkdtemp,writeFile,rm} from 'node:fs/promises';
+import path from 'node:path';
+import os from 'node:os';
+import {gzipSync} from 'node:zlib';
+import {setupWebsite} from '../src/website';
+test('website serves legal routes, compressed assets and a custom HTTP 404',async t=>{const directory=await mkdtemp(path.join(os.tmpdir(),'synapse-website-'));await writeFile(path.join(directory,'index.html'),'<h1>Synapse</h1>');await writeFile(path.join(directory,'app.js'),'console.log(1)');await writeFile(path.join(directory,'app.js.gz'),gzipSync('console.log(1)'));const app=express();setupWebsite(app,directory);const http=createServer(app);await new Promise<void>(resolve=>http.listen(0,'127.0.0.1',resolve));t.after(async()=>{await new Promise<void>(resolve=>http.close(()=>resolve()));assert.ok(path.resolve(directory).startsWith(path.resolve(os.tmpdir())+path.sep+'synapse-website-'));await rm(directory,{recursive:true,force:true})});const address=http.address() as any;const url=`http://127.0.0.1:${address.port}`;for(const route of ['/','/privacy','/terms'])assert.equal((await fetch(url+route)).status,200);assert.equal((await fetch(url+'/missing-page')).status,404);const asset=await fetch(url+'/app.js',{headers:{'Accept-Encoding':'gzip'}});assert.equal(asset.headers.get('content-encoding'),'gzip');assert.match(asset.headers.get('content-type')||'',/javascript/);assert.equal(await asset.text(),'console.log(1)');assert.equal((await fetch(url+'/app.js.gz')).status,200)});
