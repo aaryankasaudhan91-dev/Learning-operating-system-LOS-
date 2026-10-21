@@ -20,14 +20,42 @@ interface LoginPageProps {
 export default function LoginPage({ setView, setUserRole, setUserProfile, addNotification }: LoginPageProps) {
   const [cognitiveId, setCognitiveId] = useState('');
   const [secureSync, setSecureSync] = useState('');
+  const [honeypot, setHoneypot] = useState('');
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const mountTimeRef = useRef<number>(Date.now());
 
   // ... (Keep your existing canvas logic/useEffect here if you have it) ...
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    // 1. Anti-bot honeypot check
+    if (honeypot.trim()) {
+      setErrorMessage("Automated bot submission detected.");
+      return;
+    }
+
+    // 2. Anti-bot speed limiter
+    if (Date.now() - mountTimeRef.current < 1000) {
+      setErrorMessage("Submission too fast. Please verify inputs.");
+      return;
+    }
+
+    // 3. Email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(cognitiveId.trim())) {
+      setErrorMessage("Please enter a valid Cognitive ID / Email address.");
+      return;
+    }
+
+    // 4. Password length
+    if (secureSync.length < 6) {
+      setErrorMessage("Password must be at least 6 characters.");
+      return;
+    }
+
     setLoading(true);
     setErrorMessage(null);
 
@@ -396,6 +424,17 @@ export default function LoginPage({ setView, setUserRole, setUserProfile, addNot
                 <span>{errorMessage}</span>
               </div>
             )}
+
+            {/* Invisible Anti-Bot Honeypot Field */}
+            <input 
+              type="text" 
+              name="website_hp" 
+              value={honeypot} 
+              onChange={(e) => setHoneypot(e.target.value)} 
+              tabIndex={-1} 
+              autoComplete="off" 
+              style={{ display: 'none', position: 'absolute', opacity: 0, pointerEvents: 'none' }} 
+            />
 
             {/* Cognitive ID */}
             <div className="flex flex-col gap-2">

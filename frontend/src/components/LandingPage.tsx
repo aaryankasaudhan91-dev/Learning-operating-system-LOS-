@@ -4,9 +4,10 @@
  */
 
 import React, { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Compass, MousePointer, Activity, Brain, Heart, ChevronDown } from 'lucide-react';
+import { ArrowRight, Compass, MousePointer, Activity, Brain, Heart, ChevronDown, Sparkles, CheckCircle2 } from 'lucide-react';
 import { AppView } from '../types';
 import { AppLogo } from './AppLogo';
+import Footer from './Footer';
 
 interface LandingPageProps {
   setView: (view: AppView) => void;
@@ -77,7 +78,7 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
     }
   ];
 
-  // Track scroll and update active section
+  // Track scroll and update active section using nearest-center distance calculation
   useEffect(() => {
     const handleScroll = () => {
       const scrollTotal = document.documentElement.scrollHeight - window.innerHeight;
@@ -85,21 +86,25 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
         setScrollProgress(window.scrollY / scrollTotal);
       }
 
-      // Check which section is in the viewport
+      // Check which section is closest to viewport active trigger zone
       const sectionElements = sections.map(sec => document.getElementById(`sec-${sec.id}`));
-      let currentActive = 'intro';
-      const triggerBound = window.innerHeight * 0.45; // trigger halfway up screen
+      const triggerPoint = window.innerHeight * 0.45;
+      let closestSection = sections[0].id;
+      let minDistance = Infinity;
 
       sectionElements.forEach((el, index) => {
         if (el) {
           const rect = el.getBoundingClientRect();
-          if (rect.top <= triggerBound && rect.bottom >= triggerBound) {
-            currentActive = sections[index].id;
+          const sectionCenter = (rect.top + rect.bottom) / 2;
+          const distance = Math.abs(sectionCenter - triggerPoint);
+          if (distance < minDistance) {
+            minDistance = distance;
+            closestSection = sections[index].id;
           }
         }
       });
 
-      setActiveSection(currentActive);
+      setActiveSection(closestSection);
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -334,13 +339,14 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
 
   return (
     <div ref={containerRef} className="relative min-h-screen bg-void-black text-on-surface select-none pb-24">
-      {/* Scroll Progress Bar */}
+      {/* Scroll Progress Bar (hidden when resting on hero section) */}
       <div 
-        className="fixed top-20 left-0 h-1 z-50 transition-all duration-100"
+        className="fixed top-20 left-0 h-1.5 z-50 transition-all duration-150"
         style={{ 
           width: `${scrollProgress * 100}%`,
-          backgroundColor: activeColor,
-          boxShadow: `0 0 8px ${activeColor}`
+          opacity: scrollProgress > 0.02 ? 1 : 0,
+          background: 'linear-gradient(90deg, #0284c7, #7c3aed, #059669)',
+          boxShadow: '0 0 12px rgba(2, 132, 199, 0.6)'
         }}
       />
 
@@ -361,23 +367,40 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
             An ethereal operating system for your mind. Synchronize your cognitive state, calibrate working memory, and master profound focus.
           </p>
 
-          {/* Interactive CTAs */}
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 pt-10 w-full max-w-md mx-auto">
-            <button
-              onClick={() => setView('login')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-white font-extrabold text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all duration-300 group cursor-pointer"
-            >
-              <span>Initialize Sync</span>
-              <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-            </button>
-            
+          {/* Clear Primary Call to Action (CTA) */}
+          <div className="pt-6 max-w-lg mx-auto flex flex-col items-center">
             <button
               onClick={() => setView('register')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-glass-stroke backdrop-blur-md text-on-surface font-extrabold text-sm uppercase tracking-widest flex items-center justify-center gap-2 hover:bg-white/5 hover:border-electric-cyan hover:scale-[1.02] hover:shadow-[0_0_30px_rgba(0,229,255,0.15)] active:scale-95 transition-all duration-300 group cursor-pointer"
+              className="w-full sm:w-auto px-10 py-5 rounded-full bg-gradient-to-r from-electric-cyan via-plasma-violet to-synapse-green text-white font-black text-sm md:text-base uppercase tracking-widest flex items-center justify-center gap-3 shadow-[0_0_40px_rgba(2,132,199,0.4)] hover:shadow-[0_0_60px_rgba(2,132,199,0.6)] hover:scale-[1.04] active:scale-95 transition-all duration-300 group cursor-pointer border border-white/20"
             >
-              <span>Register Identity</span>
-              <Compass className="w-4 h-4 text-electric-cyan group-hover:rotate-45 transition-transform duration-500" />
+              <Sparkles className="w-5 h-5 text-yellow-300 animate-spin" style={{ animationDuration: '6s' }} />
+              <span>Initialize Cognitive OS — Start Free</span>
+              <ArrowRight className="w-5 h-5 group-hover:translate-x-1.5 transition-transform" />
             </button>
+
+            {/* Secondary navigation action & trust proof */}
+            <div className="flex items-center gap-4 mt-4 text-xs font-semibold text-on-surface-variant">
+              <span>Already registered?</span>
+              <button
+                onClick={() => setView('login')}
+                className="text-electric-cyan hover:underline font-bold uppercase tracking-wider cursor-pointer"
+              >
+                Sign In
+              </button>
+              <span>•</span>
+              <button
+                onClick={() => setView('courses')}
+                className="hover:text-on-surface transition-colors cursor-pointer"
+              >
+                Explore Curriculum
+              </button>
+            </div>
+
+            {/* Trust statement */}
+            <p className="font-mono text-[11px] text-on-surface-variant/80 mt-3 flex items-center gap-2">
+              <CheckCircle2 className="w-3.5 h-3.5 text-synapse-green inline" />
+              <span>Free for students &amp; schools • No credit card required • NEP 2020 Aligned</span>
+            </p>
           </div>
         </div>
 
@@ -393,60 +416,68 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
         <div className="flex flex-col md:flex-row gap-12 items-start">
           
           {/* Scrollable Story Content (Left side) */}
-          <div className="w-full md:w-1/2 space-y-[45vh] pr-0 md:pr-10 relative z-10">
-            {sections.map((sec, idx) => (
-              <div 
-                key={sec.id} 
-                id={`sec-${sec.id}`}
-                className={`transition-all duration-700 min-h-[55vh] flex flex-col justify-center text-left ${
-                  activeSection === sec.id ? 'opacity-100 translate-x-0' : 'opacity-25 md:scale-95'
-                }`}
-              >
-                <div className="space-y-4">
-                  <span className={`font-mono text-xs font-bold tracking-[0.3em] uppercase ${sec.color} px-3 py-1 rounded-full ${sec.bgColor} w-fit block`}>
-                    {sec.phase}
-                  </span>
-                  
-                  <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface leading-tight uppercase">
-                    {sec.title}
-                  </h2>
-                  
-                  <h3 className="font-sans font-extrabold text-lg md:text-xl text-on-surface-variant italic">
-                    {sec.subtitle}
-                  </h3>
+          <div className="w-full md:w-1/2 space-y-10 md:space-y-14 pr-0 md:pr-10 relative z-10">
+            {sections.map((sec) => {
+              const isActive = activeSection === sec.id;
+              return (
+                <div 
+                  key={sec.id} 
+                  id={`sec-${sec.id}`}
+                  className={`transition-all duration-500 min-h-[48vh] flex flex-col justify-center text-left p-6 md:p-8 rounded-3xl ${
+                    isActive 
+                      ? 'bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 shadow-xl shadow-slate-200/60 dark:shadow-none translate-x-2' 
+                      : 'opacity-40 hover:opacity-75 bg-transparent border-2 border-transparent'
+                  }`}
+                >
+                  <div className="space-y-3.5">
+                    <span className={`font-mono text-xs font-bold tracking-[0.25em] uppercase ${sec.color} px-3.5 py-1.5 rounded-full ${sec.bgColor} w-fit inline-flex items-center gap-2 border border-current/20`}>
+                      <span className={`w-2 h-2 rounded-full ${isActive ? 'animate-ping' : ''}`} style={{ backgroundColor: sec.accentColor }} />
+                      {sec.phase}
+                    </span>
+                    
+                    <h2 className="font-sans font-black text-2xl md:text-4xl text-on-surface leading-tight uppercase tracking-tight">
+                      {sec.title}
+                    </h2>
+                    
+                    <h3 className="font-sans font-bold text-base md:text-lg text-on-surface-variant italic">
+                      {sec.subtitle}
+                    </h3>
 
-                  <p className="font-sans text-base md:text-lg text-on-surface-variant leading-relaxed pt-2">
-                    {sec.description}
-                  </p>
+                    <p className="font-sans text-sm md:text-base text-on-surface-variant leading-relaxed pt-1">
+                      {sec.description}
+                    </p>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
 
           {/* Sticky Canvas Visualizer Panel (Right side) */}
-          <div className="hidden md:block w-1/2 sticky top-32 h-[80vh] flex-shrink-0 z-0">
-            <div className="glass-panel rounded-3xl w-full h-[60vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-white/5 border border-glass-stroke shadow-2xl">
+          <div className="hidden md:block w-1/2 sticky top-28 h-[78vh] flex-shrink-0 z-0">
+            <div className="rounded-3xl w-full h-[68vh] flex flex-col items-center justify-center p-6 relative overflow-hidden bg-[#070b14] border-2 border-slate-800 shadow-2xl">
               {/* Internal glow backdrop reflecting the active state */}
               <div 
-                className="absolute inset-0 opacity-10 blur-[100px] rounded-full transition-all duration-700 pointer-events-none"
+                className="absolute inset-0 opacity-25 blur-[100px] rounded-full transition-all duration-700 pointer-events-none"
                 style={{ 
                   backgroundColor: activeColor,
-                  transform: 'scale(1.2)' 
+                  transform: 'scale(1.3)' 
                 }} 
               />
               
               <canvas 
                 ref={canvasRef} 
-                className="max-w-full max-h-full aspect-square z-10 transition-transform duration-700" 
+                className="max-w-full max-h-full aspect-square z-10 transition-transform duration-700 relative" 
               />
 
               {/* Status HUD readout at bottom */}
-              <div className="absolute bottom-6 left-8 right-8 flex justify-between items-center font-mono text-[9px] text-on-surface-variant uppercase tracking-widest border-t border-glass-stroke pt-4 z-20">
-                <span className="flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-electric-cyan animate-ping" />
-                  Telemetry: Active
+              <div className="absolute bottom-5 left-7 right-7 flex justify-between items-center font-mono text-[10px] text-slate-300 uppercase tracking-widest border-t border-slate-800/80 pt-3.5 z-20 bg-[#070b14]/90 backdrop-blur-md px-2">
+                <span className="flex items-center gap-2 font-bold text-cyan-400">
+                  <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                  Neural Telemetry: Active
                 </span>
-                <span>Mode: {activeSection}</span>
+                <span className="text-slate-300 font-semibold px-2.5 py-1 rounded bg-slate-800/80 border border-slate-700">
+                  Phase: {activeSection.toUpperCase()}
+                </span>
               </div>
             </div>
           </div>
@@ -454,35 +485,42 @@ export default function LandingPage({ setView, setUserRole }: LandingPageProps) 
         </div>
       </section>
 
-      {/* CALL TO ACTION SECTION */}
+      {/* CLEAR PRIMARY CALL TO ACTION SECTION */}
       <section className="max-w-4xl mx-auto px-6 mt-40 text-center relative z-10">
-        <div className="glass-panel rounded-3xl p-12 md:p-16 border border-glass-stroke bg-white/5 shadow-2xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-br from-electric-cyan/5 via-plasma-violet/5 to-transparent pointer-events-none" />
+        <div className="glass-panel-heavy rounded-3xl p-12 md:p-16 border border-glass-stroke shadow-2xl relative overflow-hidden">
+          <div className="absolute inset-0 bg-gradient-to-br from-electric-cyan/10 via-plasma-violet/10 to-transparent pointer-events-none" />
           
-          <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase italic mb-6">
-            Synchronize Your Reality
+          <span className="font-mono text-xs font-bold uppercase tracking-[0.3em] text-electric-cyan px-3 py-1 rounded-full bg-electric-cyan/10 inline-block mb-4">
+            Next-Gen Cognitive Learning
+          </span>
+
+          <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase tracking-tight mb-6">
+            Synchronize Your Mind With LOS
           </h2>
           
           <p className="font-sans text-base md:text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed mb-10">
-            Step beyond chaotic cognitive friction. Initialize your signature, connect with authorized mentors, and achieve sustainable flow.
+            Step beyond chaotic cognitive friction. Experience real-time load balancing, spaced memory consolidation, and personalized mentorship.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md mx-auto">
             <button
-              onClick={() => setView('login')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-white font-extrabold text-sm uppercase tracking-widest hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all cursor-pointer"
+              onClick={() => setView('register')}
+              className="w-full sm:w-auto px-10 py-5 rounded-full bg-gradient-to-r from-electric-cyan via-plasma-violet to-synapse-green text-white font-extrabold text-sm md:text-base uppercase tracking-widest hover:scale-[1.04] shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all cursor-pointer border border-white/20"
             >
-              Enter Portal
+              Get Started Free &rarr;
             </button>
             <button
-              onClick={() => setView('register')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-glass-stroke text-on-surface font-extrabold text-sm uppercase tracking-widest hover:bg-white/5 hover:border-electric-cyan transition-all cursor-pointer"
+              onClick={() => setView('login')}
+              className="w-full sm:w-auto px-8 py-5 rounded-full bg-white/5 border border-glass-stroke text-on-surface font-extrabold text-sm uppercase tracking-widest hover:bg-white/10 hover:border-electric-cyan transition-all cursor-pointer"
             >
-              Register Signature
+              Existing Sign-In
             </button>
           </div>
         </div>
       </section>
+
+      {/* GLOBAL FOOTER */}
+      <Footer setView={setView} />
     </div>
   );
 }

@@ -24,7 +24,10 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
   const [designation, setDesignation] = useState('');
   const [comms, setComms] = useState('');
   const [encryption, setEncryption] = useState('');
+  const [confirmPassword, setConfirmPassword] = useState('');
   const [teacherEmail, setTeacherEmail] = useState('');
+  const [honeypot, setHoneypot] = useState('');
+  const mountTimeRef = React.useRef<number>(Date.now());
 
   // Academic States
   const [academicLevel, setAcademicLevel] = useState<'primary' | 'secondary' | 'high_secondary' | 'undergraduate' | ''>('');
@@ -38,6 +41,16 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
   const [loading, setLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
+  // Password strength calculation helper
+  const getPasswordStrength = (pass: string) => {
+    let score = 0;
+    if (pass.length >= 8) score++;
+    if (/[A-Z]/.test(pass) && /[a-z]/.test(pass)) score++;
+    if (/[0-9]/.test(pass)) score++;
+    if (/[^A-Za-z0-9]/.test(pass)) score++;
+    return score;
+  };
+
   const handleNextStep1 = () => {
     if (selectedRole) {
       setStep(2);
@@ -46,6 +59,45 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
 
   const handleNextStep2 = (e: React.FormEvent) => {
     e.preventDefault();
+    setErrorMessage(null);
+
+    // 1. Bot Honeypot Check
+    if (honeypot.trim()) {
+      setErrorMessage("Automated bot submission detected.");
+      return;
+    }
+
+    // 2. Rapid Submission Blocker
+    if (Date.now() - mountTimeRef.current < 1200) {
+      setErrorMessage("Form submitted too rapidly. Please verify your details.");
+      return;
+    }
+
+    // 3. Name length check
+    if (designation.trim().length < 2) {
+      setErrorMessage("Please enter a valid full name (minimum 2 characters).");
+      return;
+    }
+
+    // 4. Email regex validation
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!emailRegex.test(comms.trim())) {
+      setErrorMessage("Please enter a valid email address (e.g. learner@domain.com).");
+      return;
+    }
+
+    // 5. Password length & strength check
+    if (encryption.length < 8) {
+      setErrorMessage("Encryption key must be at least 8 characters in length.");
+      return;
+    }
+
+    // 6. Confirm password matching
+    if (encryption !== confirmPassword) {
+      setErrorMessage("Passwords do not match. Please re-enter your encryption key.");
+      return;
+    }
+
     if (selectedRole === 'Learner') {
       setStep(3);
     } else {
@@ -316,6 +368,18 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
                     onChange={(e) => setComms(e.target.value)}
                   />
                 </div>
+                {/* Honeypot anti-spam field - invisible to genuine human users */}
+                <input
+                  type="text"
+                  name="website_hp"
+                  value={honeypot}
+                  onChange={(e) => setHoneypot(e.target.value)}
+                  tabIndex={-1}
+                  autoComplete="off"
+                  style={{ position: 'absolute', opacity: 0, height: 0, width: 0, zIndex: -1, pointerEvents: 'none' }}
+                  aria-hidden="true"
+                />
+
                 <div className="space-y-2">
                   <label className="font-mono text-data-mono text-on-surface-variant block" htmlFor="encryption">Encryption Key (Password)</label>
                   <input 
@@ -327,6 +391,51 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
                     value={encryption}
                     onChange={(e) => setEncryption(e.target.value)}
                   />
+                  {/* Visual Password Strength Indicator */}
+                  {encryption.length > 0 && (
+                    <div className="space-y-1 mt-1">
+                      <div className="flex items-center justify-between text-xs font-mono">
+                        <span className="text-on-surface-variant">Key Complexity:</span>
+                        <span className={
+                          getPasswordStrength(encryption) <= 1 ? "text-amber-500 font-semibold" :
+                          getPasswordStrength(encryption) <= 3 ? "text-blue-500 font-semibold" :
+                          "text-emerald-500 font-semibold"
+                        }>
+                          {getPasswordStrength(encryption) <= 1 ? "Weak (Min 8 chars, mixed case & numbers)" :
+                           getPasswordStrength(encryption) <= 3 ? "Moderate" : "Robust"}
+                        </span>
+                      </div>
+                      <div className="h-1.5 w-full bg-slate-200 dark:bg-slate-700 rounded-full overflow-hidden flex gap-1">
+                        {[1, 2, 3, 4].map((bar) => {
+                          const strength = getPasswordStrength(encryption);
+                          const isActive = strength >= bar;
+                          let barColor = "bg-slate-200 dark:bg-slate-700";
+                          if (isActive) {
+                            barColor = strength <= 1 ? "bg-amber-500" : strength <= 3 ? "bg-blue-500" : "bg-emerald-500";
+                          }
+                          return (
+                            <div key={bar} className={`h-full flex-1 rounded-full transition-all duration-300 ${barColor}`} />
+                          );
+                        })}
+                      </div>
+                    </div>
+                  )}
+                </div>
+
+                <div className="space-y-2">
+                  <label className="font-mono text-data-mono text-on-surface-variant block" htmlFor="confirmPassword">Confirm Encryption Key</label>
+                  <input 
+                    className="glass-input-reg w-full px-4 py-3 text-on-surface text-body-lg placeholder-on-surface-variant/50 focus:ring-0 rounded-t-lg" 
+                    id="confirmPassword" 
+                    placeholder="••••••••" 
+                    required 
+                    type="password"
+                    value={confirmPassword}
+                    onChange={(e) => setConfirmPassword(e.target.value)}
+                  />
+                  {confirmPassword && encryption !== confirmPassword && (
+                    <p className="text-xs text-rose-500 font-mono mt-1">Keys do not match</p>
+                  )}
                 </div>
 
                 <div className="pt-8 flex justify-between items-center">

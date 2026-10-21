@@ -6,6 +6,7 @@ import { interventionAgent } from "./interventionAgent";
 import { createSosAgent } from "./sosAgent";
 import { taskHintAgent } from "./taskHintAgent";
 import { taskGeneratorAgent } from "./taskGeneratorAgent";
+import { createGuideAgent } from "./guideAgent";
 
 export function setupAgentRoutes(app: express.Express, ai: GoogleGenAI | null) {
   app.use("/api/agent", focusAgent);
@@ -14,4 +15,5 @@ export function setupAgentRoutes(app: express.Express, ai: GoogleGenAI | null) {
   app.use("/api/agent", createSosAgent(ai));
   app.use("/api/agent", taskHintAgent);
   app.use("/api/agent", taskGeneratorAgent);
+  app.use("/api/agent", createGuideAgent(ai));
 }
