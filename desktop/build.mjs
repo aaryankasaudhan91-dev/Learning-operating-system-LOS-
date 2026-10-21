@@ -1,7 +1,13 @@
+import path from 'node:path';
+import {fileURLToPath} from 'node:url';
 import { build } from 'esbuild';
-import { mkdir, cp, writeFile, readFile } from 'node:fs/promises';
+import { mkdir, cp, writeFile, readFile, rm } from 'node:fs/promises';
 await mkdir('desktop-app',{recursive:true});
 await build({entryPoints:['desktop/main.ts'],bundle:true,platform:'node',format:'cjs',external:['electron'],outfile:'desktop-app/main.cjs'});
-await cp('frontends/desktop/dist','desktop-app/frontend-dist',{recursive:true});
+const projectRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
+const destination=path.resolve('desktop-app/frontend-dist');
+if(destination!==path.join(projectRoot,'desktop-app','frontend-dist'))throw new Error('Unexpected desktop staging directory');
+await rm(destination,{recursive:true,force:true});
+await cp('frontends/desktop/dist',destination,{recursive:true});
 await cp('desktop/icon.png','desktop-app/icon.png');
 await writeFile('desktop-app/package.json',JSON.stringify({name:'synapse-desktop',version:JSON.parse(await readFile('package.json','utf8')).version,description:'Synapse learning workspace',main:'main.cjs',private:true,dependencies:{}}));
