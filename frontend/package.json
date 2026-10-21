@@ -6,7 +6,11 @@
   "scripts": {
     "dev": "vite",
     "build": "vite build",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "typecheck": "tsc --noEmit",
+    "mobile:sync": "npm run build && cap sync",
+    "mobile:android": "cap open android",
+    "mobile:ios": "cap open ios"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.14",
@@ -19,12 +23,16 @@
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "recharts": "^3.8.1",
-    "vite": "^6.2.3"
+    "vite": "^6.2.3",
+    "@capacitor/core": "^8.0.0",
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/ios": "^8.0.0"
   },
   "devDependencies": {
     "@types/node": "^22.14.0",
     "autoprefixer": "^10.4.21",
     "tailwindcss": "^4.1.14",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "@capacitor/cli": "^8.0.0"
   }
 }

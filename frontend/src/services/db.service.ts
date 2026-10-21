@@ -1,3 +1,4 @@
+import { apiFetch } from './http';
 import { UserProfile, Course, CourseModule, Lesson } from '../types';
 
 export const dbService = {
@@ -5,7 +6,7 @@ export const dbService = {
   async getStudents(mentorEmail?: string): Promise<UserProfile[]> {
     try {
       const url = mentorEmail ? `/api/users?role=student&teacherEmail=${encodeURIComponent(mentorEmail)}` : `/api/users?role=student`;
-      const response = await fetch(url);
+      const response = await apiFetch(url);
       if (!response.ok) throw new Error('Failed to fetch students');
       return await response.json();
     } catch (err) {
@@ -16,7 +17,7 @@ export const dbService = {
 
   async getUserProfile(uid: string): Promise<UserProfile | null> {
     try {
-      const response = await fetch(`/api/users/${uid}`);
+      const response = await apiFetch(`/api/users/${uid}`);
       if (!response.ok) {
         if (response.status === 404) return null;
         throw new Error('Failed to fetch user profile');
@@ -34,7 +35,7 @@ export const dbService = {
   },
 
   async updateUserProfile(uid: string, data: Partial<UserProfile>) {
-    const response = await fetch(`/api/users/${uid}`, {
+    const response = await apiFetch(`/api/users/${uid}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data)
@@ -43,7 +44,7 @@ export const dbService = {
   },
 
   async createUserProfile(profile: UserProfile) {
-    const response = await fetch(`/api/users/${profile.uid}`, {
+    const response = await apiFetch(`/api/users/${profile.uid}`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(profile)
@@ -54,7 +55,7 @@ export const dbService = {
   // Course Methods
   async getCourses(): Promise<Course[]> {
     try {
-      const response = await fetch('/api/courses');
+      const response = await apiFetch('/api/courses');
       if (!response.ok) throw new Error('Failed to fetch courses');
       return await response.json();
     } catch (err) {
@@ -65,7 +66,7 @@ export const dbService = {
 
   async getCourseModules(courseId: string): Promise<CourseModule[]> {
     try {
-      const response = await fetch(`/api/courses/${courseId}/modules`);
+      const response = await apiFetch(`/api/courses/${courseId}/modules`);
       if (!response.ok) throw new Error('Failed to fetch modules');
       return await response.json();
     } catch (err) {
@@ -76,7 +77,7 @@ export const dbService = {
 
   async getModuleLessons(courseId: string, moduleId: string): Promise<Lesson[]> {
     try {
-      const response = await fetch(`/api/courses/${courseId}/modules/${moduleId}/lessons`);
+      const response = await apiFetch(`/api/courses/${courseId}/modules/${moduleId}/lessons`);
       if (!response.ok) throw new Error('Failed to fetch lessons');
       return await response.json();
     } catch (err) {
@@ -87,7 +88,7 @@ export const dbService = {
 
   async getLesson(courseId: string, moduleId: string, lessonId: string): Promise<Lesson | null> {
     try {
-      const response = await fetch(`/api/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`);
+      const response = await apiFetch(`/api/courses/${courseId}/modules/${moduleId}/lessons/${lessonId}`);
       if (!response.ok) {
         if (response.status === 404) return null;
         throw new Error('Failed to fetch lesson');
@@ -100,7 +101,7 @@ export const dbService = {
   },
 
   async createCourse(course: Course): Promise<Course> {
-    const response = await fetch('/api/courses', {
+    const response = await apiFetch('/api/courses', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(course)
@@ -110,7 +111,7 @@ export const dbService = {
   },
 
   async createModule(courseId: string, module: CourseModule): Promise<CourseModule> {
-    const response = await fetch(`/api/courses/${courseId}/modules`, {
+    const response = await apiFetch(`/api/courses/${courseId}/modules`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(module)
@@ -120,7 +121,7 @@ export const dbService = {
   },
 
   async createLesson(courseId: string, moduleId: string, lesson: Lesson): Promise<Lesson> {
-    const response = await fetch(`/api/courses/${courseId}/modules/${moduleId}/lessons`, {
+    const response = await apiFetch(`/api/courses/${courseId}/modules/${moduleId}/lessons`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(lesson)

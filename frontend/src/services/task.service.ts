@@ -1,3 +1,4 @@
+import { apiFetch } from './http';
 import { auth } from '../lib/firebase';
 import { HomeworkTask, TaskStatus } from '../types';
 
@@ -7,7 +8,7 @@ export const taskService = {
    */
   async getStudentTasks(uid: string, email: string, name: string): Promise<HomeworkTask[]> {
     try {
-      const response = await fetch(`/api/tasks`);
+      const response = await apiFetch(`/api/tasks`);
       if (!response.ok) throw new Error('Failed to fetch tasks');
       const allTasks: HomeworkTask[] = await response.json();
       
@@ -45,7 +46,7 @@ export const taskService = {
    * Update task status
    */
   async updateTaskStatus(taskId: string, status: TaskStatus) {
-    const response = await fetch(`/api/tasks/${taskId}`, {
+    const response = await apiFetch(`/api/tasks/${taskId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ status })
@@ -57,7 +58,7 @@ export const taskService = {
    * Create a new task (for mentors)
    */
   async createTask(task: Partial<HomeworkTask>) {
-    const response = await fetch('/api/tasks', {
+    const response = await apiFetch('/api/tasks', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({

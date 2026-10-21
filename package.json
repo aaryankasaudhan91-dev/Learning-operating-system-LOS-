@@ -8,12 +8,45 @@
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
     "dev:frontend": "npm run dev -w frontend",
-    "dev:backend": "npm run dev -w backend"
+    "dev:backend": "npm run dev -w backend",
+    "server": "npm run dev -w backend",
+    "server:backend": "npm run dev -w backend",
+    "build": "npm run build -w frontend && node desktop/build.mjs",
+    "typecheck": "npm run typecheck -w frontend",
+    "desktop": "npm run build && electron .",
+    "desktop:package": "npm run build && electron-builder --dir",
+    "desktop:installer": "npm run build && electron-builder",
+    "mobile:sync": "npm run mobile:sync -w frontend"
   },
   "devDependencies": {
-    "concurrently": "^8.2.2"
+    "concurrently": "^8.2.2",
+    "electron": "^42.0.0",
+    "electron-builder": "^26.0.0",
+    "esbuild": "^0.25.0"
   },
   "dependencies": {
     "animejs": "^4.5.0"
+  },
+  "main": "desktop-dist/main.cjs",
+  "build": {
+    "appId": "com.synapse.los",
+    "productName": "Synapse",
+    "directories": {
+      "output": "release"
+    },
+    "files": [
+      "desktop-dist/**",
+      "frontend/dist/**",
+      "package.json"
+    ],
+    "win": {
+      "target": "nsis"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "linux": {
+      "target": "AppImage"
+    }
   }
 }

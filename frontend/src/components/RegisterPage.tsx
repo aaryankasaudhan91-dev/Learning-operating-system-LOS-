@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -120,7 +121,7 @@ export default function RegisterPage({ setView, setUserRole, setUserProfile, add
         }
         
         try {
-          const checkResponse = await fetch(`/api/users?role=mentor&email=${encodeURIComponent(teacherEmail.trim())}`);
+          const checkResponse = await apiFetch(`/api/users?role=mentor&email=${encodeURIComponent(teacherEmail.trim())}`);
           if (!checkResponse.ok) {
             throw new Error("Unable to contact verification service. Please try again.");
           }

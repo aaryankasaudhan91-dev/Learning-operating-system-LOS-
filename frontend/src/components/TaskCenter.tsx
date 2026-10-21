@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useEffect } from 'react';
 import { 
   Plus, Calendar, Clock, CheckCircle2, Circle, 
@@ -38,7 +39,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
     setIsGenerating(true);
     setAiError('');
     try {
-      const response = await fetch('/api/agent/generate-task', {
+      const response = await apiFetch('/api/agent/generate-task', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -76,7 +77,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
     
     const fetchTasks = async () => {
       try {
-        const response = await fetch(`/api/tasks?teacherId=${auth.currentUser!.uid}`);
+        const response = await apiFetch(`/api/tasks?teacherId=${auth.currentUser!.uid}`);
         if (!response.ok) throw new Error('Failed to fetch tasks');
         const tasks = await response.json();
         if (isSubscribed) {
@@ -114,7 +115,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
         createdAt: new Date().toISOString(),
       };
 
-      const response = await fetch('/api/tasks', {
+      const response = await apiFetch('/api/tasks', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json'
@@ -131,7 +132,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
       setAssignedTo('all');
       
       // refresh manually
-      const refreshResponse = await fetch(`/api/tasks?teacherId=${auth.currentUser!.uid}`);
+      const refreshResponse = await apiFetch(`/api/tasks?teacherId=${auth.currentUser!.uid}`);
       if (refreshResponse.ok) {
         setTasks(await refreshResponse.json());
       }
@@ -144,7 +145,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
   const handleDeleteTask = async (taskId: string) => {
     if (!confirm('Are you sure you want to delete this task?')) return;
     try {
-      const response = await fetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
+      const response = await apiFetch(`/api/tasks/${taskId}`, { method: 'DELETE' });
       if (!response.ok) throw new Error('Failed to delete task');
       
       addNotification('Task removed successfully.');

@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useEffect } from 'react';
 import { 
   ClipboardCheck, Clock, CheckCircle2, Circle, 
@@ -24,7 +25,7 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
 
     setLoadingHints(prev => ({ ...prev, [task.id]: true }));
     try {
-      const response = await fetch('/api/agent/task-hint', {
+      const response = await apiFetch('/api/agent/task-hint', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ title: task.title, description: task.description })

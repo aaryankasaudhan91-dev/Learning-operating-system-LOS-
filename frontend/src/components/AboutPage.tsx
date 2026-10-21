@@ -452,7 +452,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
       {/* BOTTOM ACTION CARD */}
       <section className="max-w-4xl mx-auto px-6 mt-40 text-center relative z-10">
-        <div className="glass-panel rounded-3xl p-12 md:p-16 border border-glass-stroke bg-white/5 shadow-2xl relative overflow-hidden">
+        <div className="glass-panel-heavy rounded-3xl p-12 md:p-16 border border-glass-stroke shadow-2xl relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-br from-electric-cyan/5 via-plasma-violet/5 to-transparent pointer-events-none" />
           
           <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase italic mb-6">

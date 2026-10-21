@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useRef, useEffect } from 'react';
 import { Shield, HelpCircle, Send, Terminal, Cpu, Layers, Wifi, AlertTriangle, CheckCircle2, MessageSquare, BookOpen, Sliders, Play, Sparkles } from 'lucide-react';
 import ManualModal from './ManualModal';
@@ -47,7 +48,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/agent/guide-chat', {
+      const response = await apiFetch('/api/agent/guide-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chatHistory: updatedMessages, uid })
@@ -173,7 +174,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
               </div>
               <div>
                 <p className="text-[10px] uppercase font-mono tracking-wider text-on-surface-variant">{diag.name}</p>
-                <p className="text-xs font-bold text-white mt-0.5">{diag.status}</p>
+                <p className="text-xs font-bold text-on-surface mt-0.5">{diag.status}</p>
               </div>
             </div>
           );
@@ -185,7 +186,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
         <button
           onClick={() => setActiveTab('faq')}
           className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
-            activeTab === 'faq' ? 'border-plasma-violet text-white' : 'border-transparent text-on-surface-variant hover:text-white'
+            activeTab === 'faq' ? 'border-plasma-violet text-on-surface' : 'border-transparent text-on-surface-variant hover:text-on-surface'
           }`}
         >
           System Guidebook
@@ -193,7 +194,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
         <button
           onClick={() => setActiveTab('chat')}
           className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
-            activeTab === 'chat' ? 'border-plasma-violet text-white' : 'border-transparent text-on-surface-variant hover:text-white'
+            activeTab === 'chat' ? 'border-plasma-violet text-on-surface' : 'border-transparent text-on-surface-variant hover:text-on-surface'
           }`}
         >
           AI Synapse Guide
@@ -201,7 +202,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
         <button
           onClick={() => setActiveTab('ticket')}
           className={`pb-3 px-4 text-xs font-bold uppercase tracking-wider transition-all border-b-2 cursor-pointer ${
-            activeTab === 'ticket' ? 'border-plasma-violet text-white' : 'border-transparent text-on-surface-variant hover:text-white'
+            activeTab === 'ticket' ? 'border-plasma-violet text-on-surface' : 'border-transparent text-on-surface-variant hover:text-on-surface'
           }`}
         >
           Open Support Ticket
@@ -213,14 +214,14 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
         {activeTab === 'faq' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
             <div className="space-y-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
                 <HelpCircle className="w-4 h-4 text-plasma-violet" />
                 Frequently Answered Telemetry
               </h3>
               <div className="space-y-3">
                 {faqs.map((faq, i) => (
                   <div key={i} className="glass-panel p-4 rounded-xl border border-glass-stroke space-y-2">
-                    <p className="text-xs font-bold text-white flex items-start gap-2">
+                    <p className="text-xs font-bold text-on-surface flex items-start gap-2">
                       <span className="text-plasma-violet">Q:</span>
                       {faq.q}
                     </p>
@@ -233,23 +234,23 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
             </div>
 
             <div className="glass-panel p-6 rounded-2xl border border-glass-stroke space-y-4 h-fit">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
                 <Terminal className="w-4 h-4 text-electric-cyan" />
                 System Operator Manual
               </h3>
               <div className="space-y-3 font-sans text-xs text-on-surface-variant leading-relaxed">
                 <p>
-                  Welcome to <strong className="text-white">Synapse Learner OS</strong>, a next-generation adaptive education cockpit designed to reduce student burnout and maximize flow states.
+                  Welcome to <strong className="text-on-surface">Synapse Learner OS</strong>, a next-generation adaptive education cockpit designed to reduce student burnout and maximize flow states.
                 </p>
                 <p>
-                  By measuring real-time user inputs, session duration, and task friction, the system shapes personalized resources. If a lesson causes difficulty, students can instantly activate the <strong className="text-white">Emergency SOS Panel</strong> to engage box-breathing and speak directly to a calming agent.
+                  By measuring real-time user inputs, session duration, and task friction, the system shapes personalized resources. If a lesson causes difficulty, students can instantly activate the <strong className="text-on-surface">Emergency SOS Panel</strong> to engage box-breathing and speak directly to a calming agent.
                 </p>
                 <div className="pt-2">
-                  <div className="p-3 bg-white/5 rounded-xl border border-glass-stroke space-y-1">
+                  <div className="p-3 bg-surface-container/60 rounded-xl border border-glass-stroke space-y-1">
                     <p className="text-[10px] font-mono uppercase tracking-wider text-plasma-violet font-bold">Recommended Flow</p>
-                    <p className="text-[11px] text-white">1. Select course/module in Course Hub.</p>
-                    <p className="text-[11px] text-white">2. Launch study guide & review lesson notes.</p>
-                    <p className="text-[11px] text-white">3. Tackle custom interactive tests assigned by your mentor.</p>
+                    <p className="text-[11px] text-on-surface">1. Select course/module in Course Hub.</p>
+                    <p className="text-[11px] text-on-surface">2. Launch study guide & review lesson notes.</p>
+                    <p className="text-[11px] text-on-surface">3. Tackle custom interactive tests assigned by your mentor.</p>
                   </div>
                   <div className="pt-2">
                     <button

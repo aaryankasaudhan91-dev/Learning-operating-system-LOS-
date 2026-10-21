@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -1787,7 +1788,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
     }
     setGeneratingTest(true);
     try {
-      const response = await fetch('/api/agent/generate-task', {
+      const response = await apiFetch('/api/agent/generate-task', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic, type: 'quiz' })
@@ -1818,7 +1819,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
     }
     setGeneratingHomework(true);
     try {
-      const response = await fetch('/api/agent/generate-task', {
+      const response = await apiFetch('/api/agent/generate-task', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ topic, type: 'custom-homework' })
@@ -2553,10 +2554,10 @@ function ModuleLessonList({ courseId, moduleId, onLessonSelect }: { courseId: st
           <button
             key={lesson.id}
             onClick={() => onLessonSelect(lesson)}
-            className="flex items-center justify-between p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all text-left group cursor-pointer"
+            className="flex items-center justify-between p-4 rounded-xl bg-surface-container/50 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-surface-container transition-all text-left group cursor-pointer"
           >
             <div>
-              <p className="text-xs font-bold text-white group-hover:text-plasma-violet transition-colors">
+              <p className="text-xs font-bold text-on-surface group-hover:text-plasma-violet transition-colors">
                 {lesson.topic}
               </p>
               <p className="text-[10px] text-on-surface-variant mt-1 italic">

@@ -14,8 +14,8 @@ interface FooterProps {
 
 export default function Footer({ setView }: FooterProps) {
   return (
-    <footer className="w-full mt-28 border-t border-glass-stroke bg-void-black/60 backdrop-blur-xl relative z-10 select-none">
-      <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-14">
+    <footer className="w-full mt-12 border-t border-slate-200 dark:border-white/10 bg-white dark:bg-[#04070d] text-slate-600 dark:text-slate-300 relative z-10 select-none transition-colors duration-300">
+      <div className="max-w-[1440px] mx-auto px-6 md:px-12 py-12">
         
         {/* Main Footer Grid */}
         <div className="grid grid-cols-1 md:grid-cols-5 gap-10 md:gap-8 pb-12 border-b border-glass-stroke">

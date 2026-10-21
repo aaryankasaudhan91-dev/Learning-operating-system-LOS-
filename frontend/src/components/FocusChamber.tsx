@@ -153,7 +153,7 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
           <select
             value={subject}
             onChange={(e) => setSubject(e.target.value)}
-            className="bg-white hover:bg-slate-50 text-on-surface rounded-xl px-4 py-2 font-bold text-sm outline-none border border-outline-variant shadow-sm cursor-pointer transition-all duration-200"
+            className="bg-surface hover:bg-surface-container text-on-surface rounded-xl px-4 py-2 font-bold text-sm outline-none border border-outline-variant shadow-sm cursor-pointer transition-all duration-200"
           >
             <option>📖 Reading Time</option>
             <option>➕ Math Practice</option>
@@ -165,8 +165,8 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
 
       {/* Overlay Alerts */}
       {offTrackAlert && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-3xl p-6">
-          <div className="bg-white border border-outline-variant rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md rounded-3xl p-6">
+          <div className="glass-panel-heavy rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
             <div className="w-20 h-20 bg-error-container/60 rounded-full flex items-center justify-center mx-auto mb-6 border border-error/20">
               <ShieldAlert className="w-10 h-10 text-error animate-bounce" />
             </div>
@@ -185,16 +185,16 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
       )}
 
       {missionComplete && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-3xl p-6">
-          <div className="bg-white border border-outline-variant rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
-            <div className="w-20 h-20 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-200">
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md rounded-3xl p-6">
+          <div className="glass-panel-heavy rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
+            <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-400/30">
               <Sparkles className="w-10 h-10 text-amber-500 animate-[spin_5s_linear_infinite]" />
             </div>
             <h3 className="text-3xl font-black text-on-surface mb-2">Session Accomplished!</h3>
             <p className="text-on-surface-variant text-base mb-6">
               Fantastic work. You earned <strong className="text-amber-500 font-bold">+3 Star Coins</strong> for this achievement.
             </p>
-            <div className="py-2.5 px-4 bg-amber-50 rounded-xl inline-block mb-8 border border-amber-100 text-amber-800 font-bold text-sm">
+            <div className="py-2.5 px-4 bg-amber-500/10 rounded-xl inline-block mb-8 border border-amber-500/20 text-amber-500 font-bold text-sm">
               Cognitive performance optimized
             </div>
             <button
@@ -208,10 +208,10 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
       )}
 
       {showReflection && (
-        <div className="absolute inset-0 z-50 flex items-center justify-center bg-slate-900/60 backdrop-blur-md rounded-3xl p-6">
-          <div className="bg-white border border-outline-variant rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
-            <div className="w-16 h-16 bg-purple-50 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-100">
-              <Brain className="w-8 h-8 text-purple-600" />
+        <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md rounded-3xl p-6">
+          <div className="glass-panel-heavy rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
+            <div className="w-16 h-16 bg-purple-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-purple-400/30">
+              <Brain className="w-8 h-8 text-purple-500" />
             </div>
             <h3 className="text-2xl font-black text-on-surface mb-2">Reflect on Your Session</h3>
             <p className="text-on-surface-variant text-sm mb-8">How did focusing on {subject} feel to you?</p>

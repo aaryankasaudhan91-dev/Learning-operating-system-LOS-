@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useEffect } from 'react';
 import { Settings, Sliders, Eye, Database, HelpCircle, Loader2, RefreshCw } from 'lucide-react';
 import { AppView } from '../types';
@@ -16,7 +17,7 @@ export default function SettingsPage({ setView, userRole }: SettingsPageProps) {
 
   const fetchTelemetry = async () => {
     try {
-      const res = await fetch('/api/db/telemetry');
+      const res = await apiFetch('/api/db/telemetry');
       if (res.ok) {
         const data = await res.json();
         setTelemetry(data);

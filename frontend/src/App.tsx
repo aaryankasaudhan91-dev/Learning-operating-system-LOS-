@@ -3,8 +3,9 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState, useEffect, lazy, Suspense } from 'react';
+import React, { useState, useEffect, useRef, lazy, Suspense } from 'react';
 import Navbar from './components/Navbar';
+import MobileNavigation from './components/MobileNavigation';
 import Sidebar from './components/Sidebar';
 import CookieConsent from './components/CookieConsent';
 import SplashScreen from './components/SplashScreen';
@@ -57,7 +58,17 @@ export default function App() {
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
   const [authLoading, setAuthLoading] = useState<boolean>(true);
-  const [showSplash, setShowSplash] = useState<boolean>(true);
+  const [showSplash, setShowSplash] = useState<boolean>(false);
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => {
+    const saved = localStorage.getItem('los_theme');
+    return saved === 'dark' ? 'dark' : 'light';
+  });
+  useEffect(() => {
+    document.documentElement.classList.toggle('dark', theme === 'dark');
+    document.documentElement.classList.toggle('light', theme === 'light');
+    localStorage.setItem('los_theme', theme);
+  }, [theme]);
+  const toggleTheme = () => setTheme(value => value === 'light' ? 'dark' : 'light');
 
   // Shared Live Simulation States
   const [cognitiveLoad, setCognitiveLoad] = useState<number>(42);
@@ -68,6 +79,21 @@ export default function App() {
   const [tasks, setTasks] = useState<SynthesisTask[]>([]);
   const [seats, setSeats] = useState<StudentSeat[]>([]);
   const [alerts, setAlerts] = useState<InterventionAlert[]>([]);
+
+  const previousCompleted = useRef<Set<string> | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  useEffect(() => {
+    const completed = new Set(tasks.filter(task => task.completed).map(task => task.id));
+    if (userRole === 'student' && previousCompleted.current && [...completed].some(id => !previousCompleted.current!.has(id))) {
+      setCelebrating(true);
+    }
+    previousCompleted.current = completed;
+  }, [tasks, userRole]);
+  useEffect(() => {
+    if (!celebrating) return;
+    const timeout = window.setTimeout(() => setCelebrating(false), 2600);
+    return () => window.clearTimeout(timeout);
+  }, [celebrating]);
 
   // Show customized action toast banner message
   const addNotification = (msg: string) => {
@@ -249,7 +275,8 @@ export default function App() {
   const isDocumentOrLandingView = ['landing', 'about', 'privacy', 'terms', '404'].includes(currentView);
 
   return (
-    <div className="relative min-h-screen bg-void-black text-on-surface">
+    <div data-role={userRole} className="relative min-h-screen bg-void-black text-on-surface">
+      {celebrating && userRole === 'student' && <div className="quest-celebration" role="status"><span aria-hidden="true">â˜…</span><strong>Quest complete!</strong><small>One more step forward. Nicely done.</small>{Array.from({length:12},(_,i)=><i key={i} style={{'--piece':i} as React.CSSProperties} aria-hidden="true" />)}</div>}
 
       {/* GLOBAL SYSTEM STATUS HEAD BANNER INTERFACE */}
       <Navbar
@@ -257,6 +284,8 @@ export default function App() {
         setView={setView}
         userRole={userRole}
         setUserRole={setUserRole}
+        theme={theme}
+        onToggleTheme={toggleTheme}
         activeAlertCount={alerts.length}
         userName={userProfile?.fullName}
         onLogout={handleLogout}
@@ -284,7 +313,7 @@ export default function App() {
         {/* Dynamic Main Workspace with Suspense code splitting */}
         <main className={`flex-1 w-full mx-auto transition-all ${
           !isDocumentOrLandingView && currentView !== 'login' && currentView !== 'register'
-            ? 'p-6 md:p-12 md:pl-6 max-w-[1440px]' 
+            ? 'study-workspace p-4 sm:p-6 md:p-10 max-w-[1440px]' 
             : 'p-0 w-full'
         }`}>
           <Suspense fallback={<ViewLoadingFallback />}>
@@ -436,46 +465,7 @@ export default function App() {
       {/* COOKIES CONSENT BANNER (Item 6) */}
       <CookieConsent setView={setView} />
 
-      {/* MOBILE BOTTOM NAVIGATION BAR (Only for active workspace/dashboard views) */}
-      {!isDocumentOrLandingView && currentView !== 'login' && currentView !== 'register' && (
-        userRole === 'student' ? (
-          <footer className="md:hidden fixed bottom-1.5 left-2 right-2 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-1.5 rounded-full backdrop-blur-2xl z-40 flex justify-around shadow-2xl">
-            <button
-              onClick={() => setView('courses')}
-              className={`flex flex-col items-center p-2 rounded-full transition-all ${currentView === 'courses' ? 'text-electric-cyan bg-electric-cyan/10 font-bold' : 'text-on-surface-variant'}`}
-            >
-              <span className="text-[10px] font-sans uppercase px-2 py-0.5">Courses</span>
-            </button>
-            <button
-              onClick={() => setView('map')}
-              className={`flex flex-col items-center p-2 rounded-full transition-all ${currentView === 'map' ? 'text-electric-cyan bg-electric-cyan/10 font-bold' : 'text-on-surface-variant'}`}
-            >
-              <span className="text-[10px] font-sans uppercase px-2 py-0.5">Map</span>
-            </button>
-            <button
-              onClick={() => setView('sos')}
-              className={`flex flex-col items-center p-2 rounded-full transition-all ${currentView === 'sos' ? 'text-error bg-red-400/10 font-bold' : 'text-on-surface-variant'}`}
-            >
-              <span className="text-[10px] font-sans uppercase px-2 py-0.5">SOS</span>
-            </button>
-          </footer>
-        ) : (
-          <footer className="md:hidden fixed bottom-1.5 left-2 right-2 bg-white/95 dark:bg-slate-900/95 border border-slate-200 dark:border-slate-800 p-1.5 rounded-full backdrop-blur-2xl z-40 flex justify-around shadow-2xl">
-            <button
-              onClick={() => setView('courses')}
-              className={`flex flex-col items-center p-2 rounded-full transition-all ${currentView === 'courses' ? 'text-plasma-violet bg-plasma-violet/10 font-bold' : 'text-on-surface-variant'}`}
-            >
-              <span className="text-[10px] font-sans uppercase px-2 py-0.5">Courses</span>
-            </button>
-            <button
-              onClick={() => setView('insights')}
-              className={`flex flex-col items-center p-2 rounded-full transition-all ${currentView === 'insights' ? 'text-plasma-violet bg-plasma-violet/10 font-bold' : 'text-on-surface-variant'}`}
-            >
-              <span className="text-[10px] font-sans uppercase px-2 py-0.5">Seat Matrix</span>
-            </button>
-          </footer>
-        )
-      )}
+      {!isDocumentOrLandingView && currentView !== 'login' && currentView !== 'register' && <MobileNavigation currentView={currentView} setView={setView} userRole={userRole} />}
 
     </div>
   );

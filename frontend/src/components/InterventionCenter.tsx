@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import { 
@@ -32,7 +33,7 @@ export default function InterventionCenter({ students, onAction }: InterventionC
   const fetchSuggestion = async (student: StudentSeat) => {
     setLoadingSuggestions(prev => ({ ...prev, [student.id]: true }));
     try {
-      const response = await fetch('/api/agent/intervention-suggestion', {
+      const response = await apiFetch('/api/agent/intervention-suggestion', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name: student.name, state: student.state, load: student.load })

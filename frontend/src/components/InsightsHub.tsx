@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -47,7 +48,7 @@ export default function InsightsHub({
   const handleAutoGeneratePrompt = async () => {
     setIsGeneratingPrompt(true);
     try {
-      const response = await fetch('/api/agent/insights-prompt', {
+      const response = await apiFetch('/api/agent/insights-prompt', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ cohort: selectedCohort })
@@ -168,7 +169,7 @@ export default function InsightsHub({
     }
 
     try {
-      const response = await fetch('/api/prompts/broadcast', {
+      const response = await apiFetch('/api/prompts/broadcast', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

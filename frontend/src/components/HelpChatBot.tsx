@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useRef, useEffect } from 'react';
 import { MessageSquare, X, Send, Bot, User } from 'lucide-react';
 
@@ -31,7 +32,7 @@ export default function HelpChatBot({ uid }: HelpChatBotProps) {
     setIsTyping(true);
 
     try {
-      const response = await fetch('/api/agent/guide-chat', {
+      const response = await apiFetch('/api/agent/guide-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chatHistory: updatedMessages, uid })

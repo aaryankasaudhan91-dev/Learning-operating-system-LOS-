@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'motion/react';
 import {
@@ -141,7 +142,7 @@ export default function LearningMap({
 
     const fetchTeacherMessage = async () => {
       try {
-        const response = await fetch('/api/prompts/latest', { signal: controller.signal });
+        const response = await apiFetch('/api/prompts/latest', { signal: controller.signal });
         if (response.ok) {
           const data = await response.json();
           if (data?.text) setTeacherMessage(data.text);

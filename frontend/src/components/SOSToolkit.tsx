@@ -1,3 +1,4 @@
+import { apiFetch } from '../services/http';
 /**
  * @license
  * SPDX-License-Identifier: Apache-2.0
@@ -72,7 +73,7 @@ export default function SOSToolkit({
     let streamStarted = false;
 
     try {
-      const response = await fetch('/api/agent/sos-chat', {
+      const response = await apiFetch('/api/agent/sos-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ chatHistory: history })
