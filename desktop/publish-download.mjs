@@ -1,0 +1,10 @@
+import { readFile, mkdir, copyFile, writeFile } from 'node:fs/promises';
+import { createHash } from 'node:crypto';
+const {version}=JSON.parse(await readFile('package.json','utf8'));
+const source=`release/Synapse Setup ${version}.exe`;
+const data=await readFile(source);
+const folder='frontends/website/public/downloads';await mkdir(folder,{recursive:true});
+const filename=`Synapse-Setup-${version}.exe`;
+await copyFile(source,`${folder}/${filename}`);
+await writeFile(`${folder}/latest.json`,JSON.stringify({version,url:`/downloads/${filename}`,sha256:createHash('sha256').update(data).digest('hex'),bytes:data.length},null,2));
+console.log(`Windows download ready: ${filename}`);

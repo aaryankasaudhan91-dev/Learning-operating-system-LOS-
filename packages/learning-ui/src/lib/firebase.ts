@@ -1,0 +1,12 @@
+// Backend-mediated authentication. No Firebase configuration or SDK in this bundle.
+export interface User{uid:string;email:string|null;displayName?:string;getIdToken:()=>Promise<string>}
+const backend=(import.meta.env.VITE_BACKEND_URL||'').replace(/\/$/,'');const storageKey='synapse_session';let token='';try{token=sessionStorage.getItem(storageKey)||''}catch{}
+export const auth:{currentUser:User|null}={currentUser:null};const subscribers=new Set<(user:User|null)=>void>();let restored=false;
+function notify(){for(const callback of subscribers)callback(auth.currentUser)}
+function user(value:any):User{return{uid:value.uid,email:value.email||null,displayName:value.displayName||'',getIdToken:async()=>{if(!token)throw new Error('Sign in required');return token}}}
+async function request(path:string,input?:unknown){const response=await fetch(backend+path,{method:input===undefined?'GET':'POST',headers:{...(input===undefined?{}:{'Content-Type':'application/json'}),...(token?{Authorization:`Bearer ${token}`}:{})},body:input===undefined?undefined:JSON.stringify(input)});if(!response.ok){let message='Account service is temporarily unavailable.';try{message=(await response.json()).error||message}catch{}throw Object.assign(new Error(message),{status:response.status})}return response.status===204?null:response.json()}
+export async function login(email:string,password:string){const result=await request('/api/auth/login',{email,password});token=result.token;sessionStorage.setItem(storageKey,token);auth.currentUser=user(result.user);restored=true;notify();return{user:auth.currentUser}}
+export async function signOut(_auth=auth){await request('/api/auth/logout',{});token='';sessionStorage.removeItem(storageKey);auth.currentUser=null;restored=true;notify()}
+export async function resetPassword(email:string){return request('/api/auth/reset-password',{email})}
+let restoration:Promise<void>|undefined;async function restore(){if(!token){restored=true;notify();return}try{const result=await request('/api/auth/session');auth.currentUser=user(result.user)}catch(error:any){if(error.status===401){token='';sessionStorage.removeItem(storageKey)}auth.currentUser=null}finally{restored=true;notify()}}
+export function onAuthStateChanged(_auth:typeof auth,callback:(user:User|null)=>void){subscribers.add(callback);if(restored)queueMicrotask(()=>{if(subscribers.has(callback))callback(auth.currentUser)});else restoration ||= restore();return()=>{subscribers.delete(callback)}}

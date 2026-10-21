@@ -2,8 +2,9 @@
   "name": "los-app",
   "private": true,
   "workspaces": [
-    "frontend",
-    "backend"
+    "backend",
+    "packages/learning-ui",
+    "frontends/*"
   ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:frontend\"",
@@ -12,11 +13,15 @@
     "server": "npm run dev -w backend",
     "server:backend": "npm run dev -w backend",
     "build": "npm run build -w frontend && node desktop/build.mjs",
-    "typecheck": "npm run typecheck -w frontend",
+    "typecheck": "npm run typecheck -w frontend && npm run typecheck -w @synapse/website && npm run typecheck -w @synapse/mobile && tsc -p backend/tsconfig.json --noEmit",
     "desktop": "npm run build && electron .",
     "desktop:package": "npm run build && electron-builder --dir",
     "desktop:installer": "npm run build && electron-builder",
-    "mobile:sync": "npm run mobile:sync -w frontend"
+    "mobile:sync": "npm run build -w @synapse/mobile && npm exec -w @synapse/mobile -- cap sync android",
+    "web:dev": "npm run dev -w @synapse/website",
+    "web:build": "npm run build -w @synapse/website",
+    "test:realtime": "tsx --test backend/tests/realtime.test.ts",
+    "test:backend": "tsx --test backend/tests/*.test.ts"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
@@ -27,26 +32,38 @@
   "dependencies": {
     "animejs": "^4.5.0"
   },
-  "main": "desktop-dist/main.cjs",
+  "main": "desktop-app/main.cjs",
   "build": {
     "appId": "com.synapse.los",
     "productName": "Synapse",
     "directories": {
-      "output": "release"
+      "output": "release",
+      "app": "desktop-app"
     },
     "files": [
-      "desktop-dist/**",
-      "frontend/dist/**",
-      "package.json"
+      "main.cjs",
+      "package.json",
+      "icon.png",
+      "frontend-dist/**",
+      "!node_modules/**"
     ],
     "win": {
-      "target": "nsis"
+      "target": "nsis",
+      "signAndEditExecutable": true,
+      "icon": "desktop/icon.ico",
+      "signExecutable": false
     },
     "mac": {
       "target": "dmg"
     },
     "linux": {
       "target": "AppImage"
-    }
+    },
+    "npmRebuild": false
+  },
+  "version": "0.2.0",
+  "description": "Synapse Learner Operating System",
+  "overrides": {
+    "rollup": "4.64.5"
   }
 }

@@ -24,6 +24,7 @@
     "@types/node": "^22.14.0",
     "esbuild": "^0.25.0",
     "tsx": "^4.21.0",
-    "typescript": "~5.8.2"
+    "typescript": "~5.8.2",
+    "mongodb-memory-server": "11.3.0"
   }
 }

@@ -1,0 +1,2 @@
+import {AppLogo} from './AppLogo';
+export default function AppLoading({label='Opening your space…'}:{label?:string}){return <div className="synapse-loading" role="status" aria-live="polite"><div className="loading-mark"><i/><i/><i/><AppLogo className="w-16 h-16" showText={false}/></div><strong>synapse<span>.</span></strong><p>{label}</p><span className="loading-dots" aria-hidden="true"><b/><b/><b/></span></div>}

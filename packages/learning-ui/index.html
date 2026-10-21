@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, viewport-fit=cover" />
+  
+  <!-- Primary Meta Tags -->
+  <title>Synapse | Your learning space</title>
+  <meta name="title" content="LOS | Learner Operating System - AI-Adaptive Cognitive Platform" />
+  <meta name="description" content="LOS is an intelligent cognitive operating system that balances mental workload in real time, featuring AI focus chambers, telemetry diagnostics, and adaptive learning pathways aligned with NEP 2020." />
+  <meta name="keywords" content="Learner OS, LOS, cognitive profiling, adaptive learning, edtech, focus chambers, student telemetry, NEP 2020, AI tutor" />
+  <meta name="author" content="LOS Cognitive Architecture Team" />
+  <meta name="robots" content="index, follow" />
+  <meta name="theme-color" content="#090d16" />
+
+  <!-- Force HTTPS (Upgrade Insecure Requests & Client Redirection) -->
+  <meta http-equiv="Content-Security-Policy" content="upgrade-insecure-requests" />
+  <script>
+    if (location.protocol === 'http:' && location.hostname !== 'localhost' && location.hostname !== '127.0.0.1') {
+      location.replace('https:' + location.href.substring(location.protocol.length));
+    }
+  </script>
+
+  <!-- Favicon and App Icons -->
+  <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+  <link rel="apple-touch-icon" href="/favicon.svg" />
+
+  <!-- Open Graph / Facebook / LinkedIn -->
+  <meta property="og:type" content="website" />
+  <meta property="og:url" content="https://learner-os.web.app/" />
+  <meta property="og:title" content="LOS | Learner Operating System - AI-Driven Adaptive Learning" />
+  <meta property="og:description" content="Intelligent cognitive load balancing, deep focus chambers, and real-time student telemetry for sustainable learning." />
+  <meta property="og:image" content="/og-image.svg" />
+  <meta property="og:site_name" content="Learner Operating System" />
+  <meta property="og:locale" content="en_US" />
+
+  <!-- Twitter Card -->
+  <meta name="twitter:card" content="summary_large_image" />
+  <meta name="twitter:url" content="https://learner-os.web.app/" />
+  <meta name="twitter:title" content="LOS | Learner Operating System - AI-Driven Adaptive Learning" />
+  <meta name="twitter:description" content="Intelligent cognitive load balancing, deep focus chambers, and real-time student telemetry." />
+  <meta name="twitter:image" content="/og-image.svg" />
+
+  <!-- Performance Optimizations: DNS Prefetch & Font Preconnect -->
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="dns-prefetch" href="https://fonts.googleapis.com" />
+  <link rel="stylesheet"
+    href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200&display=swap">
+
+  <!-- Privacy-First Analytics DataLayer Initialization (Consent Denied by Default) -->
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag(){dataLayer.push(arguments);}
+    // Set default consent to denied until user explicitly accepts cookie consent banner
+    gtag('consent', 'default', {
+      'analytics_storage': 'denied',
+      'ad_storage': 'denied',
+      'functionality_storage': 'granted',
+      'security_storage': 'granted'
+    });
+  </script>
+</head>
+
+<body>
+  <div id="root"></div>
+  <script type="module" src="/src/main.tsx"></script>
+</body>
+
+</html>

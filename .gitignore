@@ -14,5 +14,18 @@ brag-output
 # Native application outputs
 desktop-dist/
 release/
+*.exe
+**/dist-web/
+dist-web/
 frontend/android/.gradle/
 frontend/android/local.properties
+
+frontend/dist-web/
+
+desktop-app/
+frontend/web-public/downloads/
+
+frontends/*/dist/
+frontends/mobile/android/.gradle/
+frontends/mobile/android/local.properties
+frontends/website/public/downloads/

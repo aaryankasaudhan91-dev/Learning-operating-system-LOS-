@@ -1,0 +1,3 @@
+import {useEffect,useState} from 'react';
+import AppLoading from './AppLoading';
+export default function SplashScreen({onFinish}:{onFinish:()=>void}){const[leaving,setLeaving]=useState(false);useEffect(()=>{const reduced=matchMedia('(prefers-reduced-motion: reduce)').matches;const timer=setTimeout(()=>setLeaving(true),reduced?250:1200);return()=>clearTimeout(timer)},[]);useEffect(()=>{if(!leaving)return;const timer=setTimeout(onFinish,280);return()=>clearTimeout(timer)},[leaving,onFinish]);return <div className={`startup-splash ${leaving?'splash-leaving':''}`}><AppLoading label="Your next chapter starts here."/><button onClick={()=>setLeaving(true)} className="text-button">Skip introduction</button></div>}

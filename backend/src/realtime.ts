@@ -6,12 +6,10 @@ import { getAuth } from 'firebase-admin/auth';
 import mongoose from 'mongoose';
 export type Resource = 'tasks' | 'courses' | 'users' | 'prompts';
 type Identity = {uid:string;email?:string};
-export async function verifyIdentity(token:string):Promise<Identity> {
- const app=getApps()[0] || initializeApp({credential:applicationDefault(),projectId:process.env.FIREBASE_PROJECT_ID});
- return getAuth(app).verifyIdToken(token);
-}
+export { verifyIdentity } from './security';
+import { verifyIdentity } from './security';
 export function attachRealtime(app:Express,http:HttpServer,verify=verifyIdentity) {
- const origins=(process.env.REALTIME_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,https://localhost,capacitor://localhost,null').split(',').map(value=>value.trim()).filter(Boolean);
+ const origins=(process.env.REALTIME_ORIGINS || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:3000,http://localhost:5174,http://127.0.0.1:5174,http://localhost:5175,http://127.0.0.1:5175,https://localhost,capacitor://localhost,null').split(',').map(value=>value.trim()).filter(Boolean);
  const io=new Server(http,{cors:{origin:origins},allowRequest:(req,cb)=>cb(null,!req.headers.origin || origins.includes(req.headers.origin)),maxHttpBufferSize:16384});
  io.use(async(socket,next)=>{try{
   const token=socket.handshake.auth.token;
@@ -25,7 +23,7 @@ export function attachRealtime(app:Express,http:HttpServer,verify=verifyIdentity
   let resource:Resource|undefined;
   if(/^\/api\/(?:tasks|batch\/tasks)(?:\/|$)/.test(req.path))resource='tasks';
   else if(/^\/api\/(?:courses|batch\/(?:modules|lessons))(?:\/|$)/.test(req.path))resource='courses';
-  else if(/^\/api\/users(?:\/|$)/.test(req.path))resource='users';
+  else if(/^\/api\/(?:users|relationships|learners|focus|quests)(?:\/|$)/.test(req.path))resource='users';
   else if(/^\/api\/prompts(?:\/|$)/.test(req.path))resource='prompts';
   const token=req.headers.authorization?.replace(/^Bearer /,'');
   if(resource && token)res.once('finish',()=>{void (async()=>{
@@ -33,14 +31,17 @@ export function attachRealtime(app:Express,http:HttpServer,verify=verifyIdentity
    const actor=await verify(token);const event={resource,changedAt:Date.now()};
    if(resource==='courses'){io.to('catalog').emit('data:changed',event);return}
    const recipients=new Set([actor.uid]);
+   if(req.path.startsWith('/api/relationships/') && mongoose.models.Relationship){const link=await mongoose.models.Relationship.findById(req.params.id).lean();if(link){recipients.add(link.learnerId);recipients.add(link.mentorId)}}
    if(resource==='users' && req.params.uid)recipients.add(String(req.params.uid));
    if(resource==='tasks'){
     const id=req.params.id || req.body?.id;
     const task=id && mongoose.models.Task?await mongoose.models.Task.findOne({id}).lean():req.body;
     for(const value of [task?.studentId,task?.assignedTo,task?.mentorId])if(typeof value==='string' && value!=='all')recipients.add(value);
    }
-   // Broadcast prompts do not expose their contents. Their author is notified;
-   // recipient-specific delivery can be added with verified relationship records.
+   if(resource==='prompts' && actor.email && mongoose.models.UserProfile){
+    const linked=mongoose.models.Relationship?await mongoose.models.Relationship.find({mentorId:actor.uid,status:'active'}).select('learnerId').lean():[];
+    for(const learner of linked)if(typeof learner.learnerId==='string')recipients.add(learner.learnerId);
+   }
    for(const uid of recipients)io.to(`user:${uid}`).emit('data:changed',event);
   })().catch(()=>{/* No valid identity: skip realtime; REST refresh remains available. */})});
   next();

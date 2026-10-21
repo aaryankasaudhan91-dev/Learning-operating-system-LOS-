@@ -1,0 +1,33 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import { createServer } from 'node:http';
+import { once } from 'node:events';
+import express from 'express';
+import { io as client, type Socket } from 'socket.io-client';
+import { attachRealtime } from '../src/realtime';
+
+test('authenticated updates are scoped, sanitized, and emitted only after successful writes', async t => {
+ const app=express();const http=createServer(app);
+ const server=attachRealtime(app,http,async token=>{if(token!=='alice' && token!=='bob')throw new Error('invalid');return {uid:token}});
+ app.use(express.json());
+ app.post('/api/tasks',(req,res)=>res.status(req.query.fail?500:200).json({ok:true}));
+ await new Promise<void>(resolve=>http.listen(0,'127.0.0.1',resolve));
+ const address=http.address();assert.ok(address && typeof address!=='string');
+ const url=`http://127.0.0.1:${address.port}`;const sockets:Socket[]=[];
+ t.after(async()=>{for(const socket of sockets)socket.disconnect();await new Promise<void>(resolve=>server.close(()=>resolve()))});
+ const connect=async(token?:string,origin='http://localhost:5173')=>{const socket=client(url,{auth:{token},forceNew:true,reconnection:false,extraHeaders:{Origin:origin},timeout:1500});sockets.push(socket);return socket};
+ const anonymous=await connect();await once(anonymous,'connect_error');assert.equal(anonymous.connected,false);
+ const forbidden=await connect('alice','https://untrusted.example');await once(forbidden,'connect_error');assert.equal(forbidden.connected,false);
+ const alice=await connect('alice');await once(alice,'connect');
+ const bob=await connect('bob');await once(bob,'connect');
+ const aliceEvents:unknown[]=[];const bobEvents:unknown[]=[];
+ alice.on('data:changed',event=>aliceEvents.push(event));bob.on('data:changed',event=>bobEvents.push(event));
+ const received=once(alice,'data:changed');
+ await fetch(`${url}/api/tasks`,{method:'POST',headers:{Authorization:'Bearer alice','Content-Type':'application/json'},body:JSON.stringify({studentId:'alice',title:'private title',answer:'private answer'})});
+ const [event]=await received;
+ assert.deepEqual(Object.keys(event).sort(),['changedAt','resource']);assert.equal(event.resource,'tasks');
+ await fetch(`${url}/api/tasks?fail=1`,{method:'POST',headers:{Authorization:'Bearer alice','Content-Type':'application/json'},body:'{}'});
+ await fetch(`${url}/api/tasks`,{method:'POST',headers:{'Content-Type':'application/json'},body:'{}'});
+ await new Promise(resolve=>setTimeout(resolve,100));
+ assert.equal(aliceEvents.length,1);assert.equal(bobEvents.length,0);
+});
