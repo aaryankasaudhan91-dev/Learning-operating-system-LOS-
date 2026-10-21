@@ -20,6 +20,7 @@ export function attachRealtime(app:Express,http:HttpServer,verify=verifyIdentity
  // Successful API writes cause invalidation only; no learner records leave through sockets.
  app.use((req,res,next)=>{
   if(!['POST','PUT','PATCH','DELETE'].includes(req.method))return next();
+  if(/^\/api\/focus\//.test(req.path)&&!req.path.endsWith('/complete'))return next();
   let resource:Resource|undefined;
   if(/^\/api\/(?:tasks|batch\/tasks)(?:\/|$)/.test(req.path))resource='tasks';
   else if(/^\/api\/(?:courses|batch\/(?:modules|lessons))(?:\/|$)/.test(req.path))resource='courses';
@@ -31,13 +32,15 @@ export function attachRealtime(app:Express,http:HttpServer,verify=verifyIdentity
    const actor=await verify(token);const event={resource,changedAt:Date.now()};
    if(resource==='courses'){io.to('catalog').emit('data:changed',event);return}
    const recipients=new Set([actor.uid]);
-   if(req.path.startsWith('/api/relationships/') && mongoose.models.Relationship){const link=await mongoose.models.Relationship.findById(req.params.id).lean();if(link){recipients.add(link.learnerId);recipients.add(link.mentorId)}}
+   if(req.path.startsWith('/api/relationships') && mongoose.models.Relationship){const link=res.locals.realtimeLink || (req.params.id?await mongoose.models.Relationship.findById(req.params.id).lean():null);if(link){recipients.add(link.learnerId);recipients.add(link.mentorId)}}
    if(resource==='users' && req.params.uid)recipients.add(String(req.params.uid));
    if(resource==='tasks'){
     const id=req.params.id || req.body?.id;
-    const task=id && mongoose.models.Task?await mongoose.models.Task.findOne({id}).lean():req.body;
-    for(const value of [task?.studentId,task?.assignedTo,task?.mentorId])if(typeof value==='string' && value!=='all')recipients.add(value);
+    const task=res.locals.realtimeTask || (id && mongoose.models.Task?await mongoose.models.Task.findOne({id}).lean():null);
+    for(const value of [task?.studentId,task?.assignedTo,task?.teacherId])if(typeof value==='string' && value!=='all')recipients.add(value);
    }
+   if(resource==='tasks' && ['POST','DELETE'].includes(req.method) && /^\/api\/tasks(?:\/[^/]+)?$/.test(req.path)){const task=res.locals.realtimeTask;if(task?.assignedTo==='all'&&mongoose.models.Relationship){const links=await mongoose.models.Relationship.find({mentorId:task.teacherId,status:'active'}).select('learnerId').lean();for(const link of links)recipients.add(link.learnerId)}}
+   if(resource==='users' && !req.path.startsWith('/api/quests') && mongoose.models.Relationship){const links=await mongoose.models.Relationship.find({learnerId:actor.uid,status:'active'}).select('mentorId').lean();for(const link of links)recipients.add(link.mentorId)}
    if(resource==='prompts' && actor.email && mongoose.models.UserProfile){
     const linked=mongoose.models.Relationship?await mongoose.models.Relationship.find({mentorId:actor.uid,status:'active'}).select('learnerId').lean():[];
     for(const learner of linked)if(typeof learner.learnerId==='string')recipients.add(learner.learnerId);

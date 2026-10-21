@@ -1,3 +1,6 @@
+import {io as socketClient,type Socket} from 'socket.io-client';
+import {once} from 'node:events';
+import {attachRealtime} from '../src/realtime';
 import {saveSession,verifySession,removeSession,Session} from '../src/sessions';
 import test from 'node:test';
 import assert from 'node:assert/strict';
@@ -13,8 +16,8 @@ test('real API persistence and authorization boundaries',async t=>{
  await Session.init();
  await Promise.all([User.init(),Course.init(),Submission.init(),Lesson.init(),Focus.init(),Progress.init()]);
  const verify=async(token:string)=>{if(!['alice','bob','teacher','other'].includes(token))throw new Error();return{uid:token,email:`${token}@example.com`}};
- const app=createApp({verify});const http=createServer(app);await new Promise<void>(resolve=>http.listen(0,'127.0.0.1',resolve));const address=http.address() as any;const url=`http://127.0.0.1:${address.port}`;
- t.after(async()=>{await new Promise<void>(resolve=>http.close(()=>resolve()));await mongoose.disconnect();await db.stop()});
+ const http=createServer();let live!:ReturnType<typeof attachRealtime>;const sockets:Socket[]=[];const app=createApp({verify,beforeRoutes:application=>{live=attachRealtime(application,http,verify)}});http.on('request',app);await new Promise<void>(resolve=>http.listen(0,'127.0.0.1',resolve));const address=http.address() as any;const url=`http://127.0.0.1:${address.port}`;
+ t.after(async()=>{for(const socket of sockets)socket.disconnect();await new Promise<void>(resolve=>live.close(()=>resolve()));await mongoose.disconnect();await db.stop()});
  async function request(path:string,token?:string,method='GET',data?:any){const response=await fetch(url+path,{method,headers:{...(token?{Authorization:`Bearer ${token}`}:{}) ,...(data?{'Content-Type':'application/json'}:{})},body:data?JSON.stringify(data):undefined});const json=await response.json();return{status:response.status,json}}
  assert.equal((await request('/api/courses')).status,401);
  process.env.AUTH_SESSION_ENCRYPTION_KEY=Buffer.alloc(32,7).toString('base64');
@@ -72,6 +75,12 @@ test('real API persistence and authorization boundaries',async t=>{
  assert.equal((await request(`/api/focus/sessions/${session.json.id}/heartbeat`,'bob','POST',{})).status,404);
  await Focus.updateOne({id:session.json.id},{$set:{activeSeconds:120}});
  const ended=await request(`/api/focus/sessions/${session.json.id}/complete`,'alice','POST',{});assert.equal(ended.status,200);const retry=await request(`/api/focus/sessions/${session.json.id}/complete`,'alice','POST',{});assert.equal(retry.json.alreadyRecorded,true);assert.equal(await Progress.countDocuments({uid:'alice',eventId:`focus:${session.json.id}`}),1);const finalProgress=await request('/api/progress','alice');assert.equal(finalProgress.json.focusStreak,1);assert.equal(finalProgress.json.todayFocusMinutes,2);
+ const connect=async(token:string)=>{const socket=socketClient(url,{auth:{token},forceNew:true,reconnection:false,transports:['websocket'],extraHeaders:{Origin:'http://localhost:5173'}});sockets.push(socket);await once(socket,'connect',{signal:AbortSignal.timeout(5000)});return socket};
+ const learnerSocket=await connect('alice');const teacherSocket=await connect('teacher');
+ const nextTaskChange=(socket:Socket)=>new Promise<any>((resolve,reject)=>{const handler=(event:any)=>{if(event.resource==='tasks'){clearTimeout(timeout);socket.off('data:changed',handler);resolve(event)}};const timeout=setTimeout(()=>{socket.off('data:changed',handler);reject(new Error('Expected live task update'))},5000);socket.on('data:changed',handler)});
+ const learnerNotified=nextTaskChange(learnerSocket);const authorNotified=nextTaskChange(teacherSocket);assert.equal((await request('/api/tasks','teacher','POST',{title:'Whole class',assignedTo:'all'})).status,201);await Promise.all([learnerNotified,authorNotified]);
+ const teacherNotified=nextTaskChange(teacherSocket);assert.equal((await request(`/api/tasks/${task.json.id}/submissions`,'alice','POST',{answer:'Updated answer'})).status,200);await teacherNotified;
+
 });
 
 test('database outage is explicit, never a seeded or successful empty response',async t=>{const http=createServer(createApp({ready:()=>false,verify:async()=>({uid:'alice',email:'alice@example.com'})}));await new Promise<void>(resolve=>http.listen(0,'127.0.0.1',resolve));t.after(()=>{http.close()});const address=http.address() as any;const response=await fetch(`http://127.0.0.1:${address.port}/api/courses`,{headers:{Authorization:'Bearer valid'}});assert.equal(response.status,503);assert.equal((await response.json()).code,'DATABASE_UNAVAILABLE')});
