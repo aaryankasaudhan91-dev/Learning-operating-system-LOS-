@@ -211,7 +211,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
               </h3>
               <div className="space-y-3 font-sans text-xs text-on-surface-variant leading-relaxed">
                 <p>
-                  Welcome to <strong className="text-on-surface">Synapse Learner OS</strong>, a next-generation adaptive education cockpit designed to reduce student burnout and maximize flow states.
+                  Welcome to <strong className="text-on-surface">Synapse</strong>, a learning space for lessons, practice, personal goals and focused study.
                 </p>
                 <p>
                   By measuring real-time user inputs, session duration, and task friction, the system shapes personalized resources. If a lesson causes difficulty, students can instantly activate the <strong className="text-on-surface">Emergency SOS Panel</strong> to engage box-breathing and speak directly to a calming agent.

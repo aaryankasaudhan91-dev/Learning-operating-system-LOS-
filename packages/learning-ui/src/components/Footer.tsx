@@ -149,7 +149,7 @@ export default function Footer({ setView }: FooterProps) {
         {/* Bottom copyright and compliance strip */}
         <div className="pt-8 flex flex-col sm:flex-row items-center justify-between gap-4 text-xs text-on-surface-variant">
           <p>
-            &copy; {new Date().getFullYear()} Learner Operating System (LOS). All rights reserved. Built with cognitive respect.
+            &copy; {new Date().getFullYear()} Synapse. A student research project by Aaryan Kasaudhan and Nikhil Pandey.
           </p>
 
           <div className="flex items-center gap-6">

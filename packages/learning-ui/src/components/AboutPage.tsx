@@ -167,7 +167,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
         ctx.font = '700 10px Courier, monospace';
         ctx.fillStyle = '#00e5ff';
-        ctx.fillText('NUCLEUS: SYNTHESIS ACTIVE', 25, 30);
+        ctx.fillText('A SMALL START. A NEW POSSIBILITY.', 25, 30);
 
       } else if (activeSection === 'philosophy') {
         // Balanced rotating rings (respect, calibrate, sustain)
@@ -212,7 +212,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
         ctx.font = '700 10px Courier, monospace';
         ctx.fillStyle = '#efa3ce';
-        ctx.fillText('INTEGRITY INDEX: BALANCE', 25, 30);
+        ctx.fillText('FIND YOUR OWN RHYTHM.', 25, 30);
 
       } else if (activeSection === 'architecture') {
         // Feedback loop flowchart schematic with flying particles
@@ -331,7 +331,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
         ctx.font = '700 10px Courier, monospace';
         ctx.fillStyle = '#90cafa';
-        ctx.fillText('NETWORK MAP: CONSTELLATED', 25, 30);
+        ctx.fillText('BUILT WITH CURIOSITY.', 25, 30);
       }
 
       animationFrameId = requestAnimationFrame(render);
