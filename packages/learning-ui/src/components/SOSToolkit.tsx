@@ -189,10 +189,10 @@ export default function SOSToolkit({
 
             {/* Breathing Phase Text */}
             <div className="z-10 text-center space-y-1">
-              <p className="font-sans font-black text-3xl tracking-tight text-on-primary uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+              <p className="font-sans font-black text-3xl tracking-tight text-on-surface uppercase">
                 {breathPhase}
               </p>
-              <p className="font-mono text-xs text-electric-cyan font-bold tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
+              <p className="font-mono text-xs text-electric-cyan font-bold tracking-widest">
                 {breathSeconds}s REMAINING
               </p>
             </div>

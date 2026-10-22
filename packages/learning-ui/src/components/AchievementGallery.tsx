@@ -9,7 +9,7 @@ interface AchievementGalleryProps {
 
 export default function AchievementGallery({ achievements }: AchievementGalleryProps) {
   const badgeColors = {
-    earlyBird: 'text-[#FFD700] bg-[#FFD700]/10 border-[#FFD700]/30',
+    earlyBird: 'text-warning bg-warning/10 border-warning/30',
     deepFocusMaster: 'text-plasma-violet bg-plasma-violet/10 border-plasma-violet/30',
     streakHealer: 'text-synapse-green bg-synapse-green/10 border-synapse-green/30',
     collaborator: 'text-electric-cyan bg-electric-cyan/10 border-electric-cyan/30',
@@ -45,7 +45,7 @@ export default function AchievementGallery({ achievements }: AchievementGalleryP
               </div>
               <div>
                 <p className="text-[11px] font-bold tracking-tight leading-tight">{badge.title}</p>
-                <p className="text-[9px] opacity-60 font-mono mt-0.5">{badge.dateAwarded}</p>
+                <p className="text-[9px] text-on-surface-variant font-mono mt-0.5">{badge.dateAwarded}</p>
               </div>
             </motion.div>
           );
