@@ -32,7 +32,7 @@ const FunStreak = ({ streak, bestStreak }: { streak: number, bestStreak: number 
   return (
     <div className="relative overflow-hidden group/streak bg-gradient-to-br from-orange-500/10 to-transparent p-4 rounded-xl border border-orange-500/20 flex items-center justify-between cursor-pointer hover:border-orange-500/40 transition-all">
       <div className="absolute -right-4 -bottom-4 opacity-5 group-hover/streak:rotate-12 group-hover/streak:scale-125 transition-transform duration-700">
-        <Flame className="w-20 h-20 text-orange-500" />
+        <Flame className="w-20 h-20 text-warning" />
       </div>
 
       <div className="flex items-center gap-4 relative z-10">
@@ -41,10 +41,10 @@ const FunStreak = ({ streak, bestStreak }: { streak: number, bestStreak: number 
           transition={{ repeat: Infinity, duration: 2 }}
           className="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center shadow-lg shadow-orange-500/20 border border-orange-500/30 group-hover/streak:scale-110 transition-transform"
         >
-          <Flame className={`w-6 h-6 text-orange-500 ${streak > 0 ? 'animate-pulse' : 'opacity-40'}`} />
+          <Flame className={`w-6 h-6 text-warning ${streak > 0 ? 'animate-pulse' : 'opacity-40'}`} />
         </motion.div>
         <div>
-          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-orange-400 font-bold leading-none mb-1">
+          <p className="text-[10px] font-mono uppercase tracking-[0.2em] text-warning font-bold leading-none mb-1">
             Learning Streak
           </p>
           <div className="flex items-baseline gap-1.5">
@@ -54,12 +54,12 @@ const FunStreak = ({ streak, bestStreak }: { streak: number, bestStreak: number 
                 initial={{ y: 20, opacity: 0 }}
                 animate={{ y: 0, opacity: 1 }}
                 exit={{ y: -20, opacity: 0 }}
-                className="text-3xl font-sans font-black text-on-surface tracking-tighter group-hover/streak:text-orange-400 transition-colors"
+                className="text-3xl font-sans font-black text-on-surface tracking-tighter group-hover/streak:text-warning transition-colors"
               >
                 {streak}
               </motion.span>
             </AnimatePresence>
-            <span className="text-xs font-bold text-orange-400/70">Days</span>
+            <span className="text-xs font-bold text-warning/70">Days</span>
           </div>
         </div>
       </div>
@@ -206,7 +206,7 @@ export default function LearningMap({
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 50 }}
-            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-plasma-violet text-white px-6 py-3 rounded-full text-sm font-bold shadow-lg shadow-plasma-violet/30 flex items-center gap-2"
+            className="fixed bottom-24 left-1/2 -translate-x-1/2 z-50 bg-plasma-violet text-on-primary px-6 py-3 rounded-full text-sm font-bold shadow-lg shadow-plasma-violet/30 flex items-center gap-2"
           >
             <Sparkles className="w-4 h-4" />
             {toastMessage}
@@ -216,7 +216,7 @@ export default function LearningMap({
 
       {/* Teacher's Magic Note */}
       {teacherMessage && (
-        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-void-black/95 border border-plasma-violet/60 text-white px-6 py-4 rounded-2xl flex flex-col gap-2 max-w-md shadow-[0_0_20px_rgba(112,0,255,0.3)] backdrop-blur-md animate-[fadeIn_0.3s_ease-out]">
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-50 bg-void-black/95 border border-plasma-violet/60 text-on-surface px-6 py-4 rounded-2xl flex flex-col gap-2 max-w-md shadow-[0_0_20px_rgba(112,0,255,0.3)] backdrop-blur-md animate-[fadeIn_0.3s_ease-out]">
           <div className="flex items-center gap-2 text-plasma-violet">
             <MessageCircle className="w-4 h-4 text-plasma-violet animate-pulse" />
             <span className="font-mono text-[10px] uppercase tracking-widest font-extrabold">Teacher's Magic Note</span>
@@ -226,7 +226,7 @@ export default function LearningMap({
           </p>
           <button
             onClick={() => setTeacherMessage(null)}
-            className="absolute top-3 right-3 text-on-surface-variant hover:text-white p-1 rounded-full hover:bg-white/5 transition-colors"
+            className="absolute top-3 right-3 text-on-surface-variant hover:text-on-surface p-1 rounded-full hover:bg-white/5 transition-colors"
             aria-label="Close message"
           >
             <X className="w-4.5 h-4.5" />
@@ -246,7 +246,7 @@ export default function LearningMap({
           <div className="flex gap-4 items-center">
             <button
               onClick={() => setTiredMode(!tiredMode)}
-              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors ${tiredMode ? 'bg-orange-500/20 border-orange-500 text-orange-400' : 'bg-white/5 border-glass-stroke text-on-surface-variant hover:text-white'}`}
+              className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-xs font-bold transition-colors ${tiredMode ? 'bg-orange-500/20 border-orange-500 text-warning' : 'bg-white/5 border-glass-stroke text-on-surface-variant hover:text-on-surface'}`}
             >
               <BatteryLow className="w-4 h-4" />
               I'm Feeling Tired
@@ -314,7 +314,7 @@ export default function LearningMap({
               </h4>
               <button
                 onClick={() => setSelectedLevel(null)}
-                className="text-on-surface-variant hover:text-white text-xs font-semibold px-2 py-0.5 rounded bg-white/5 border border-glass-stroke"
+                className="text-on-surface-variant hover:text-on-surface text-xs font-semibold px-2 py-0.5 rounded bg-white/5 border border-glass-stroke"
               >
                 Close
               </button>
@@ -342,7 +342,7 @@ export default function LearningMap({
             <button
               key={tab}
               onClick={() => setActiveRightTab(tab)}
-              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all capitalize ${activeRightTab === tab ? `bg-${tab === 'brain' ? 'plasma-violet' : tab === 'homework' ? 'synapse-green' : 'electric-cyan'} ${tab === 'brain' ? 'text-white' : 'text-void-black'} shadow-lg` : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
+              className={`flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl text-xs font-bold transition-all capitalize ${activeRightTab === tab ? `bg-${tab === 'brain' ? 'plasma-violet' : tab === 'homework' ? 'synapse-green' : 'electric-cyan'} text-on-primary shadow-lg` : 'text-on-surface-variant hover:text-on-surface hover:bg-white/5'
                 }`}
             >
               {tab === 'brain' && <Smile className="w-3.5 h-3.5" />}
@@ -411,7 +411,7 @@ export default function LearningMap({
             <div className="flex justify-between items-center mb-4">
               <h3 className="font-sans font-bold text-lg text-on-surface flex items-center gap-2">
                 <Star className="w-5 h-5 text-electric-cyan" />
-                My Mini Quests {tiredMode && <span className="text-xs text-orange-400 bg-orange-500/20 px-2 py-0.5 rounded ml-2">Easy Mode</span>}
+                My Mini Quests {tiredMode && <span className="text-xs text-warning bg-orange-500/20 px-2 py-0.5 rounded ml-2">Easy Mode</span>}
               </h3>
             </div>
             <form onSubmit={handleAddQuest} className="flex gap-2 mb-4">
@@ -422,7 +422,7 @@ export default function LearningMap({
                 onChange={(e) => setNewQuestTitle(e.target.value)}
                 className="flex-1 bg-surface-container-low border border-glass-stroke rounded-xl px-3 py-2 text-sm text-on-surface placeholder-outline-variant focus:outline-none focus:border-electric-cyan transition-all"
               />
-              <button type="submit" className="p-2.5 rounded-xl bg-electric-cyan text-void-black hover:bg-electric-cyan/85 transition-all">
+              <button type="submit" className="p-2.5 rounded-xl bg-electric-cyan text-on-primary hover:bg-electric-cyan/85 transition-all">
                 <Plus className="w-4 h-4 font-extrabold" />
               </button>
             </form>

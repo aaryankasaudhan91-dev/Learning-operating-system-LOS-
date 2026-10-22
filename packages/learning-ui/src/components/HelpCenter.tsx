@@ -226,7 +226,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                   <div className="pt-2">
                     <button
                       onClick={() => setIsManualOpen(true)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all text-center cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-on-primary font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all text-center cursor-pointer"
                     >
                       Open Full Manual ({userRole === 'student' ? 'Student Guide' : 'Mentor Guide'})
                     </button>
@@ -245,7 +245,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                 <Shield className="w-4 h-4" />
               </div>
               <div>
-                <p className="text-xs font-bold text-white">Embedded Support Assistant</p>
+                <p className="text-xs font-bold text-on-surface">Embedded Support Assistant</p>
                 <p className="text-[10px] text-synapse-green flex items-center gap-1 font-mono uppercase">
                   <span className="w-1.5 h-1.5 bg-synapse-green rounded-full animate-pulse" /> Active Node
                 </p>
@@ -268,7 +268,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                       ? 'bg-electric-cyan/5 border-electric-cyan/10 rounded-tr-none text-right' 
                       : 'bg-white/5 border-glass-stroke rounded-tl-none'
                   }`}>
-                    <p className="text-xs text-white leading-relaxed">{msg.text}</p>
+                    <p className="text-xs text-on-surface leading-relaxed">{msg.text}</p>
                   </div>
                 </div>
               ))}
@@ -277,10 +277,10 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                   <div className="w-8 h-8 rounded-xl flex items-center justify-center flex-shrink-0 border bg-plasma-violet/10 border-plasma-violet/20 text-plasma-violet">
                     <Shield className="w-4 h-4" />
                   </div>
-                  <div className="p-3.5 rounded-2xl text-xs leading-relaxed bg-white/5 border border-glass-stroke text-white rounded-tl-none font-sans flex items-center gap-1.5 h-10">
-                    <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse"></span>
-                    <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-150"></span>
-                    <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-300"></span>
+                  <div className="p-3.5 rounded-2xl text-xs leading-relaxed bg-white/5 border border-glass-stroke text-on-surface rounded-tl-none font-sans flex items-center gap-1.5 h-10">
+                    <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse"></span>
+                    <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse delay-150"></span>
+                    <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse delay-300"></span>
                   </div>
                 </div>
               )}
@@ -292,21 +292,21 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
               <button 
                 onClick={() => submitUserQuestion("What is cognitive load?")}
                 disabled={isTyping}
-                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-on-surface hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
               >
                 What is cognitive load?
               </button>
               <button 
                 onClick={() => submitUserQuestion("How do I take a custom quiz?")}
                 disabled={isTyping}
-                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-on-surface hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
               >
                 How to take a quiz?
               </button>
               <button 
                 onClick={() => submitUserQuestion("What does the SOS panel do?")}
                 disabled={isTyping}
-                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-white hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
+                className="px-3 py-1.5 rounded-full border border-glass-stroke text-[10px] text-on-surface-variant hover:text-on-surface hover:border-plasma-violet/40 bg-void-black/40 transition-all cursor-pointer disabled:opacity-50"
               >
                 What does SOS panel do?
               </button>
@@ -325,7 +325,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
               <button
                 type="submit"
                 disabled={!chatInput.trim() || isTyping}
-                className="px-4 rounded-xl bg-plasma-violet text-white text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:scale-102 transition-transform disabled:opacity-50"
+                className="px-4 rounded-xl bg-plasma-violet text-on-primary text-xs font-bold uppercase tracking-wider flex items-center gap-2 hover:scale-102 transition-transform disabled:opacity-50"
               >
                 <Send className="w-3.5 h-3.5" />
                 Send
@@ -337,7 +337,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
         {activeTab === 'ticket' && (
           <div className="glass-panel border border-glass-stroke rounded-2xl p-6 md:p-8 max-w-2xl mx-auto space-y-6">
             <div className="border-b border-glass-stroke pb-4">
-              <h3 className="text-sm font-bold text-white uppercase tracking-wider flex items-center gap-2">
+              <h3 className="text-sm font-bold text-on-surface uppercase tracking-wider flex items-center gap-2">
                 <AlertTriangle className="w-4 h-4 text-plasma-violet" />
                 Submit Telemetry Intervention
               </h3>
@@ -352,7 +352,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                   <CheckCircle2 className="w-8 h-8" />
                 </div>
                 <div>
-                  <h4 className="text-sm font-bold text-white">Ticket Submitted Successfully</h4>
+                  <h4 className="text-sm font-bold text-on-surface">Ticket Submitted Successfully</h4>
                   <p className="text-xs text-on-surface-variant mt-1 max-w-md mx-auto">
                     Your issue report has been logged and synchronized with the Synapse monitor team. We will resolve it in your current workspace shortly.
                   </p>
@@ -366,7 +366,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                     <select
                       value={ticketCategory}
                       onChange={e => setTicketCategory(e.target.value)}
-                      className="w-full bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-plasma-violet"
+                      className="w-full bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
                     >
                       <option value="General support">General Support</option>
                       <option value="High Load / Stress Lock">High Load / Stress Lock</option>
@@ -383,7 +383,7 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                       placeholder="Summary of issue..."
                       value={ticketSubject}
                       onChange={e => setTicketSubject(e.target.value)}
-                      className="w-full bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-white focus:outline-none focus:border-plasma-violet"
+                      className="w-full bg-void-black/50 border border-glass-stroke rounded-xl px-4 py-2.5 text-xs text-on-surface focus:outline-none focus:border-plasma-violet"
                     />
                   </div>
                 </div>
@@ -396,14 +396,14 @@ export default function HelpCenter({ setView, userRole, uid }: HelpCenterProps) 
                     placeholder="Describe exactly what happened, and any steps to reproduce..."
                     value={ticketDescription}
                     onChange={e => setTicketDescription(e.target.value)}
-                    className="w-full bg-void-black/50 border border-glass-stroke rounded-xl p-4 text-xs text-white focus:outline-none focus:border-plasma-violet resize-none"
+                    className="w-full bg-void-black/50 border border-glass-stroke rounded-xl p-4 text-xs text-on-surface focus:outline-none focus:border-plasma-violet resize-none"
                   />
                 </div>
 
                 <div className="flex justify-end gap-3 pt-2">
                   <button
                     type="submit"
-                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-transform"
+                    className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-xs font-bold uppercase tracking-wider hover:scale-102 transition-transform"
                   >
                     Submit Ticket
                   </button>

@@ -152,7 +152,7 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
       {/* Top Bar: Dashboard Status */}
       <div className="relative z-10 flex flex-col sm:flex-row justify-between items-center gap-4 mb-8 bg-white/70 backdrop-blur-md p-4 rounded-2xl border border-white/80 shadow-[0_4px_24px_rgba(0,0,0,0.02)]">
         <div className="flex items-center gap-3 bg-primary-container/40 px-5 py-2 rounded-xl border border-primary/10 shadow-sm">
-          <Star className="w-6 h-6 text-amber-500 fill-amber-400 animate-[spin_8s_linear_infinite]" />
+          <Star className="w-6 h-6 text-warning fill-amber-400 animate-[spin_8s_linear_infinite]" />
           <span className="text-lg font-bold text-primary-on-primary-container">
             Stars: {starsEarned}
           </span>
@@ -186,7 +186,7 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
             </p>
             <button
               onClick={() => { setOffTrackAlert(false); setTimerRunning(true); }}
-              className="w-full py-4 bg-primary text-white rounded-full font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
+              className="w-full py-4 bg-primary text-on-primary rounded-full font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
             >
               Resume Study Session
             </button>
@@ -198,18 +198,18 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
         <div className="absolute inset-0 z-50 flex items-center justify-center bg-black/70 backdrop-blur-md rounded-3xl p-6">
           <div className="glass-panel-heavy rounded-3xl p-8 max-w-md w-full text-center shadow-2xl animate-[scaleIn_0.3s_cubic-bezier(0.34,1.56,0.64,1)]">
             <div className="w-20 h-20 bg-amber-500/20 rounded-full flex items-center justify-center mx-auto mb-6 border border-amber-400/30">
-              <Sparkles className="w-10 h-10 text-amber-500 animate-[spin_5s_linear_infinite]" />
+              <Sparkles className="w-10 h-10 text-warning animate-[spin_5s_linear_infinite]" />
             </div>
             <h3 className="text-3xl font-black text-on-surface mb-2">Session Accomplished!</h3>
             <p className="text-on-surface-variant text-base mb-6">
-              Fantastic work. You earned <strong className="text-amber-500 font-bold">+3 Star Coins</strong> for this achievement.
+              Fantastic work. You earned <strong className="text-warning font-bold">+3 Star Coins</strong> for this achievement.
             </p>
-            <div className="py-2.5 px-4 bg-amber-500/10 rounded-xl inline-block mb-8 border border-amber-500/20 text-amber-500 font-bold text-sm">
+            <div className="py-2.5 px-4 bg-amber-500/10 rounded-xl inline-block mb-8 border border-amber-500/20 text-warning font-bold text-sm">
               Cognitive performance optimized
             </div>
             <button
               onClick={() => setShowReflection(true)}
-              className="w-full py-4 bg-primary text-white rounded-full font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
+              className="w-full py-4 bg-primary text-on-primary rounded-full font-bold text-base shadow-lg shadow-primary/20 hover:bg-primary/90 active:scale-95 transition-all cursor-pointer"
             >
               Log Session Reflection
             </button>
@@ -314,8 +314,8 @@ export default function SpaceMission({ setView, setCognitiveLoad }: SpaceMission
                 if (!timerRunning && !musicPlaying) setMusicPlaying(true);
               }}
               className={`px-8 py-3.5 rounded-full font-bold text-lg flex items-center gap-2 transition-all cursor-pointer hover:-translate-y-0.5 active:translate-y-0 ${timerRunning
-                  ? 'bg-red-500 text-white shadow-md shadow-red-500/10 hover:bg-red-600'
-                  : 'bg-primary text-white shadow-md shadow-primary/10 hover:bg-primary/95'
+                  ? 'bg-error text-on-error shadow-md shadow-red-500/10 hover:bg-error/90'
+                  : 'bg-primary text-on-primary shadow-md shadow-primary/10 hover:bg-primary/95'
                 }`}
             >
               {timerRunning ? (

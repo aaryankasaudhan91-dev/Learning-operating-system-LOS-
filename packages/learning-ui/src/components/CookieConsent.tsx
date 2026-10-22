@@ -72,7 +72,7 @@ export default function CookieConsent({ setView }: CookieConsentProps) {
             <div className="flex flex-col sm:flex-row items-center gap-2">
               <button
                 onClick={handleAcceptAll}
-                className="w-full sm:w-auto flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-white text-xs font-bold uppercase tracking-wider hover:opacity-95 active:scale-95 transition-all shadow-md cursor-pointer"
+                className="w-full sm:w-auto flex-1 px-4 py-2.5 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-on-primary text-xs font-bold uppercase tracking-wider hover:opacity-95 active:scale-95 transition-all shadow-md cursor-pointer"
               >
                 Accept All
               </button>

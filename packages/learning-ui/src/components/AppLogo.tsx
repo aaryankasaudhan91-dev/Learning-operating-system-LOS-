@@ -58,8 +58,8 @@ export function AppLogo({ className = "w-12 h-12", showText = true }: AppLogoPro
       </svg>
       {showText && (
         <div className="flex flex-col items-center">
-          <span className="text-3xl font-bold tracking-tight text-white mb-0.5">LOS</span>
-          <span className="text-[8px] font-mono tracking-widest text-[#bac9cc] uppercase">Learning Operating System</span>
+          <span className="text-3xl font-bold tracking-tight text-on-surface mb-0.5">LOS</span>
+          <span className="text-[8px] font-mono tracking-widest text-on-surface-variant uppercase">Learning Operating System</span>
         </div>
       )}
     </div>

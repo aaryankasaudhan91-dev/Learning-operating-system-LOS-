@@ -17,7 +17,7 @@ export default function PeerInsight({ receivedFeedback, onSend }: PeerInsightPro
   const badges = [
     { type: 'helpful' as const, icon: Heart, label: 'Encouragement', color: 'text-pink-400' },
     { type: 'focus' as const, icon: Sparkles, label: 'Focus Boost', color: 'text-plasma-violet' },
-    { type: 'creative' as const, icon: Lightbulb, label: 'Creative Spark', color: 'text-yellow-400' },
+    { type: 'creative' as const, icon: Lightbulb, label: 'Creative Spark', color: 'text-warning' },
     { type: 'logic' as const, icon: UserCheck, label: 'Peer Support', color: 'text-synapse-green' },
   ];
 
@@ -75,7 +75,7 @@ export default function PeerInsight({ receivedFeedback, onSend }: PeerInsightPro
           <button
             type="submit"
             disabled={isSending || !message.trim()}
-            className="absolute bottom-3 right-3 p-2 rounded-lg bg-electric-cyan text-void-black font-bold disabled:opacity-50 hover:scale-105 active:scale-95 transition-all"
+            className="absolute bottom-3 right-3 p-2 rounded-lg bg-electric-cyan text-on-primary font-bold disabled:opacity-50 hover:scale-105 active:scale-95 transition-all"
           >
             {isSending ? <Sparkles className="w-4 h-4 animate-spin" /> : <Send className="w-4 h-4" />}
           </button>
@@ -108,7 +108,7 @@ export default function PeerInsight({ receivedFeedback, onSend }: PeerInsightPro
             </motion.div>
           ))}
           {receivedFeedback.length === 0 && (
-            <div className="py-8 text-center text-on-surface-variant opacity-40">
+            <div className="py-8 text-center text-on-surface-variant">
               <p className="text-[10px] font-mono uppercase tracking-widest">Awaiting community support...</p>
             </div>
           )}

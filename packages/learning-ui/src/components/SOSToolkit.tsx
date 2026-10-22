@@ -189,7 +189,7 @@ export default function SOSToolkit({
 
             {/* Breathing Phase Text */}
             <div className="z-10 text-center space-y-1">
-              <p className="font-sans font-black text-3xl tracking-tight text-white uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
+              <p className="font-sans font-black text-3xl tracking-tight text-on-primary uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.5)]">
                 {breathPhase}
               </p>
               <p className="font-mono text-xs text-electric-cyan font-bold tracking-widest drop-shadow-[0_2px_4px_rgba(0,0,0,0.5)]">
@@ -282,14 +282,14 @@ export default function SOSToolkit({
                   if (groundingStep === 3 && !inputs.hear.trim()) { alert("Please type your observations first."); return; }
                   setGroundingStep(prev=>prev+1);
                 }}
-                className="px-4 py-2 rounded-lg bg-electric-cyan text-void-black text-xs font-bold uppercase tracking-wider hover:bg-electric-cyan/85 transition-all flex items-center gap-1"
+                className="px-4 py-2 rounded-lg bg-electric-cyan text-on-primary text-xs font-bold uppercase tracking-wider hover:bg-electric-cyan/85 transition-all flex items-center gap-1"
               >
                 Continue <ChevronRight className="w-4 h-4 font-extrabold" />
               </button>
             ) : (
               <button 
                 onClick={() => { setGroundingStep(1); setInputs({see:'', touch:'', hear:'', smell:'', taste:''}); }}
-                className="text-xs text-on-surface-variant hover:text-white font-medium"
+                className="text-xs text-on-surface-variant hover:text-on-surface font-medium"
               >
                 Reset Checklist
               </button>
@@ -349,7 +349,7 @@ export default function SOSToolkit({
                 <button
                   key={idx}
                   onClick={() => handleSelectPrewrittenChat(opt)}
-                  className="px-3 py-1.5 rounded-full bg-void-black/70 border border-glass-stroke text-[10px] text-on-surface-variant hover:border-electric-cyan hover:text-white transition-all text-left"
+                  className="px-3 py-1.5 rounded-full bg-void-black/70 border border-glass-stroke text-[10px] text-on-surface-variant hover:border-electric-cyan hover:text-on-surface transition-all text-left"
                 >
                   {opt}
                 </button>

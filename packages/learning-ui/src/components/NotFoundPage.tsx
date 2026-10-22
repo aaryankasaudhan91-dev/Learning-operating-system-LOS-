@@ -23,7 +23,7 @@ export default function NotFoundPage({ setView }: NotFoundPageProps) {
         </div>
 
         {/* Floating 404 badge */}
-        <div className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full bg-error text-white font-mono text-xs font-black uppercase tracking-widest shadow-lg">
+        <div className="absolute -bottom-2 -right-2 px-3 py-1 rounded-full bg-error text-on-error font-mono text-xs font-black uppercase tracking-widest shadow-lg">
           Error 404
         </div>
       </div>

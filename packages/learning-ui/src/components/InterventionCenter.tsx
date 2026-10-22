@@ -58,10 +58,10 @@ export default function InterventionCenter({ students, onAction }: InterventionC
     <div className="space-y-4">
       <div className="flex items-center justify-between mb-2">
         <h3 className="font-sans font-bold text-base text-on-surface flex items-center gap-2">
-          <AlertTriangle className="w-5 h-5 text-red-500" />
+          <AlertTriangle className="w-5 h-5 text-error" />
           Active Interventions
         </h3>
-        <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-red-400 text-[10px] font-mono font-bold border border-red-500/20">
+        <span className="px-2 py-0.5 rounded-full bg-red-500/10 text-error text-[10px] font-mono font-bold border border-red-500/20">
           {atRiskStudents.length} Students At-Risk
         </span>
       </div>
@@ -92,7 +92,7 @@ export default function InterventionCenter({ students, onAction }: InterventionC
                   </div>
                 </div>
                 <div className="flex flex-col items-end">
-                  <span className="text-[9px] font-mono text-red-400 font-bold">24m Friction</span>
+                  <span className="text-[9px] font-mono text-error font-bold">24m Friction</span>
                   <div className="flex gap-0.5 mt-1">
                     {[1, 2, 3].map(i => (
                       <div key={i} className="w-4 h-1 rounded-full bg-red-500" />

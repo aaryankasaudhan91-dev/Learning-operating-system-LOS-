@@ -24,7 +24,7 @@ export default function AudioNotes({ notes }: AudioNotesProps) {
           >
             <div className="flex items-center gap-4">
               <div className="w-10 h-10 rounded-full bg-plasma-violet flex items-center justify-center shadow-lg shadow-plasma-violet/20 group-hover:scale-110 transition-transform">
-                <Play className="w-5 h-5 text-white fill-white ml-0.5" />
+                <Play className="w-5 h-5 text-on-primary fill-current ml-0.5" />
               </div>
               <div>
                 <p className="text-xs font-bold text-on-surface">Audio Snippet from Mentor</p>
@@ -53,7 +53,7 @@ export default function AudioNotes({ notes }: AudioNotesProps) {
         ))}
 
         {notes.length === 0 && (
-          <div className="py-10 text-center flex flex-col items-center border border-dashed border-glass-stroke rounded-2xl opacity-40">
+          <div className="py-10 text-center flex flex-col items-center border border-dashed border-glass-stroke rounded-2xl text-on-surface-variant">
             <Volume2 className="w-8 h-8 mb-2" />
             <p className="text-[10px] font-mono uppercase tracking-widest">No Audio Notes Present</p>
           </div>

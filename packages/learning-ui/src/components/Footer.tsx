@@ -28,17 +28,17 @@ export default function Footer({ setView }: FooterProps) {
             >
               <AppLogo className="w-9 h-9" showText={false} />
               <span className="font-sans font-black text-xl tracking-tight text-on-surface group-hover:text-electric-cyan transition-colors">
-                LOS <span className="text-xs font-mono font-medium text-electric-cyan ml-1 tracking-widest uppercase">Learner OS</span>
+                Synapse <span className="text-xs font-mono font-medium text-electric-cyan ml-1 tracking-widest uppercase">Space to grow</span>
               </span>
             </div>
 
             <p className="font-sans text-xs md:text-sm text-on-surface-variant max-w-sm leading-relaxed">
-              An intelligent, cognitive operating system engineered to balance working memory load, prevent burnout, and foster sustainable deep learning through real-time telemetry.
+              A student research project that brings lessons, practice, personal goals and focused study into one learning space.
             </p>
 
             <div className="flex items-center gap-2 font-mono text-[11px] text-synapse-green bg-synapse-green/10 border border-synapse-green/20 px-3 py-1.5 rounded-full w-fit">
               <span className="w-2 h-2 rounded-full bg-synapse-green animate-ping" />
-              <span>Telemetry Engine: 100% Operational</span>
+              <span>Built for everyday learning</span>
             </div>
           </div>
 
@@ -53,7 +53,7 @@ export default function Footer({ setView }: FooterProps) {
                   onClick={() => setView('landing')} 
                   className="hover:text-electric-cyan transition-colors cursor-pointer"
                 >
-                  Home Portal
+                  Home
                 </button>
               </li>
               <li>
@@ -61,7 +61,7 @@ export default function Footer({ setView }: FooterProps) {
                   onClick={() => setView('about')} 
                   className="hover:text-electric-cyan transition-colors cursor-pointer"
                 >
-                  About Philosophy
+                  About Synapse
                 </button>
               </li>
               <li>
@@ -77,7 +77,7 @@ export default function Footer({ setView }: FooterProps) {
                   onClick={() => setView('help')} 
                   className="hover:text-electric-cyan transition-colors cursor-pointer"
                 >
-                  Diagnostic Help Desk
+                  Help centre
                 </button>
               </li>
             </ul>
@@ -121,7 +121,7 @@ export default function Footer({ setView }: FooterProps) {
                   onClick={() => setView('404')} 
                   className="hover:text-electric-cyan transition-colors cursor-pointer"
                 >
-                  Diagnostic 404 Node
+                  Page not found
                 </button>
               </li>
             </ul>

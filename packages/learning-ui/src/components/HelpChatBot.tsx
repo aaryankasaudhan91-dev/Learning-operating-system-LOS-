@@ -86,7 +86,7 @@ export default function HelpChatBot({ uid }: HelpChatBotProps) {
       {/* Floating Action Button */}
       <button 
         onClick={() => setIsOpen(true)}
-        className={`fixed bottom-6 right-6 lg:bottom-12 lg:right-12 w-14 h-14 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black flex items-center justify-center shadow-lg shadow-electric-cyan/20 hover:scale-110 active:scale-95 transition-all z-50 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
+        className={`fixed bottom-6 right-6 lg:bottom-12 lg:right-12 w-14 h-14 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-on-primary flex items-center justify-center shadow-lg shadow-electric-cyan/20 hover:scale-110 active:scale-95 transition-all z-50 ${isOpen ? 'scale-0 opacity-0' : 'scale-100 opacity-100'}`}
         title="Synapse AI Support"
       >
         <MessageSquare className="w-6 h-6" />
@@ -109,7 +109,7 @@ export default function HelpChatBot({ uid }: HelpChatBotProps) {
               </p>
             </div>
           </div>
-          <button onClick={() => setIsOpen(false)} className="text-on-surface-variant hover:text-white transition-colors">
+          <button onClick={() => setIsOpen(false)} className="text-on-surface-variant hover:text-on-surface transition-colors">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -131,10 +131,10 @@ export default function HelpChatBot({ uid }: HelpChatBotProps) {
               <div className="w-6 h-6 rounded-full flex items-center justify-center flex-shrink-0 bg-electric-cyan/20 text-electric-cyan">
                 <Bot className="w-3 h-3" />
               </div>
-              <div className="p-3 rounded-2xl bg-white/5 border border-glass-stroke text-white rounded-bl-sm flex items-center gap-1.5 h-8">
-                <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse"></span>
-                <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-150"></span>
-                <span className="w-1.5 h-1.5 bg-white/70 rounded-full animate-pulse delay-300"></span>
+              <div className="p-3 rounded-2xl bg-white/5 border border-glass-stroke text-on-surface rounded-bl-sm flex items-center gap-1.5 h-8">
+                <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse"></span>
+                <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse delay-150"></span>
+                <span className="w-1.5 h-1.5 bg-on-surface-variant rounded-full animate-pulse delay-300"></span>
               </div>
             </div>
           )}

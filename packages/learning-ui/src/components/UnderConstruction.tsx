@@ -36,7 +36,7 @@ export default function UnderConstruction({ setView, featureName }: UnderConstru
       
       <button
         onClick={() => setView('courses')}
-        className="flex items-center gap-3 px-10 py-4 rounded-full bg-plasma-violet text-white font-sans font-extrabold text-xs uppercase tracking-[0.25em] hover:bg-plasma-violet/90 hover:scale-105 transition-all shadow-xl shadow-plasma-violet/20 group"
+        className="flex items-center gap-3 px-10 py-4 rounded-full bg-plasma-violet text-on-primary font-sans font-extrabold text-xs uppercase tracking-[0.25em] hover:bg-plasma-violet/90 hover:scale-105 transition-all shadow-xl shadow-plasma-violet/20 group"
       >
         <ArrowLeft className="w-4 h-4 transition-transform group-hover:-translate-x-2" />
         Back to Course Hub

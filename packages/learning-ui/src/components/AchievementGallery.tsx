@@ -51,7 +51,7 @@ export default function AchievementGallery({ achievements }: AchievementGalleryP
           );
         })}
         {achievements.length === 0 && (
-          <div className="col-span-2 py-8 flex flex-col items-center justify-center border border-dashed border-glass-stroke rounded-xl opacity-40">
+          <div className="col-span-2 py-8 flex flex-col items-center justify-center border border-dashed border-glass-stroke rounded-xl text-on-surface-variant">
             <Star className="w-8 h-8 mb-2" />
             <p className="text-[10px] font-mono uppercase tracking-widest">No Milestones Yet</p>
           </div>

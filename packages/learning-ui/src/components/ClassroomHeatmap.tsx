@@ -49,7 +49,7 @@ export default function ClassroomHeatmap({ seats }: ClassroomHeatmapProps) {
             onClick={() => setShowAtRiskOnly(!showAtRiskOnly)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest transition-all border ${
               showAtRiskOnly 
-                ? 'bg-red-500/20 text-red-400 border-red-500/40' 
+                ? 'bg-red-500/20 text-error border-red-500/40' 
                 : 'bg-white/5 text-on-surface-variant border-glass-stroke hover:border-white/20'
             }`}
           >
@@ -124,7 +124,7 @@ export default function ClassroomHeatmap({ seats }: ClassroomHeatmapProps) {
                   style={{ transform: 'translateZ(100px)' }}
                 >
                   <div className="glass-panel p-3 rounded-2xl border-white/20 shadow-2xl space-y-1">
-                    <p className="text-xs font-bold text-white truncate">{seat.name}</p>
+                    <p className="text-xs font-bold text-on-surface truncate">{seat.name}</p>
                     <div className="flex justify-between items-center">
                       <span className="text-[10px] font-mono text-on-surface-variant uppercase">{getIntensityLabel(seat.load)}</span>
                       <span className="text-xs font-black text-electric-cyan">{seat.load}%</span>
@@ -157,7 +157,7 @@ export default function ClassroomHeatmap({ seats }: ClassroomHeatmapProps) {
         <div className="glass-panel p-5 rounded-2xl border-white/5 space-y-4">
           <h4 className="text-xs font-mono uppercase tracking-widest text-on-surface-variant font-black">Sync Thresholds</h4>
           <p className="text-sm text-on-surface leading-relaxed">
-            Color intensity correlates to synaptic stability. <span className="text-red-400 font-bold">Red peaks</span> indicate areas requiring immediate intervention or breakout tasks.
+            Color intensity correlates to synaptic stability. <span className="text-error font-bold">Red peaks</span> indicate areas requiring immediate intervention or breakout tasks.
           </p>
         </div>
         <div className="glass-panel p-5 rounded-2xl border-white/5 space-y-4">

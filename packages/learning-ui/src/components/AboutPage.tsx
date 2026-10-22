@@ -23,39 +23,39 @@ export default function AboutPage({ setView }: AboutPageProps) {
   const sections = [
     {
       id: 'genesis',
-      title: 'Our Genesis',
-      subtitle: 'Bridging Cognition and Code',
-      description: 'Learner OS was born out of frustration with static educational platforms that treat human brains as standardized containers. We set out to build a platform that respects cognitive limits, measuring mental state in real-time to shape study patterns dynamically.',
+      title: 'Our beginning',
+      subtitle: 'Built around everyday learning',
+      description: 'Synapse began with a simple idea: make learning easier to organise. Lessons, practice, personal goals and focused study belong in one space, with room to move at your own pace.',
       color: 'text-electric-cyan',
       bgColor: 'bg-electric-cyan/10',
       accentColor: '#00e5ff'
     },
     {
       id: 'philosophy',
-      title: 'Cognitive Respect',
-      subtitle: 'Flow over Grind',
-      description: 'We believe learning should feel like play, not a performance trial. Grades and points are secondary to mental wellness and memory state. By removing artificial barriers and prioritizing sustainable focus, we help you lock in deep mastery without the burnout.',
+      title: 'Your own rhythm',
+      subtitle: 'Focus, pause, continue',
+      description: 'A small goal can be a good place to start. Use focused study sessions and take a break when you need one. Learning should fit into your day.',
       color: 'text-plasma-violet',
       bgColor: 'bg-plasma-violet/10',
-      accentColor: '#7c3aed'
+      accentColor: '#efa3ce'
     },
     {
       id: 'architecture',
-      title: 'Telemetry Architecture',
-      subtitle: 'Self-correcting Feedback Loops',
-      description: 'The LOS engine runs on a dynamic double loop: Telemetry logs interaction friction, state analyzers process cognitive capacity, and the UI adapts on the fly. This continuously updates your course structure, preventing mental congestion before it occurs.',
+      title: 'Progress you can revisit',
+      subtitle: 'Saved work, useful feedback',
+      description: 'Submitted work and saved learning activity help you see what you have done. Study independently, or connect with a teacher through an accepted link to share learning activity.',
       color: 'text-synapse-green',
       bgColor: 'bg-synapse-green/10',
       accentColor: '#10b981'
     },
     {
       id: 'pioneers',
-      title: 'The Pioneers',
-      subtitle: 'Humanity-First Science',
-      description: 'Our team comprises cognitive neuroscientists, educational psychologists, and software architects who believe technology should conform to humans, not the other way around. Together, we are engineering the future of human intellectual capability.',
-      color: 'text-amber-500',
-      bgColor: 'bg-amber-500/10',
-      accentColor: '#f59e0b'
+      title: 'The people behind Synapse',
+      subtitle: 'A student research project',
+      description: 'Synapse is a student research project by Aaryan Kasaudhan and Nikhil Pandey. We are exploring thoughtful ways to bring learning tools together and improve them through feedback.',
+      color: 'text-electric-cyan',
+      bgColor: 'bg-electric-cyan/10',
+      accentColor: '#90cafa'
     }
   ];
 
@@ -178,7 +178,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
           ctx.beginPath();
           ctx.arc(centerX, centerY, radius, 0, Math.PI * 2);
-          ctx.strokeStyle = 'rgba(124, 90, 237, 0.08)';
+          ctx.strokeStyle = 'rgba(239, 163, 206, 0.08)';
           ctx.lineWidth = 2;
           ctx.stroke();
 
@@ -188,9 +188,9 @@ export default function AboutPage({ setView }: AboutPageProps) {
 
           ctx.beginPath();
           ctx.arc(nodeX, nodeY, 6, 0, Math.PI * 2);
-          ctx.fillStyle = '#7c3aed';
+          ctx.fillStyle = '#efa3ce';
           ctx.shadowBlur = 12;
-          ctx.shadowColor = '#7c3aed';
+          ctx.shadowColor = '#efa3ce';
           ctx.fill();
           ctx.shadowBlur = 0;
 
@@ -198,7 +198,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
           ctx.beginPath();
           ctx.moveTo(centerX, centerY);
           ctx.lineTo(nodeX, nodeY);
-          ctx.strokeStyle = 'rgba(124, 90, 237, 0.08)';
+          ctx.strokeStyle = 'rgba(239, 163, 206, 0.08)';
           ctx.stroke();
         }
 
@@ -207,11 +207,11 @@ export default function AboutPage({ setView }: AboutPageProps) {
         const opacity = 1 - (time % 80) / 80;
         ctx.beginPath();
         ctx.arc(centerX, centerY, pulseRad, 0, Math.PI * 2);
-        ctx.strokeStyle = `rgba(124, 90, 237, ${opacity * 0.25})`;
+        ctx.strokeStyle = `rgba(239, 163, 206, ${opacity * 0.25})`;
         ctx.stroke();
 
         ctx.font = '700 10px Courier, monospace';
-        ctx.fillStyle = '#7c3aed';
+        ctx.fillStyle = '#efa3ce';
         ctx.fillText('INTEGRITY INDEX: BALANCE', 25, 30);
 
       } else if (activeSection === 'architecture') {
@@ -322,15 +322,15 @@ export default function AboutPage({ setView }: AboutPageProps) {
           // Draw node
           ctx.beginPath();
           ctx.arc(n1.x + wobbleX, n1.y + wobbleY, 5, 0, Math.PI * 2);
-          ctx.fillStyle = '#f59e0b';
+          ctx.fillStyle = '#90cafa';
           ctx.shadowBlur = 10;
-          ctx.shadowColor = '#f59e0b';
+          ctx.shadowColor = '#90cafa';
           ctx.fill();
           ctx.shadowBlur = 0;
         }
 
         ctx.font = '700 10px Courier, monospace';
-        ctx.fillStyle = '#f59e0b';
+        ctx.fillStyle = '#90cafa';
         ctx.fillText('NETWORK MAP: CONSTELLATED', 25, 30);
       }
 
@@ -345,33 +345,33 @@ export default function AboutPage({ setView }: AboutPageProps) {
   const activeColor = sections.find(s => s.id === activeSection)?.accentColor || '#00e5ff';
 
   return (
-    <div ref={containerRef} className="relative min-h-screen bg-void-black text-on-surface select-none pb-24">
+    <div ref={containerRef} className="about-app relative min-h-screen bg-void-black text-on-surface pb-24">
       {/* Scroll Progress Bar (hidden on hero section) */}
       <div 
         className="fixed top-20 left-0 h-1.5 z-50 transition-all duration-150"
         style={{ 
           width: `${scrollProgress * 100}%`,
           opacity: scrollProgress > 0.02 ? 1 : 0,
-          background: 'linear-gradient(90deg, #00e5ff, #7c3aed, #10b981)',
+          background: 'linear-gradient(90deg, #00e5ff, #efa3ce, #10b981)',
           boxShadow: '0 0 12px rgba(0, 229, 255, 0.6)'
         }}
       />
 
       {/* Hero Header with relative positioning */}
-      <section className="relative min-h-[50vh] flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 animate-[fadeIn_0.5s_ease-out]">
+      <section className="about-app-hero relative min-h-[50vh] flex flex-col items-center justify-center text-center px-6 pt-24 pb-16 animate-[fadeIn_0.5s_ease-out]">
         <div className="max-w-3xl space-y-4">
           <span className="font-mono text-xs font-bold tracking-[0.3em] text-electric-cyan uppercase">
-            Cognitive Architects
+            ABOUT SYNAPSE
           </span>
-          <h1 className="font-sans font-black text-4xl md:text-7xl uppercase italic leading-none">
-            About <span className="bg-gradient-to-r from-electric-cyan to-plasma-violet bg-clip-text text-transparent">Learner OS</span>
+          <h1 className="about-app-title font-sans font-semibold leading-tight">
+            About <span className="text-electric-cyan">Synapse</span>
           </h1>
-          <p className="font-sans text-base md:text-lg text-on-surface-variant max-w-xl mx-auto leading-relaxed opacity-80">
-            Discover the philosophy, architecture, and minds behind a system engineered to adapt to human cognitive biology.
+          <p className="font-sans text-base md:text-lg text-on-surface-variant max-w-xl mx-auto leading-relaxed">
+            A learning space built with curiosity, care and room to grow.
           </p>
         </div>
 
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-on-surface-variant animate-bounce opacity-50">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 text-on-surface-variant animate-bounce">
           <span className="font-mono text-[9px] uppercase tracking-[0.2em]">Our Story</span>
           <ChevronDown className="w-4 h-4" />
         </div>
@@ -389,10 +389,10 @@ export default function AboutPage({ setView }: AboutPageProps) {
                 <div 
                   key={sec.id} 
                   id={`sec-${sec.id}`}
-                  className={`transition-all duration-500 min-h-[48vh] flex flex-col justify-center text-left p-6 md:p-8 rounded-3xl ${
+                  className={`about-story-card transition-all duration-500 min-h-[48vh] flex flex-col justify-center text-left p-6 md:p-8 rounded-3xl ${
                     isActive 
-                      ? 'bg-white dark:bg-slate-900 border-2 border-slate-300 dark:border-slate-700 shadow-xl shadow-slate-200/60 dark:shadow-none translate-x-2' 
-                      : 'opacity-40 hover:opacity-75 bg-transparent border-2 border-transparent'
+                      ? 'is-active' 
+                      : 'is-idle'
                   }`}
                 >
                   <div className="space-y-3.5">
@@ -401,7 +401,7 @@ export default function AboutPage({ setView }: AboutPageProps) {
                       {(idx + 1).toString().padStart(2, '0')} / {sections.length.toString().padStart(2, '0')} • {sec.id.toUpperCase()}
                     </span>
                     
-                    <h2 className="font-sans font-black text-2xl md:text-4xl text-on-surface uppercase tracking-tight">
+                    <h2 className="font-sans font-semibold text-2xl md:text-4xl text-on-surface tracking-tight">
                       {sec.title}
                     </h2>
                     
@@ -438,10 +438,10 @@ export default function AboutPage({ setView }: AboutPageProps) {
               <div className="absolute bottom-5 left-7 right-7 flex justify-between items-center font-mono text-[10px] text-slate-300 uppercase tracking-widest border-t border-slate-800/80 pt-3.5 z-20 bg-[#070b14]/90 backdrop-blur-md px-2">
                 <span className="flex items-center gap-2 font-bold text-cyan-400">
                   <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
-                  Telemetry Active
+                  Learning in motion
                 </span>
                 <span className="text-slate-300 font-semibold px-2.5 py-1 rounded bg-slate-800/80 border border-slate-700">
-                  Module: {activeSection.toUpperCase()}
+                  Chapter {sections.findIndex(section => section.id === activeSection) + 1} / {sections.length}
                 </span>
               </div>
             </div>
@@ -456,25 +456,25 @@ export default function AboutPage({ setView }: AboutPageProps) {
           <div className="absolute inset-0 bg-gradient-to-br from-electric-cyan/5 via-plasma-violet/5 to-transparent pointer-events-none" />
           
           <h2 className="font-sans font-black text-3xl md:text-5xl text-on-surface uppercase italic mb-6">
-            Join the Paradigm Shift
+            Make room for your next idea.
           </h2>
           
           <p className="font-sans text-base md:text-lg text-on-surface-variant max-w-2xl mx-auto leading-relaxed mb-10">
-            Ready to explore? Register a signature profile now or enter your secure sync to resume protocols.
+            Sign in to continue learning, or return home to explore Synapse.
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4 justify-center items-center w-full max-w-md mx-auto">
             <button
               onClick={() => setView('login')}
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-white font-extrabold text-sm uppercase tracking-widest hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all cursor-pointer"
+              className="w-full sm:w-auto px-8 py-4 rounded-full bg-gradient-to-r from-electric-cyan to-plasma-violet text-on-primary font-extrabold text-sm uppercase tracking-widest hover:scale-[1.03] hover:shadow-[0_0_35px_rgba(2,132,199,0.35)] active:scale-95 transition-all cursor-pointer"
             >
-              Enter Portal
+              Sign in
             </button>
             <button
               onClick={() => setView('landing')}
               className="w-full sm:w-auto px-8 py-4 rounded-full bg-transparent border border-glass-stroke text-on-surface font-extrabold text-sm uppercase tracking-widest hover:bg-white/5 hover:border-electric-cyan transition-all cursor-pointer"
             >
-              Return Home
+              Return home
             </button>
           </div>
         </div>

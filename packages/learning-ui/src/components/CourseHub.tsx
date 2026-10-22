@@ -512,7 +512,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
             key={cls}
             onClick={() => handleClassSelect(cls)}
             className={`px-6 py-2.5 rounded-full font-sans font-bold text-[10px] uppercase tracking-widest transition-all border cursor-pointer ${selectedClass === cls
-              ? 'bg-plasma-violet border-plasma-violet text-white shadow-lg shadow-plasma-violet/20'
+              ? 'bg-plasma-violet border-plasma-violet text-on-primary shadow-lg shadow-plasma-violet/20'
               : 'bg-white/5 border-glass-stroke text-on-surface-variant hover:border-plasma-violet/40 hover:text-on-surface'
               }`}
           >
@@ -556,14 +556,14 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                 {profile?.role === 'student' ? (
                   "No Course Available"
                 ) : (
-                  <>Course modules for <span className="text-white font-bold">{selectedClass}</span> are currently being synchronized.</>
+                  <>Course modules for <span className="text-on-surface font-bold">{selectedClass}</span> are currently being synchronized.</>
                 )}
               </p>
             </div>
           )}
         </div>
       ) : (
-        <div className="py-32 flex flex-col items-center justify-center text-center opacity-40">
+        <div className="py-32 flex flex-col items-center justify-center text-center text-on-surface-variant">
           <GraduationCap className="w-16 h-16 text-on-surface-variant mb-6" />
           <h3 className="text-2xl font-bold text-on-surface mb-2 tracking-tight uppercase italic">
             {profile?.role === 'student' ? 'No Course Available' : 'Select Academic Grade'}
@@ -582,7 +582,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
     <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-500">
       <button
         onClick={() => setView('selection')}
-        className="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors group mb-6 cursor-pointer"
+        className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors group mb-6 cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span className="text-[10px] font-sans font-bold uppercase tracking-widest">Back to Courses</span>
@@ -599,7 +599,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               {selectedCourse?.subject}
             </span>
           </div>
-          <h2 className="text-4xl font-bold text-white tracking-tight italic">
+          <h2 className="text-4xl font-bold text-on-surface tracking-tight italic">
             {selectedCourse?.title}
           </h2>
         </div>
@@ -624,7 +624,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                   <span className="text-[10px] font-mono text-plasma-violet uppercase tracking-widest font-bold block mb-1">
                     {module.term}
                   </span>
-                  <h3 className="text-xl font-bold text-white">{module.title}</h3>
+                  <h3 className="text-xl font-bold text-on-surface">{module.title}</h3>
                 </div>
                 <div className="w-10 h-10 rounded-full bg-plasma-violet/10 border border-plasma-violet/20 flex items-center justify-center">
                   <Target className="w-5 h-5 text-plasma-violet" />
@@ -660,7 +660,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
         {/* Right Column: Resources & Info */}
         <div className="space-y-6">
           <div className="glass-panel border border-glass-stroke rounded-2xl p-6 bg-white/5">
-            <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-white mb-6">
+            <h4 className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-on-surface mb-6">
               <Layers className="w-4 h-4 text-plasma-violet" />
               Course Structure
             </h4>
@@ -696,7 +696,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           </div>
 
           <div className="glass-panel border border-glass-stroke rounded-2xl p-6 bg-gradient-to-br from-plasma-violet/5 to-transparent bg-white/5">
-            <h4 className="text-[10px] font-bold uppercase tracking-widest text-white mb-4">Recommended Resources</h4>
+            <h4 className="text-[10px] font-bold uppercase tracking-widest text-on-surface mb-4">Recommended Resources</h4>
             <div className="space-y-3">
               <div className="p-3 rounded-xl bg-white/5 border border-glass-stroke hover:bg-white/10 transition-all cursor-pointer">
                 <p className="text-xs font-bold text-on-surface">NCERT Marigold Textbook</p>
@@ -717,7 +717,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
     <div className="max-w-4xl mx-auto space-y-8 animate-in fade-in zoom-in-95 duration-500">
       <button
         onClick={() => setView('details')}
-        className="flex items-center gap-2 text-on-surface-variant hover:text-white transition-colors group cursor-pointer"
+        className="flex items-center gap-2 text-on-surface-variant hover:text-on-surface transition-colors group cursor-pointer"
       >
         <ArrowLeft className="w-4 h-4 group-hover:-translate-x-1 transition-transform" />
         <span className="text-[10px] font-sans font-bold uppercase tracking-widest">Back to Modules</span>
@@ -739,7 +739,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               )}
             </div>
 
-            <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight mb-4 italic">
+            <h1 className="text-4xl md:text-5xl font-bold text-on-surface tracking-tight mb-4 italic">
               {selectedLesson?.topic}
             </h1>
 
@@ -758,7 +758,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               <Target className="w-4 h-4" />
               Learning Outcome
             </h4>
-            <p className="text-xl text-white font-sans leading-relaxed italic">
+            <p className="text-xl text-on-surface font-sans leading-relaxed italic">
               "{selectedLesson?.learningOutcome}"
             </p>
           </div>
@@ -776,11 +776,11 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     onClick={() => setActivePlayingVideo({ title: "Personal Video", url: selectedLesson.personalVideo || "" })}
                     className="flex items-center text-left gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer w-full focus:outline-none"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-red-500 group-hover:scale-110 transition-transform">
+                    <div className="w-10 h-10 rounded-lg bg-red-500/10 border border-red-500/20 flex items-center justify-center text-error group-hover:scale-110 transition-transform">
                       <Video className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Personal Video</p>
+                      <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Personal Video</p>
                       <p className="text-[10px] text-on-surface-variant">Watch teacher's recording</p>
                     </div>
                   </button>
@@ -794,7 +794,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       <PlayCircle className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Video Tutorial</p>
+                      <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Video Tutorial</p>
                       <p className="text-[10px] text-on-surface-variant">External lesson walkthrough</p>
                     </div>
                   </button>
@@ -810,7 +810,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       <FileText className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Study Notes</p>
+                      <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Study Notes</p>
                       <p className="text-[10px] text-on-surface-variant">Download topic materials</p>
                     </div>
                   </a>
@@ -828,7 +828,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       <Target className="w-5 h-5" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Test (Custom)</p>
+                      <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Topic Test (Custom)</p>
                       <p className="text-[10px] text-on-surface-variant">Take interactive quiz</p>
                     </div>
                   </button>
@@ -844,7 +844,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                         <Target className="w-5 h-5" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Test</p>
+                        <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Topic Test</p>
                         <p className="text-[10px] text-on-surface-variant">Take the topic quiz link</p>
                       </div>
                     </a>
@@ -859,11 +859,11 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     }}
                     className="flex items-center text-left gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer w-full focus:outline-none"
                   >
-                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
-                      <BookOpen className="w-5 h-5 text-orange-500" />
+                    <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-warning group-hover:scale-110 transition-transform">
+                      <BookOpen className="w-5 h-5 text-warning" />
                     </div>
                     <div>
-                      <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Homework (Custom)</p>
+                      <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Topic Homework (Custom)</p>
                       <p className="text-[10px] text-on-surface-variant">Solve interactive homework</p>
                     </div>
                   </button>
@@ -875,11 +875,11 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       rel="noopener noreferrer"
                       className="flex items-center gap-3 p-4 rounded-xl bg-white/5 border border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/10 transition-all group cursor-pointer"
                     >
-                      <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-orange-500 group-hover:scale-110 transition-transform">
-                        <BookOpen className="w-5 h-5 text-orange-500" />
+                      <div className="w-10 h-10 rounded-lg bg-orange-500/10 border border-orange-500/20 flex items-center justify-center text-warning group-hover:scale-110 transition-transform">
+                        <BookOpen className="w-5 h-5 text-warning" />
                       </div>
                       <div>
-                        <p className="text-xs font-bold text-white uppercase tracking-wider">Topic Homework</p>
+                        <p className="text-xs font-bold text-on-surface uppercase tracking-wider">Topic Homework</p>
                         <p className="text-[10px] text-on-surface-variant">View homework assignment</p>
                       </div>
                     </a>
@@ -909,7 +909,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                   </div>
                   <div className="flex-1 pb-6">
                     <div className="flex items-center justify-between mb-2">
-                      <h5 className="text-sm font-bold text-white uppercase tracking-wider">{step.step}</h5>
+                      <h5 className="text-sm font-bold text-on-surface uppercase tracking-wider">{step.step}</h5>
                       <span className="text-[10px] font-mono text-on-surface-variant bg-white/5 px-2 py-0.5 rounded border border-glass-stroke">
                         {step.duration}
                       </span>
@@ -953,8 +953,8 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
             onClick={() => setCreatorTab(tab)}
             className={`px-4 py-2 rounded-lg text-[10px] font-bold uppercase tracking-widest transition-all cursor-pointer ${
               creatorTab === tab 
-                ? 'bg-plasma-violet text-white shadow-lg' 
-                : 'bg-white/5 border border-glass-stroke text-on-surface-variant hover:text-white'
+                ? 'bg-plasma-violet text-on-primary shadow-lg' 
+                : 'bg-white/5 border border-glass-stroke text-on-surface-variant hover:text-on-surface'
             }`}
           >
             Create {tab}
@@ -964,7 +964,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
       {creatorTab === 'course' && (
         <form onSubmit={handleAddCourse} className="glass-panel border border-glass-stroke rounded-2xl p-8 bg-white/5 space-y-6">
-          <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider italic">Create New Course</h3>
+          <h3 className="text-xl font-bold text-on-surface mb-4 uppercase tracking-wider italic">Create New Course</h3>
           
           <div>
             <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-2">Class Level</label>
@@ -1013,7 +1013,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             Deploy Course
           </button>
@@ -1022,7 +1022,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
       {creatorTab === 'module' && (
         <form onSubmit={handleAddModule} className="glass-panel border border-glass-stroke rounded-2xl p-8 bg-white/5 space-y-6">
-          <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider italic">Add Module to Syllabus</h3>
+          <h3 className="text-xl font-bold text-on-surface mb-4 uppercase tracking-wider italic">Add Module to Syllabus</h3>
 
           <div>
             <label className="block text-[10px] font-mono text-on-surface-variant uppercase tracking-widest font-bold mb-2">Select Parent Course</label>
@@ -1073,7 +1073,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             Deploy Module
           </button>
@@ -1082,7 +1082,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
       {creatorTab === 'lesson' && (
         <form onSubmit={handleAddLesson} className="glass-panel border border-glass-stroke rounded-2xl p-8 bg-white/5 space-y-6">
-          <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider italic">Add Topic / Lesson</h3>
+          <h3 className="text-xl font-bold text-on-surface mb-4 uppercase tracking-wider italic">Add Topic / Lesson</h3>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div>
@@ -1203,7 +1203,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     <button
                       type="button"
                       onClick={() => setNewLessonTestType('link')}
-                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonTestType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonTestType === 'link' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                     >
                       Web Link
                     </button>
@@ -1218,7 +1218,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                           setShowTestMaker(true);
                         }
                       }}
-                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonTestType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonTestType === 'custom' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                     >
                       Interactive Maker
                     </button>
@@ -1238,7 +1238,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     <div className="text-xs">
                       {newLessonTestCustom ? (
                         <div>
-                          <p className="font-bold text-white">{newLessonTestCustom.title}</p>
+                          <p className="font-bold text-on-surface">{newLessonTestCustom.title}</p>
                           <p className="text-[10px] text-on-surface-variant">{newLessonTestCustom.questions.length} Questions configured</p>
                         </div>
                       ) : (
@@ -1274,7 +1274,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     <button
                       type="button"
                       onClick={() => setNewLessonHomeworkType('link')}
-                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonHomeworkType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonHomeworkType === 'link' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                     >
                       Web Link
                     </button>
@@ -1289,7 +1289,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                           setShowHomeworkMaker(true);
                         }
                       }}
-                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonHomeworkType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                      className={`px-3 py-1 rounded-md text-[9px] font-mono font-bold uppercase tracking-wider transition-all ${newLessonHomeworkType === 'custom' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                     >
                       Interactive Maker
                     </button>
@@ -1309,7 +1309,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     <div className="text-xs">
                       {newLessonHomeworkCustom ? (
                         <div>
-                          <p className="font-bold text-white">{newLessonHomeworkCustom.title}</p>
+                          <p className="font-bold text-on-surface">{newLessonHomeworkCustom.title}</p>
                           <p className="text-[10px] text-on-surface-variant">{newLessonHomeworkCustom.questions.length} problems configured</p>
                         </div>
                       ) : (
@@ -1383,7 +1383,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
           <button
             type="submit"
-            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all cursor-pointer"
+            className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all cursor-pointer"
           >
             Deploy Topic / Lesson
           </button>
@@ -1414,25 +1414,25 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           {/* Left/Middle Columns: Profile and Courses */}
           <div className="lg:col-span-2 space-y-8">
             <div className="glass-panel border border-glass-stroke rounded-2xl p-6 bg-white/5">
-              <h3 className="text-xl font-bold text-white mb-4 uppercase tracking-wider italic">Student Profile</h3>
+              <h3 className="text-xl font-bold text-on-surface mb-4 uppercase tracking-wider italic">Student Profile</h3>
               <div className="grid grid-cols-2 gap-4 text-xs font-sans mb-6">
                 <div>
                   <p className="text-on-surface-variant font-bold">Full Name:</p>
-                  <p className="text-white text-sm mt-0.5">{selectedStudent.fullName}</p>
+                  <p className="text-on-surface text-sm mt-0.5">{selectedStudent.fullName}</p>
                 </div>
                 <div>
                   <p className="text-on-surface-variant font-bold">Email:</p>
-                  <p className="text-white text-sm mt-0.5">{selectedStudent.email}</p>
+                  <p className="text-on-surface text-sm mt-0.5">{selectedStudent.email}</p>
                 </div>
                 <div>
                   <p className="text-on-surface-variant font-bold">Class Grade:</p>
-                  <p className="text-white text-sm mt-0.5">
+                  <p className="text-on-surface text-sm mt-0.5">
                     {selectedStudent.academicInfo?.className ? `Class ${selectedStudent.academicInfo.className}` : 'Unassigned'}
                   </p>
                 </div>
                 <div>
                   <p className="text-on-surface-variant font-bold">Cognitive Load:</p>
-                  <p className="text-white text-sm mt-0.5">{selectedStudent.cognitiveLoad}%</p>
+                  <p className="text-on-surface text-sm mt-0.5">{selectedStudent.cognitiveLoad}%</p>
                 </div>
               </div>
 
@@ -1470,7 +1470,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       <div className="w-10 h-10 rounded-xl bg-plasma-violet/10 border border-plasma-violet/20 flex items-center justify-center mb-4">
                         <Book className="w-5 h-5 text-plasma-violet" />
                       </div>
-                      <h4 className="text-lg font-bold text-white mb-2">{course.subject}</h4>
+                      <h4 className="text-lg font-bold text-on-surface mb-2">{course.subject}</h4>
                       <p className="text-xs text-on-surface-variant leading-relaxed mb-4">{course.title}</p>
                       <div className="text-[9px] font-mono text-plasma-violet uppercase tracking-widest font-bold flex items-center">
                         Inspect Syllabus <ChevronRight className="ml-1 w-3 h-3 group-hover:translate-x-1 transition-transform" />
@@ -1489,7 +1489,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           {/* Right Column: Quick Add Topic/Lesson Form */}
           <div className="space-y-6">
             <form onSubmit={handleAddQuickLesson} className="glass-panel border border-glass-stroke rounded-2xl p-6 bg-white/5 space-y-4">
-              <h4 className="text-base font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+              <h4 className="text-base font-bold text-on-surface uppercase tracking-wider italic flex items-center gap-2">
                 <Plus className="w-5 h-5 text-plasma-violet" />
                 Add Lesson to Student Course
               </h4>
@@ -1634,7 +1634,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                             <button
                               type="button"
                               onClick={() => setQuickLessonTestType('link')}
-                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonTestType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonTestType === 'link' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                             >
                               Link
                             </button>
@@ -1649,7 +1649,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                                   setShowTestMaker(true);
                                 }
                               }}
-                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonTestType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonTestType === 'custom' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                             >
                               Custom
                             </button>
@@ -1669,7 +1669,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                             <div className="text-[10px]">
                               {quickLessonTestCustom ? (
                                 <div>
-                                  <p className="font-bold text-white truncate max-w-[120px]">{quickLessonTestCustom.title}</p>
+                                  <p className="font-bold text-on-surface truncate max-w-[120px]">{quickLessonTestCustom.title}</p>
                                   <p className="text-[8px] text-on-surface-variant">{quickLessonTestCustom.questions.length} Qs</p>
                                 </div>
                               ) : (
@@ -1705,7 +1705,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                             <button
                               type="button"
                               onClick={() => setQuickLessonHomeworkType('link')}
-                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonHomeworkType === 'link' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonHomeworkType === 'link' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                             >
                               Link
                             </button>
@@ -1720,7 +1720,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                                   setShowHomeworkMaker(true);
                                 }
                               }}
-                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonHomeworkType === 'custom' ? 'bg-plasma-violet text-white shadow-sm' : 'text-on-surface-variant hover:text-white'}`}
+                              className={`px-2 py-0.5 rounded text-[8px] font-mono font-bold uppercase tracking-wider transition-all ${quickLessonHomeworkType === 'custom' ? 'bg-plasma-violet text-on-primary shadow-sm' : 'text-on-surface-variant hover:text-on-surface'}`}
                             >
                               Custom
                             </button>
@@ -1740,7 +1740,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                             <div className="text-[10px]">
                               {quickLessonHomeworkCustom ? (
                                 <div>
-                                  <p className="font-bold text-white truncate max-w-[120px]">{quickLessonHomeworkCustom.title}</p>
+                                  <p className="font-bold text-on-surface truncate max-w-[120px]">{quickLessonHomeworkCustom.title}</p>
                                   <p className="text-[8px] text-on-surface-variant">{quickLessonHomeworkCustom.questions.length} Tasks</p>
                                 </div>
                               ) : (
@@ -1770,7 +1770,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
                       <button
                         type="submit"
-                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-[10px] font-bold uppercase tracking-widest hover:scale-102 active:scale-98 transition-all cursor-pointer mt-2"
+                        className="w-full py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-[10px] font-bold uppercase tracking-widest hover:scale-102 active:scale-98 transition-all cursor-pointer mt-2"
                       >
                         Deploy Topic / Lesson
                       </button>
@@ -1782,7 +1782,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           </div>
         </div>
       ) : (
-        <div className="py-20 flex flex-col items-center justify-center text-center opacity-40">
+        <div className="py-20 flex flex-col items-center justify-center text-center text-on-surface-variant">
           <Users className="w-12 h-12 text-on-surface-variant mb-4" />
           <p className="text-xs text-on-surface-variant">Select a student above to inspect their assigned courses and study paths.</p>
         </div>
@@ -1858,13 +1858,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
         <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+            <h3 className="text-lg font-bold text-on-surface uppercase tracking-wider italic flex items-center gap-2">
               <Target className="w-5 h-5 text-plasma-violet" />
               Interactive Test / Quiz Maker
             </h3>
             <button
               onClick={() => setShowTestMaker(false)}
-              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+              className="text-on-surface-variant hover:text-on-surface transition-colors text-sm font-bold"
             >
               ✕
             </button>
@@ -1917,7 +1917,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                           updated.splice(idx, 1);
                           setTestMakerQuestions(updated);
                         }}
-                        className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase"
+                        className="text-error hover:text-error text-[10px] font-bold uppercase"
                       >
                         Delete
                       </button>
@@ -1973,7 +1973,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               onClick={() => {
                 setTestMakerQuestions([...testMakerQuestions, { question: '', options: ['', '', '', ''], correctOptionIndex: 0 }]);
               }}
-              className="w-full py-2 rounded-xl border border-dashed border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/5 text-on-surface-variant hover:text-white transition-all text-xs font-bold"
+              className="w-full py-2 rounded-xl border border-dashed border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/5 text-on-surface-variant hover:text-on-surface transition-all text-xs font-bold"
             >
               + Add Question
             </button>
@@ -2010,7 +2010,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                 }
                 setShowTestMaker(false);
               }}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
             >
               Save Quiz Config
             </button>
@@ -2026,13 +2026,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
         <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+            <h3 className="text-lg font-bold text-on-surface uppercase tracking-wider italic flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-plasma-violet" />
               Interactive Homework assignment Maker
             </h3>
             <button
               onClick={() => setShowHomeworkMaker(false)}
-              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+              className="text-on-surface-variant hover:text-on-surface transition-colors text-sm font-bold"
             >
               ✕
             </button>
@@ -2085,7 +2085,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                           updated.splice(idx, 1);
                           setHomeworkMakerQuestions(updated);
                         }}
-                        className="text-red-500 hover:text-red-400 text-[10px] font-bold uppercase"
+                        className="text-error hover:text-error text-[10px] font-bold uppercase"
                       >
                         Delete
                       </button>
@@ -2112,7 +2112,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               onClick={() => {
                 setHomeworkMakerQuestions([...homeworkMakerQuestions, '']);
               }}
-              className="w-full py-2 rounded-xl border border-dashed border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/5 text-on-surface-variant hover:text-white transition-all text-xs font-bold"
+              className="w-full py-2 rounded-xl border border-dashed border-glass-stroke hover:border-plasma-violet/40 hover:bg-white/5 text-on-surface-variant hover:text-on-surface transition-all text-xs font-bold"
             >
               + Add Problem Task
             </button>
@@ -2149,7 +2149,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                 }
                 setShowHomeworkMaker(false);
               }}
-              className="px-5 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+              className="px-5 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
             >
               Save Homework Config
             </button>
@@ -2165,13 +2165,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
         <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+            <h3 className="text-lg font-bold text-on-surface uppercase tracking-wider italic flex items-center gap-2">
               <Target className="w-5 h-5 text-plasma-violet" />
               {activeTakingTest.title}
             </h3>
             <button
               onClick={() => setActiveTakingTest(null)}
-              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+              className="text-on-surface-variant hover:text-on-surface transition-colors text-sm font-bold"
             >
               ✕
             </button>
@@ -2186,7 +2186,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
 
               return (
                 <div key={idx} className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3">
-                  <p className="text-sm font-bold text-white font-sans">
+                  <p className="text-sm font-bold text-on-surface font-sans">
                     {idx + 1}. {q.question}
                   </p>
 
@@ -2197,11 +2197,11 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                         if (optIdx === correctOption) {
                           btnStyle = "bg-green-500/20 border-green-500/50 text-green-400 font-bold";
                         } else if (optIdx === selectedIdx && !isCorrect) {
-                          btnStyle = "bg-red-500/20 border-red-500/50 text-red-400 font-bold";
+                          btnStyle = "bg-red-500/20 border-red-500/50 text-error font-bold";
                         }
                       } else {
                         if (selectedIdx === optIdx) {
-                          btnStyle = "bg-plasma-violet/20 border-plasma-violet text-white font-bold";
+                          btnStyle = "bg-plasma-violet/20 border-plasma-violet text-on-surface font-bold";
                         }
                       }
 
@@ -2231,7 +2231,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       {isCorrect ? (
                         <span className="text-green-400 font-bold">✓ Correct Answer</span>
                       ) : (
-                        <span className="text-red-400 font-bold">✗ Incorrect (Correct: {q.options[correctOption!]})</span>
+                        <span className="text-error font-bold">✗ Incorrect (Correct: {q.options[correctOption!]})</span>
                       )}
                     </div>
                   )}
@@ -2243,7 +2243,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           {quizScore && (
             <div className="p-4 rounded-xl bg-plasma-violet/10 border border-plasma-violet/30 text-center space-y-2">
               <p className="text-xs uppercase font-mono tracking-widest text-plasma-violet font-bold">Quiz Results</p>
-              <h4 className="text-3xl font-extrabold text-white">
+              <h4 className="text-3xl font-extrabold text-on-surface">
                 {quizScore.score} / {quizScore.total}
               </h4>
               <p className="text-xs text-on-surface-variant italic">
@@ -2257,7 +2257,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               <button
                 type="button"
                 onClick={() => setActiveTakingTest(null)}
-                className="px-6 py-2 rounded-xl bg-plasma-violet text-white text-xs font-bold uppercase tracking-wider transition-all"
+                className="px-6 py-2 rounded-xl bg-plasma-violet text-on-primary text-xs font-bold uppercase tracking-wider transition-all"
               >
                 Close Results
               </button>
@@ -2287,7 +2287,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                       setQuizScore({score:result.score,total:result.total,submitted:true,correctOptions:result.correctOptions});
                     }catch{alert('Quiz was not submitted. Your answers remain here; please retry.')}})();
                   }}
-                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
                 >
                   Submit Quiz
                 </button>
@@ -2305,13 +2305,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/80 backdrop-blur-md p-4 overflow-y-auto">
         <div className="relative w-full max-w-2xl bg-void-black border border-glass-stroke rounded-2xl p-6 shadow-2xl space-y-6 my-8 max-h-[90vh] overflow-y-auto">
           <div className="flex justify-between items-center border-b border-glass-stroke pb-3">
-            <h3 className="text-lg font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+            <h3 className="text-lg font-bold text-on-surface uppercase tracking-wider italic flex items-center gap-2">
               <BookOpen className="w-5 h-5 text-plasma-violet" />
               {activeTakingHomework.title}
             </h3>
             <button
               onClick={() => setActiveTakingHomework(null)}
-              className="text-on-surface-variant hover:text-white transition-colors text-sm font-bold"
+              className="text-on-surface-variant hover:text-on-surface transition-colors text-sm font-bold"
             >
               ✕
             </button>
@@ -2320,7 +2320,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
           <div className="space-y-6 overflow-y-auto max-h-[50vh] pr-2">
             {activeTakingHomework.questions.map((q: string, idx: number) => (
               <div key={idx} className="p-4 rounded-xl bg-white/5 border border-glass-stroke space-y-3">
-                <p className="text-sm font-bold text-white font-sans leading-relaxed">
+                <p className="text-sm font-bold text-on-surface font-sans leading-relaxed">
                   {idx + 1}. {q}
                 </p>
 
@@ -2354,7 +2354,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
               <button
                 type="button"
                 onClick={() => setActiveTakingHomework(null)}
-                className="px-6 py-2 rounded-xl bg-green-600 text-white text-xs font-bold uppercase tracking-wider transition-all"
+                className="px-6 py-2 rounded-xl bg-green-600 text-on-surface text-xs font-bold uppercase tracking-wider transition-all"
               >
                 Done
               </button>
@@ -2378,7 +2378,7 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
                     }
                     void (async()=>{try{if(!selectedLesson)throw new Error();const response=await apiFetch(`/api/lessons/${selectedLesson.id}/submissions`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({kind:'homework',responses:studentHomeworkAnswers})});if(!response.ok)throw new Error();setHwSubmitted(true)}catch{alert('Homework was not submitted. Your answers remain here; please retry.')}})();
                   }}
-                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
+                  className="px-6 py-2 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary text-xs font-bold uppercase tracking-wider hover:scale-102 transition-all"
                 >
                   Submit Homework
                 </button>
@@ -2409,13 +2409,13 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
       <div className="fixed inset-0 z-50 flex items-center justify-center bg-void-black/90 backdrop-blur-md p-4">
         <div className="relative w-full max-w-4xl bg-void-black border border-glass-stroke rounded-2xl overflow-hidden shadow-2xl space-y-4 p-4">
           <div className="flex justify-between items-center border-b border-glass-stroke pb-2">
-            <h3 className="text-xs font-bold text-white uppercase tracking-wider italic flex items-center gap-2">
+            <h3 className="text-xs font-bold text-on-surface uppercase tracking-wider italic flex items-center gap-2">
               <PlayCircle className="w-5 h-5 text-plasma-violet" />
               {activePlayingVideo.title}
             </h3>
             <button
               onClick={() => setActivePlayingVideo(null)}
-              className="text-on-surface-variant hover:text-white transition-colors text-xs font-bold p-1"
+              className="text-on-surface-variant hover:text-on-surface transition-colors text-xs font-bold p-1"
             >
               ✕ Close
             </button>
@@ -2476,8 +2476,8 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
             onClick={() => { setMentorMode('explorer'); setView('selection'); }}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
               mentorMode === 'explorer' 
-                ? 'bg-plasma-violet text-white shadow-lg' 
-                : 'text-on-surface-variant hover:text-white bg-white/5'
+                ? 'bg-plasma-violet text-on-primary shadow-lg' 
+                : 'text-on-surface-variant hover:text-on-surface bg-white/5'
             }`}
           >
             Course Explorer
@@ -2486,8 +2486,8 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
             onClick={() => setMentorMode('creator')}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
               mentorMode === 'creator' 
-                ? 'bg-plasma-violet text-white shadow-lg' 
-                : 'text-on-surface-variant hover:text-white bg-white/5'
+                ? 'bg-plasma-violet text-on-primary shadow-lg' 
+                : 'text-on-surface-variant hover:text-on-surface bg-white/5'
             }`}
           >
             Course Creator
@@ -2496,8 +2496,8 @@ export default function CourseHub({ profile: propProfile, loading: propLoading }
             onClick={() => setMentorMode('students')}
             className={`px-4 py-2 rounded-xl text-xs font-bold uppercase tracking-wider transition-all cursor-pointer ${
               mentorMode === 'students' 
-                ? 'bg-plasma-violet text-white shadow-lg' 
-                : 'text-on-surface-variant hover:text-white bg-white/5'
+                ? 'bg-plasma-violet text-on-primary shadow-lg' 
+                : 'text-on-surface-variant hover:text-on-surface bg-white/5'
             }`}
           >
             Student Courses

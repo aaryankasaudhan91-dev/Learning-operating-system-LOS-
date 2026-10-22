@@ -128,7 +128,7 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
           <div className="bg-surface-container w-full max-w-2xl rounded-2xl border border-glass-stroke p-6 shadow-2xl relative">
             <button 
               onClick={() => { setActiveQuiz(null); setQuizAnswer(''); }}
-              className="absolute top-4 right-4 text-on-surface-variant hover:text-white"
+              className="absolute top-4 right-4 text-on-surface-variant hover:text-on-surface"
             >
               ×
             </button>
@@ -146,7 +146,7 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
               <button 
                 onClick={handleQuizSubmit}
                 disabled={!quizAnswer.trim()}
-                className="w-full py-3 bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
+                className="w-full py-3 bg-gradient-to-r from-electric-cyan to-plasma-violet text-on-primary font-bold rounded-xl hover:opacity-90 disabled:opacity-50 transition-opacity"
               >
                 Submit Answer
               </button>
@@ -205,7 +205,7 @@ export default function StudentTaskBoard({ onStatusChange }: StudentTaskBoardPro
                 ) : task.status === 'in-progress' ? (
                   <RefreshCw className="w-5 h-5 text-electric-cyan animate-spin-slow" />
                 ) : (
-                  <Circle className={`w-5 h-5 text-on-surface-variant ${!isQuiz && 'group-hover:text-white'} transition-colors`} />
+                  <Circle className={`w-5 h-5 text-on-surface-variant ${!isQuiz && 'group-hover:text-on-surface'} transition-colors`} />
                 )}
               </div>
               <div className="flex-1">

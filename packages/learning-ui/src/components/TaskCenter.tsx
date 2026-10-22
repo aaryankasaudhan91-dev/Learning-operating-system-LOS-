@@ -183,7 +183,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
         </div>
         <button 
           onClick={() => setIsAdding(!isAdding)}
-          className="flex items-center gap-2 px-4 py-2 rounded-full bg-plasma-violet text-white text-sm font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-plasma-violet/20"
+          className="flex items-center gap-2 px-4 py-2 rounded-full bg-plasma-violet text-on-primary text-sm font-bold hover:scale-105 active:scale-95 transition-all shadow-lg shadow-plasma-violet/20"
         >
           {isAdding ? 'Cancel' : <><Plus className="w-4 h-4" /> New Task</>}
         </button>
@@ -235,7 +235,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
                   type="button"
                   onClick={handleGenerateAI}
                   disabled={isGenerating}
-                  className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-plasma-violet/95 to-electric-cyan/95 text-white text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed shadow-md shadow-electric-cyan/10"
+                  className="w-full flex items-center justify-center gap-2 px-4 py-2 rounded-lg bg-gradient-to-r from-plasma-violet/95 to-electric-cyan/95 text-on-primary text-xs font-bold hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50 disabled:scale-100 cursor-pointer disabled:cursor-not-allowed shadow-md shadow-electric-cyan/10"
                 >
                   {isGenerating ? (
                     <>
@@ -253,7 +253,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
             </div>
 
             {aiError && (
-              <p className="text-[10px] text-red-400 font-medium">{aiError}</p>
+              <p className="text-[10px] text-error font-medium">{aiError}</p>
             )}
             
             <p className="text-[9px] text-on-surface-variant/80 italic">
@@ -317,7 +317,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
             <div className="flex items-end">
               <button 
                 type="submit"
-                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-white font-bold text-sm shadow-lg shadow-plasma-violet/20 hover:opacity-90 active:scale-[0.98] transition-all"
+                className="w-full py-2.5 rounded-xl bg-gradient-to-r from-plasma-violet to-electric-cyan text-on-primary font-bold text-sm shadow-lg shadow-plasma-violet/20 hover:opacity-90 active:scale-[0.98] transition-all"
               >
                 Launch Task
               </button>
@@ -354,7 +354,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
                 </div>
                 <button 
                   onClick={() => handleDeleteTask(task.id)}
-                  className="p-2 rounded-full hover:bg-red-500/10 text-on-surface-variant hover:text-red-400 transition-all opacity-0 group-hover:opacity-100"
+                  className="p-2 rounded-full hover:bg-red-500/10 text-on-surface-variant hover:text-error transition-all opacity-0 group-hover:opacity-100"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
@@ -373,7 +373,7 @@ export default function TaskCenter({ seats, addNotification }: TaskCenterProps) 
 
                 <div className="flex items-center gap-2">
                   <div className="w-8 h-8 rounded-full bg-surface-container flex items-center justify-center">
-                    <Clock className="w-4 h-4 text-orange-400" />
+                    <Clock className="w-4 h-4 text-warning" />
                   </div>
                   <div>
                     <p className="text-[10px] uppercase tracking-widest text-on-surface-variant font-bold leading-none">Dead-line</p>

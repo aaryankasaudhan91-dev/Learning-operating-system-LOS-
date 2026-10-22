@@ -19,7 +19,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
           <div className="flex items-center gap-3">
             <BookOpen className="w-6 h-6 text-plasma-violet" />
             <div>
-              <h2 className="text-lg font-bold text-white">
+              <h2 className="text-lg font-bold text-on-surface">
                 {userRole === 'student' ? 'Student Cockpit Operational Manual' : 'Mentor Console Administration Manual'}
               </h2>
               <p className="text-[10px] font-mono text-on-surface-variant uppercase tracking-wider mt-0.5">
@@ -29,7 +29,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
           </div>
           <button 
             onClick={onClose} 
-            className="text-on-surface-variant hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
+            className="text-on-surface-variant hover:text-on-surface transition-colors p-1.5 rounded-lg hover:bg-white/5 cursor-pointer"
           >
             <X className="w-5 h-5" />
           </button>
@@ -41,7 +41,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
             /* Student Manual */
             <>
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
                   <Brain className="w-4 h-4 text-electric-cyan" /> 
                   1. Cognitive Map & Task Optimization
                 </h3>
@@ -51,8 +51,8 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-orange-400" /> 
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-warning" /> 
                   2. Course Hub & Custom Tests
                 </h3>
                 <p>
@@ -61,7 +61,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
                   <Terminal className="w-4 h-4 text-synapse-green" /> 
                   3. Focus Chamber & Deep Work
                 </h3>
@@ -71,8 +71,8 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
-                  <Heart className="w-4 h-4 text-red-400" /> 
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
+                  <Heart className="w-4 h-4 text-error" /> 
                   4. Mental Health & Emergency SOS Panel
                 </h3>
                 <p>
@@ -84,7 +84,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
             /* Mentor Manual */
             <>
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
                   <Cpu className="w-4 h-4 text-plasma-violet" /> 
                   1. Cohort Seating Grid & Real-time State
                 </h3>
@@ -94,7 +94,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
                   <Sliders className="w-4 h-4 text-electric-cyan" /> 
                   2. Active Interventions & Broadcast Prompts
                 </h3>
@@ -104,8 +104,8 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
-                  <Layers className="w-4 h-4 text-orange-400" /> 
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
+                  <Layers className="w-4 h-4 text-warning" /> 
                   3. Course Creation & Assessment Design
                 </h3>
                 <p>
@@ -114,7 +114,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
               </div>
 
               <div className="space-y-2">
-                <h3 className="text-white font-bold flex items-center gap-2">
+                <h3 className="text-on-surface font-bold flex items-center gap-2">
                   <Shield className="w-4 h-4 text-synapse-green" /> 
                   4. AI Orchestration & Generation
                 </h3>
@@ -130,7 +130,7 @@ export default function ManualModal({ isOpen, onClose, userRole }: ManualModalPr
         <div className="p-4 bg-surface-container-high border-t border-glass-stroke flex justify-end">
           <button 
             onClick={onClose}
-            className="px-5 py-2 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-void-black font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
+            className="px-5 py-2 rounded-xl bg-gradient-to-r from-electric-cyan to-plasma-violet text-on-primary font-bold text-xs hover:scale-[1.02] active:scale-95 transition-all cursor-pointer"
           >
             Acknowledge & Close
           </button>
