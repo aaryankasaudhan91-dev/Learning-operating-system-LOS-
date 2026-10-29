@@ -20,7 +20,7 @@ Authenticated `/api/assistant/privacy` GET/PUT/DELETE endpoints manage only the 
 
 Cloud AI and public web reading remain unavailable. The interface can save both as off or remove that record. It cannot collect a future grant for an unspecified provider. Deleting a record keeps both off. Future integration must ask again under its current notice and check provider/audience eligibility.
 
-**All optional provider-backed AI endpoints are now paused on the server**, including previously configured providers. The denial happens before quota reservations or provider requests. This is deliberate: configuring an API key does not establish consent. Core login, courses, focus sessions and progress APIs remain in place. Local commands do not need a backend connection or a provider key.
+**All optional provider-backed AI endpoints are now paused on the server**, including previously configured providers. The denial happens before quota reservations or provider requests. This is deliberate: configuring an API key does not establish consent. The shared frontend also refuses agent requests before sending them, including when connected to an older backend. Restart/redeploy the backend to enforce the server-side controls for other clients. Core login, courses, focus sessions and progress APIs remain in place. Local commands do not need a backend connection or a provider key.
 
 ## Verification
 

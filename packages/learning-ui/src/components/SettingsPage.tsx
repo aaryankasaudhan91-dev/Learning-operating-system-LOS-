@@ -18,7 +18,7 @@ export default function SettingsPage({setView,userRole,account}:{setView:(view:A
  useEffect(()=>{void refresh();return watchConnection(setState)},[account]);
  return <section className="real-form page-opening"><span className="editorial-kicker">YOUR WORKSPACE</span><h1>Settings.</h1>
   <p>Change your appearance with the theme switch in the navigation.</p><p>Live connection: <strong>{state}</strong></p>
-  {capabilities&&<p>Cloud AI: disabled until consent and provider checks are ready.</p>}
+  {capabilities&&<p>{capabilities.ai?.enabled===false?'Cloud AI: disabled until consent and provider checks are ready.':'Cloud requests are paused in this app. Update the connected backend to apply server privacy controls.'}</p>}
   {local&&<p>Local model: <strong>{local.local==='ready'?'Ready on this device':local.local==='invalid'?'Files need repair':'Not installed for this device'}</strong>.</p>}
   {error&&<p role="alert">{error}</p>}
   <button className="ink-button" disabled={busy} onClick={()=>void refresh()}>{busy?'Checking…':'Refresh service status'}</button>

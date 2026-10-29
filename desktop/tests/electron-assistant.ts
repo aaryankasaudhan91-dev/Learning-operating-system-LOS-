@@ -8,6 +8,7 @@ import {pathToFileURL} from 'node:url';
 import {attachAssistant} from '../assistant/ipc';
 import {createLocalRuntime} from '../assistant/runtime';
 import {PrivacyStore} from '../assistant/privacy-store';
+if(process.env.SYNAPSE_TEST_PROFILE)app.setPath('userData',process.env.SYNAPSE_TEST_PROFILE);
 app.on('window-all-closed',()=>{});
 app.whenReady().then(async()=>{
  const temporary=await mkdtemp(path.join(os.tmpdir(),'synapse-privacy-ipc-'));
@@ -100,6 +101,6 @@ app.whenReady().then(async()=>{
   await waitFor(focus,'window.focusWrites===1');
   console.log('Electron/privacy/UI checks passed: isolated accounts, saved opt-out, wrong window/document, cancellation, reload, settings recovery, content clearing, preference removal, and explicit focus Start.');
   result=0;
- }catch(error){console.error(error)}
+ }catch(error){console.error(error);const last=windows[windows.length-1];if(last && !last.isDestroyed())console.error(await last.webContents.executeJavaScript("({privacy:document.querySelector('.assistant-privacy-settings')?.textContent,checkbox:document.querySelector('.assistant-privacy-toggle input')?.checked})"))}
  finally{if(process.env.SYNAPSE_ASSISTANT_RESULT)await writeFile(process.env.SYNAPSE_ASSISTANT_RESULT,JSON.stringify({ok:result===0}));dispose?.();for(const window of windows)if(!window.isDestroyed())window.destroy();await rm(temporary,{recursive:true,force:true});app.exit(result)}
 });
