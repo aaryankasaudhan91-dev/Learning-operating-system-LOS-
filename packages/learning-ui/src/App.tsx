@@ -1,3 +1,4 @@
+import {bindAssistantAccount, useAssistantPrivacy} from './services/assistant-privacy.service';
 import { apiFetch } from './services/http';
 import { watchResource } from './services/realtime';
 /**
@@ -45,6 +46,7 @@ const NotFoundPage = lazy(() => import('./components/NotFoundPage'));
 function ViewLoadingFallback(){return <AppLoading label="Opening your next view…"/>}
 
 export default function App() {
+  const assistantPrivacy=useAssistantPrivacy();
   const [currentView, setView] = useState<AppView>('landing');
   const [focusDraft, setFocusDraft] = useState<FocusDraft | null>(null);
   const [userRole, setUserRole] = useState<'student' | 'mentor'>('student');
@@ -218,11 +220,12 @@ export default function App() {
   },[currentUser?.uid,userRole]);
 
   useEffect(()=>{
-    const publicViews=['landing','about','privacy','terms','404','login','register'];
+    const publicViews=['landing','about','privacy','terms','404','login','register','settings'];
     if(!authLoading && !currentUser && !publicViews.includes(currentView))setView('login');
   },[authLoading,currentUser,currentView]);
 
-  useEffect(() => {setFocusDraft(null)}, [currentUser?.uid]);
+  useEffect(() => {void bindAssistantAccount(currentUser?.uid)}, [currentUser?.uid]);
+  useEffect(() => {setFocusDraft(null)}, [currentUser?.uid, assistantPrivacy.clearEpoch]);
   function applyAssistantAction(action: AssistantAction) {
     if (action.name === 'open_view') {setView(action.arguments.view); return}
     if (!currentUser) {setView('login'); return}
@@ -243,7 +246,7 @@ export default function App() {
 
 
   // Views that don't need persistent app sidebar or top bar chrome
-  if(profileError && currentUser && !['landing','about','privacy','terms','login','register'].includes(currentView)) return <section className="real-form page-opening"><AppLogo className="w-14 h-14" showText={false}/><h1>Reconnect your space.</h1><p role="alert">{profileError}</p><button className="ink-button" onClick={()=>window.location.reload()}>Retry connection</button><button className="text-button" onClick={handleLogout}>Sign out</button></section>;
+  if(profileError && currentUser && !['landing','about','privacy','terms','login','register','settings'].includes(currentView)) return <section className="real-form page-opening"><AppLogo className="w-14 h-14" showText={false}/><h1>Reconnect your space.</h1><p role="alert">{profileError}</p><button className="ink-button" onClick={()=>window.location.reload()}>Retry connection</button><button className="text-button" onClick={handleLogout}>Sign out</button></section>;
   const isDocumentOrLandingView = ['landing', 'about', 'privacy', 'terms', '404'].includes(currentView);
 
   return (
@@ -390,6 +393,7 @@ export default function App() {
 
             {currentView === 'settings' && (
               <SettingsPage
+                account={currentUser?.uid}
                 setView={setView}
                 userRole={userRole}
               />

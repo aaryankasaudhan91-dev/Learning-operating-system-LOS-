@@ -1,3 +1,4 @@
+import {useAssistantPrivacy} from '../services/assistant-privacy.service';
 import React, {useEffect, useRef, useState} from 'react';
 import {ArrowLeft, Check, CirclePause, Headphones, Play, RotateCcw, Sparkles} from 'lucide-react';
 import {AppView} from '../types';
@@ -28,6 +29,15 @@ export default function FocusChamber({setView, draft, onDraftConsumed}: Props) {
   const audio = useRef<AudioContext | null>(null);
 
   const appliedDraft = useRef<string | null>(null);
+  const privacy=useAssistantPrivacy();
+  const clearEpoch=useRef(privacy.clearEpoch);
+  useEffect(()=>{
+    if(clearEpoch.current===privacy.clearEpoch)return;
+    clearEpoch.current=privacy.clearEpoch;
+    if(appliedDraft.current && (!sessionRef.current || sessionRef.current.state==='completed')){
+      appliedDraft.current=null;setTopic('');setMinutes(15);setNotice('Assistant draft cleared. Your saved sessions were kept.');
+    }
+  },[privacy.clearEpoch]);
   useEffect(() => {
     if (loading || !draft || appliedDraft.current === draft.id) return;
     appliedDraft.current = draft.id;

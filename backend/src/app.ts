@@ -1,3 +1,4 @@
+import {setupAssistantPrivacyRoutes} from './assistant-privacy';
 import {setupFocusRoutes} from './focus';
 import {QuestModel as Quest} from './models';
 import {setupAuthRoutes} from './auth';
@@ -27,6 +28,7 @@ export function createApp(options:AppOptions={}){
  setupAuthRoutes(app,ready);
  setupPublicRoutes(app,ready);
  app.use('/api',rateLimit(600,60000),(_req,res,next)=>{if(!ready()){res.status(503).json({error:'Database is temporarily unavailable',code:'DATABASE_UNAVAILABLE'});return}next()},authentication(options.verify || verifyIdentity),rateLimit(180,60000),(req,res,next)=>{if(!ready()){res.status(503).json({error:'Database is temporarily unavailable',code:'DATABASE_UNAVAILABLE'});return}try{if(['POST','PUT','PATCH'].includes(req.method))body(req.body);next()}catch(error){next(error)}});
+ setupAssistantPrivacyRoutes(app);
  const uid=(res:Response)=>res.locals.identity.uid as string;
  async function profile(res:Response){const user=await User.findOne({uid:uid(res)});check(user,403,'Complete your profile first');return user}
  async function mentor(res:Response){const user=await profile(res);check(user.role==='mentor',403,'Teacher account required');return user}

@@ -1,9 +1,12 @@
+import {useAssistantPrivacy} from '../services/assistant-privacy.service';
 import {useEffect, useRef, useState, type FormEvent} from 'react';
 import {MessageSquare, X} from 'lucide-react';
 import {assistantValue, desktopAssistant} from '../services/assistant.service';
 import type {AssistantAction, AssistantProposal, AssistantStatus} from '../services/assistant.types';
 interface Props {account?: string; onApply: (action: AssistantAction) => void}
 export default function AssistantPanel({account, onApply}: Props) {
+  const privacy=useAssistantPrivacy();
+  const context=privacy.account===(account??null) && !privacy.binding ? privacy.context : null;
   const [open, setOpen] = useState(false), [text, setText] = useState('');
   const [status, setStatus] = useState<AssistantStatus | null>(null);
   const [proposal, setProposal] = useState<AssistantProposal | null>(null);
@@ -22,30 +25,30 @@ export default function AssistantPanel({account, onApply}: Props) {
   }, []);
   useEffect(() => {
     epoch.current++; active.current = null; setText(''); setProposal(null); setError(''); setBusy(false);
-    void desktopAssistant()?.reset().catch(() => {});
     return () => {epoch.current++; const id = active.current; if (id) void desktopAssistant()?.cancel(id).catch(() => {})};
-  }, [account]);
+  }, [account, context?.token, privacy.clearEpoch]);
   useEffect(() => {if (open) input.current?.focus()}, [open]);
   useEffect(() => {if (proposal?.kind === 'proposal') applyButton.current?.focus()}, [proposal]);
   async function submit(event: FormEvent) {
-    event.preventDefault(); if (busy || !text.trim()) return;
+    event.preventDefault(); if (busy || !text.trim() || !context || !context.preferences.localCommandsEnabled) return;
     const bridge = desktopAssistant(); if (!bridge) return;
     const id = crypto.randomUUID(), version = ++epoch.current;
     active.current = id; setBusy(true); setProposal(null); setError('');
     try {
-      const result = assistantValue(await bridge.propose(text.trim(), id));
+      const result = assistantValue(await bridge.propose(text.trim(), id, context.token));
       if (version === epoch.current && active.current === id) setProposal(result);
     } catch (reason) {if (version === epoch.current) setError(reason instanceof Error ? reason.message : 'Local command failed.')}
     finally {if (version === epoch.current) {setBusy(false); active.current = null}}
   }
-  const ready = status?.local === 'ready';
+  const ready = status?.local === 'ready' && context?.storage==='ready' && context.preferences.localCommandsEnabled;
   return <>
     <button ref={trigger} className="assistant-trigger" onClick={() => {if (open) close(); else setOpen(true)}} aria-expanded={open} aria-controls="local-assistant-panel"><MessageSquare size={19} aria-hidden="true"/><span>Local assistant</span></button>
     {open && <section id="local-assistant-panel" className="assistant-panel" aria-labelledby="local-assistant-heading" onKeyDown={event => {if (event.key === 'Escape') close()}}>
-      <div className="assistant-panel-header"><div><h2 id="local-assistant-heading">Local assistant</h2><p>{ready ? 'Ready on this device' : status?.local === 'invalid' ? 'Local files need repair' : 'Local model not ready'}</p></div><button className="text-button" onClick={close} aria-label="Close local assistant"><X size={20}/></button></div>
+      <div className="assistant-panel-header"><div><h2 id="local-assistant-heading">Local assistant</h2><p>{!context ? 'Checking privacy choices…' : context.storage!=='ready' ? 'Privacy choices need repair' : !context.preferences.localCommandsEnabled ? 'Paused in Settings' : ready ? 'Ready on this device' : status?.local === 'invalid' ? 'Local files need repair' : 'Local model not ready'}</p></div><button className="text-button" onClick={close} aria-label="Close local assistant"><X size={20}/></button></div>
       <p>Your command stays on this device. Try “open courses” or “prepare a 20 minute focus session on algebra”.</p>
+      <button className="text-button" onClick={()=>{onApply({name:'open_view',arguments:{view:'settings'}});close()}}>Privacy settings</button>
       <p className="assistant-note">Commands create proposals. Web reading and cloud explanations are not enabled here.</p>
-      {!ready && <p role="status">{status?.local === 'unsupported-platform' ? 'Local commands currently support Windows x64.' : 'Run the local assistant setup and restart Synapse to enable commands.'}</p>}
+      {!ready && context?.preferences.localCommandsEnabled && <p role="status">{status?.local === 'unsupported-platform' ? 'Local commands currently support Windows x64.' : 'Run the local assistant setup and restart Synapse to enable commands.'}</p>}
       <form onSubmit={submit}><label htmlFor="local-command">Your command</label><input ref={input} id="local-command" value={text} maxLength={2000} onChange={event => setText(event.target.value)} disabled={busy || !ready} autoComplete="off"/>
         <div className="assistant-actions"><button className="ink-button" disabled={!ready || busy || !text.trim()}>{busy ? 'Reading locally…' : 'Prepare action'}</button>{busy && <button type="button" className="text-button" onClick={cancel}>Cancel</button>}</div>
       </form>

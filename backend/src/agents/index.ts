@@ -1,3 +1,4 @@
+import {assertAssistantCloudAllowed} from '../assistant-privacy';
 import express from 'express';
 import { GoogleGenAI } from '@google/genai';
 import mongoose from 'mongoose';
@@ -28,12 +29,13 @@ async function inference(instruction:string){
  const data:any=await response.json();const result=provider==='anthropic'?data.content?.[0]?.text:data.choices?.[0]?.message?.content;check(typeof result==='string' && result.trim(),502,'AI returned an empty response');return result;
 }
 export function setupAgentRoutes(app:express.Express,_legacy?:GoogleGenAI|null){
- app.get('/api/capabilities',(_req,res)=>res.json({ai:{configured:configured(),source:'live-provider-only'},realtime:true}));
+ app.get('/api/capabilities',(_req,res)=>res.json({ai:{configured:configured(),enabled:false,reason:'PRIVACY_SETUP_PENDING',source:'live-provider-only'},realtime:true}));
  for(const [path,role,key] of [['focus','focus','content'],['task-hint','hint','hint'],['insights-prompt','insights','prompt'],['intervention-suggestion','intervention','suggestion'],['generate-task','generate',''],['sos-chat','sos',''],['guide-chat','guide','']] as const){
  app.post(`/api/agent/${path}`,async(req,res,next)=>{try{
   const input=body(req.body);if(role==='generate'||role==='focus')text(input.topic,'Topic',500);if(role==='hint')text(input.title,'Task title',500);
   check(JSON.stringify(input).length<=20000,400,'AI context is too long');
   check(configured(),503,'Live AI is not configured.');
+  assertAssistantCloudAllowed();
   const uid=res.locals.identity.uid;const day=new Date().toISOString().slice(0,10);const limit=Math.max(1,Math.min(1000,Number(process.env.AI_DAILY_REQUEST_LIMIT || 20)));
   await Usage.updateOne({uid,day},{$setOnInsert:{count:0}},{upsert:true});
   const reserved=await Usage.findOneAndUpdate({uid,day,count:{$lt:limit}},{$inc:{count:1}},{returnDocument:'after'});check(reserved,429,'Your daily AI allowance is exhausted. Lessons and progress remain available.');

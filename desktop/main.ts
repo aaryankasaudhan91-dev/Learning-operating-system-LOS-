@@ -4,6 +4,7 @@ import path from 'node:path';
 import {pathToFileURL} from 'node:url';
 import {createLocalRuntime} from './assistant/runtime';
 import {attachAssistant} from './assistant/ipc';
+import {PrivacyStore} from './assistant/privacy-store';
 
 let window: BrowserWindow | undefined;
 const cleanup = new Set<() => void>();
@@ -28,13 +29,16 @@ async function createWindow() {
   const root = app.isPackaged ? path.join(process.resourcesPath, 'native', 'win32-x64')
     : path.join(app.getAppPath(), 'resources', 'native', 'win32-x64');
   const runtime = createLocalRuntime(root, path.join(__dirname, 'native-manifest.json'));
-  const dispose = attachAssistant(current, expected, runtime); cleanup.add(dispose);
+  const dispose = attachAssistant(current, expected, runtime, new PrivacyStore(path.join(app.getPath('userData'), 'assistant', 'privacy-v1'))); cleanup.add(dispose);
   current.once('closed', () => {cleanup.delete(dispose); if (window === current) window = undefined});
   if (preview) await current.loadURL(preview); else await current.loadFile(document);
 }
+if (!app.requestSingleInstanceLock()) {app.quit()} else {
+app.on('second-instance', () => {if (window && !window.isDestroyed()) {if(window.isMinimized())window.restore();window.focus()}});
 app.whenReady().then(async () => {
   await createWindow();
   app.on('activate', () => {if (!BrowserWindow.getAllWindows().length) void createWindow()});
 }).catch(() => {app.quit()});
+}
 app.on('before-quit', () => {for (const dispose of cleanup) dispose()});
 app.on('window-all-closed', () => {if (process.platform !== 'darwin') app.quit()});

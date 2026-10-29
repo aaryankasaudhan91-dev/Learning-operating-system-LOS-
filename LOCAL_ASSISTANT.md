@@ -12,7 +12,7 @@ On the development machine where this implementation was applied, the native eng
 npm run desktop
 ```
 
-Use **Local assistant** in the bottom corner. The website/mobile bundles do not import Electron or acquire native privileges. Their existing guide remains available. The new desktop assistant has no cloud or public-web operation enabled; existing cloud-backed learning features elsewhere in LOS retain their existing server configuration.
+Use **Local assistant** in the bottom corner. The website/mobile bundles do not import Electron or acquire native privileges. The new desktop assistant has no cloud or public-web operation enabled. Phase 2 now pauses all provider-backed AI endpoints server-side until consent and eligibility routing are ready. Core learning and focus APIs remain available. See ASSISTANT_PRIVACY.md.
 
 ## Rebuild on another Windows x64 development machine
 
@@ -54,7 +54,7 @@ The build adds `preload.cjs` and the manifest to the existing staging package an
 - The bridge uses the verified Needle 3 C ABI and omits high-level Python argument-repair helpers. Independent validation and user confirmation remain mandatory. The 0.4 confidence floor controls proposal availability; it grants no authority and is not a claim of semantic accuracy.
 - Engine stdout reasoning is not returned or stored. Web content and provider keys never enter the local assistant.
 - Obscura is not launched yet. Public browsing remains gated on Windows process containment, network-policy tests and reviewed resource acquisition. A child process alone is not a security sandbox.
-- Stored cloud consent, audience eligibility, provider-wide Mongo quotas and free-tier routing are subsequent work. The new assistant does not silently upload unsupported commands.
+- Account-scoped off choices and local privacy controls are now implemented in Phase 2. Positive cloud consent, audience eligibility, provider-wide Mongo quotas and free-tier routing remain subsequent work. The new assistant does not silently upload unsupported commands.
 - Existing unsigned installer settings have not been turned into a signed release. Code signing, installed-app tests and Windows CI remain release work.
 
 Official sources: [Needle API](https://www.cactuscompute.com/blog/needle-python-docs), [C ABI implementation](https://github.com/cactus-compute/needle/blob/main/needle/_worker.py), [Electron security](https://www.electronjs.org/docs/latest/tutorial/security), [PyInstaller](https://pyinstaller.org/en/stable/usage.html).
