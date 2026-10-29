@@ -29,3 +29,7 @@ frontends/*/dist/
 frontends/mobile/android/.gradle/
 frontends/mobile/android/local.properties
 frontends/website/public/downloads/
+
+# Rebuilt local model artifacts; source and hash locks are tracked.
+resources/native/
+__pycache__/

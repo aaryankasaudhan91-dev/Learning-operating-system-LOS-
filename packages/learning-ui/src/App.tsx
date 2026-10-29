@@ -12,6 +12,9 @@ import Sidebar from './components/Sidebar';
 import CookieConsent from './components/CookieConsent';
 import AppLoading from './components/AppLoading';
 import HelpChatBot from './components/HelpChatBot';
+import AssistantPanel from './components/AssistantPanel';
+import {desktopAssistant} from './services/assistant.service';
+import type {AssistantAction, FocusDraft} from './services/assistant.types';
 import { AppView, StudentSeat, InterventionAlert, SynthesisTask } from './types';
 import { Sparkles, X, Loader2 } from 'lucide-react';
 import { onAuthStateChanged, User, signOut } from './lib/firebase';
@@ -39,10 +42,11 @@ const TermsConditions = lazy(() => import('./components/TermsConditions'));
 const NotFoundPage = lazy(() => import('./components/NotFoundPage'));
 
 // High-fidelity fallback loading screen during view transitions
-function ViewLoadingFallback(){return <AppLoading label="Opening your next view…"/>}
+function ViewLoadingFallback(){return <AppLoading label="Opening your next viewâ€¦"/>}
 
 export default function App() {
   const [currentView, setView] = useState<AppView>('landing');
+  const [focusDraft, setFocusDraft] = useState<FocusDraft | null>(null);
   const [userRole, setUserRole] = useState<'student' | 'mentor'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -218,7 +222,15 @@ export default function App() {
     if(!authLoading && !currentUser && !publicViews.includes(currentView))setView('login');
   },[authLoading,currentUser,currentView]);
 
+  useEffect(() => {setFocusDraft(null)}, [currentUser?.uid]);
+  function applyAssistantAction(action: AssistantAction) {
+    if (action.name === 'open_view') {setView(action.arguments.view); return}
+    if (!currentUser) {setView('login'); return}
+    setFocusDraft({id: crypto.randomUUID(), ...action.arguments}); setView('chamber');
+  }
   const handleLogout = async () => {
+    setFocusDraft(null);
+    await desktopAssistant()?.reset().catch(() => {});
     try {
       localStorage.removeItem('los_demo_user'); // Retire legacy demo sessions; never restore them.
       await signOut(auth);
@@ -329,8 +341,10 @@ export default function App() {
 
             {currentView === 'chamber' && (
               <FocusChamber 
+                key={currentUser?.uid}
                 setView={setView}
-                setCognitiveLoad={setCognitiveLoad}
+                draft={focusDraft}
+                onDraftConsumed={() => setFocusDraft(null)}
               />
             )}
 
@@ -396,7 +410,7 @@ export default function App() {
         </main>
       </div>
 
-      <HelpChatBot uid={currentUser?.uid} />
+      {desktopAssistant() ? <AssistantPanel account={currentUser?.uid} onApply={applyAssistantAction}/> : <HelpChatBot uid={currentUser?.uid} />}
 
       {/* FLOATING ACTION NOTIFICATION TOAST FEEDBACKS BANNER */}
       {activeNotification && currentView !== 'chamber' && (

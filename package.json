@@ -13,7 +13,7 @@
     "server": "npm run dev -w backend",
     "server:backend": "npm run dev -w backend",
     "build": "npm run build -w frontend && node desktop/build.mjs",
-    "typecheck": "npm run typecheck -w frontend && npm run typecheck -w @synapse/website && npm run typecheck -w @synapse/mobile && tsc -p backend/tsconfig.json --noEmit",
+    "typecheck": "npm run typecheck -w frontend && npm run typecheck -w @synapse/website && npm run typecheck -w @synapse/mobile && tsc -p backend/tsconfig.json --noEmit && tsc -p desktop/tsconfig.json",
     "desktop": "npm run build && electron .",
     "desktop:package": "npm run build && electron-builder --dir",
     "desktop:installer": "npm run build && electron-builder",
@@ -21,7 +21,16 @@
     "web:dev": "npm run dev -w @synapse/website",
     "web:build": "npm run build -w @synapse/website",
     "test:realtime": "tsx --test backend/tests/realtime.test.ts",
-    "test:backend": "tsx --test backend/tests/*.test.ts"
+    "test:backend": "tsx --test backend/tests/*.test.ts",
+    "dev:all": "concurrently -k -n API,APP,WEB,MOBILE \"npm run dev:backend\" \"npm run dev:frontend\" \"npm run web:dev\" \"npm run dev -w @synapse/mobile\"",
+    "desktop:dev": "concurrently -k -n API,APP,ELECTRON \"npm run dev:backend\" \"npm run dev:frontend\" \"node desktop/dev.mjs\"",
+    "check:ready": "node scripts/check-readiness.mjs",
+    "setup:env": "node scripts/setup-env.mjs",
+    "test:assistant": "tsx --test backend/tests/assistant.test.ts",
+    "assistant:setup": "python scripts/setup-assistant.py",
+    "test:assistant:electron": "node desktop/test-assistant.mjs",
+    "test:assistant:native": "python scripts/test-assistant-native.py",
+    "test:assistant:python": "python -m unittest discover -s native/needle -p test_worker.py"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
@@ -42,6 +51,8 @@
     },
     "files": [
       "main.cjs",
+      "preload.cjs",
+      "native-manifest.json",
       "package.json",
       "icon.png",
       "frontend-dist/**",
@@ -59,7 +70,17 @@
     "linux": {
       "target": "AppImage"
     },
-    "npmRebuild": false
+    "npmRebuild": false,
+    "extraResources": [
+      {
+        "from": "resources/native/win32-x64",
+        "to": "native/win32-x64",
+        "filter": [
+          "needle/**",
+          "licenses/**"
+        ]
+      }
+    ]
   },
   "version": "0.2.0",
   "description": "Synapse Learner Operating System",

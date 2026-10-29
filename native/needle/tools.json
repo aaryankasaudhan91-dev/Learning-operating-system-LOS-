@@ -1,0 +1,49 @@
+[
+  {
+    "name": "open_view",
+    "description": "Propose opening a Synapse app screen.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "view": {
+          "type": "string",
+          "enum": [
+            "map",
+            "courses",
+            "chamber",
+            "profile",
+            "settings",
+            "help"
+          ]
+        }
+      },
+      "required": [
+        "view"
+      ],
+      "additionalProperties": false
+    }
+  },
+  {
+    "name": "prepare_focus",
+    "description": "Propose a focus session for a topic and a number of minutes. The user must confirm before it starts.",
+    "parameters": {
+      "type": "object",
+      "properties": {
+        "topic": {
+          "type": "string",
+          "maxLength": 100
+        },
+        "minutes": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 120
+        }
+      },
+      "required": [
+        "topic",
+        "minutes"
+      ],
+      "additionalProperties": false
+    }
+  }
+]

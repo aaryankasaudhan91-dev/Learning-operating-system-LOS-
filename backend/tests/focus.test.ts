@@ -1,0 +1,67 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+import {createServer} from 'node:http';
+import mongoose from 'mongoose';
+import {MongoMemoryServer} from 'mongodb-memory-server';
+import {createApp} from '../src/app';
+import {FocusSessionModel as Focus, ProgressModel as Progress, UserProfileModel as User} from '../src/models';
+
+test('focus preserves paused time, rejects fabricated credit, and saves reflections privately', async t => {
+  const db = await MongoMemoryServer.create({binary: {version: '7.0.14'}});
+  await mongoose.connect(db.getUri());
+  await Promise.all([Focus.init(), Progress.init(), User.init()]);
+  await User.create({uid: 'learner', email: 'learner@example.test', fullName: 'Learner', role: 'student', cognitiveLoad: 77});
+  const server = createServer(createApp({verify: async token => ({uid: token})}));
+  await new Promise<void>(resolve => server.listen(0, '127.0.0.1', resolve));
+  t.after(async () => {
+    await new Promise<void>(resolve => server.close(() => resolve()));
+    await mongoose.disconnect(); await db.stop();
+  });
+  const base = 'http://127.0.0.1:' + (server.address() as any).port + '/api/focus/sessions';
+  async function call(path: string, method = 'POST', data: unknown = {}, user = 'learner') {
+    const response = await fetch(base + path, {method, headers: {Authorization: 'Bearer ' + user, 'Content-Type': 'application/json'}, ...(method === 'GET' ? {} : {body: JSON.stringify(data)})});
+    return {status: response.status, data: await response.json()};
+  }
+  assert.equal((await call('', 'POST', {activeSeconds: 99999})).status, 400);
+  const starts = await Promise.all(Array.from({length: 4}, () => call('', 'POST', {topic: 'Fractions', targetMinutes: 15})));
+  starts.forEach(result => assert.equal(result.status, 201));
+  const id = starts[0].data.id;
+  assert.ok(starts.every(result => result.data.id === id));
+  assert.equal(await Focus.countDocuments({uid: 'learner'}), 1);
+  assert.equal((await call('/active', 'GET')).data.session.topic, 'Fractions');
+  assert.equal((await call('/' + id + '/pause', 'POST', {}, 'other')).status, 404);
+  await Focus.updateOne({id}, {$set: {activeSeconds: 59, lastHeartbeatAt: new Date(Date.now() - 15000)}});
+  const paused = await call('/' + id + '/pause');
+  assert.equal(paused.data.state, 'paused');
+  assert.ok(paused.data.activeSeconds >= 74 && paused.data.activeSeconds < 76);
+  await Focus.updateOne({id}, {$set: {lastHeartbeatAt: new Date(Date.now() - 86400000)}});
+  const pausedHeartbeat = await call('/' + id + '/heartbeat');
+  assert.equal(pausedHeartbeat.data.activeSeconds, paused.data.activeSeconds);
+  const resumed = await call('/' + id + '/resume');
+  assert.equal(resumed.data.state, 'running');
+  assert.equal(resumed.data.activeSeconds, paused.data.activeSeconds);
+  await Focus.updateOne({id}, {$set: {activeSeconds: 120, lastHeartbeatAt: new Date(Date.now() - 15000)}});
+  const pulses = await Promise.all(Array.from({length: 6}, () => call('/' + id + '/heartbeat')));
+  pulses.forEach(result => assert.equal(result.status, 200));
+  const accrued = (await Focus.findOne({id}))!.activeSeconds;
+  assert.ok(accrued >= 135 && accrued < 138, 'Concurrent heartbeats must not duplicate the elapsed interval');
+  assert.equal((await call('/' + id + '/complete', 'POST', {minutes: 999})).status, 400);
+  await Focus.updateOne({id}, {$set: {lastHeartbeatAt: new Date(Date.now() - 86400000)}});
+  const completed = await Promise.all(Array.from({length: 4}, () => call('/' + id + '/complete')));
+  completed.forEach(result => {assert.equal(result.status, 200); assert.equal(result.data.minutes, 2)});
+  assert.equal(await Progress.countDocuments({uid: 'learner', eventId: 'focus:' + id}), 1);
+  assert.equal((await User.findOne({uid: 'learner'}))!.todayFocusMinutes, 2);
+  assert.equal((await call('/active', 'GET')).data.session, null);
+  assert.equal((await call('/' + id + '/heartbeat')).status, 409);
+  assert.equal((await call('/' + id + '/reflection', 'PATCH', {reflection: 'hard'}, 'other')).status, 404);
+  assert.equal((await call('/' + id + '/reflection', 'PATCH', {reflection: 'invented'})).status, 400);
+  assert.equal((await call('/' + id + '/reflection', 'PATCH', {reflection: 'hard'})).status, 200);
+  assert.equal((await Focus.findOne({id}))!.reflection, 'hard');
+  assert.equal((await Progress.findOne({uid: 'learner', eventId: 'focus:' + id}))!.reflection, 'hard');
+  assert.equal((await User.findOne({uid: 'learner'}))!.cognitiveLoad, 77, 'Reflection must not infer or change difficulty');
+  await Focus.create({id:'legacy-null',uid:'learner',endedAt:null,activeSeconds:30});
+  assert.equal((await call('/active','GET')).data.session.id,'legacy-null');
+  assert.equal((await call('/legacy-null/reflection','PATCH',{reflection:'good'})).status,404);
+  assert.equal((await call('', 'POST', {})).data.id,'legacy-null');
+  assert.equal((await call('/legacy-null/complete')).status,200);
+});

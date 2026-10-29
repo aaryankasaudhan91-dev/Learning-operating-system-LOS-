@@ -1,8 +1,11 @@
+import {stageNative} from './stage-native.mjs';
 import path from 'node:path';
 import {fileURLToPath} from 'node:url';
 import { build } from 'esbuild';
 import { mkdir, cp, writeFile, readFile, rm } from 'node:fs/promises';
 await mkdir('desktop-app',{recursive:true});
+await stageNative();
+await build({entryPoints:['desktop/preload.ts'],bundle:true,platform:'node',format:'cjs',external:['electron'],outfile:'desktop-app/preload.cjs'});
 await build({entryPoints:['desktop/main.ts'],bundle:true,platform:'node',format:'cjs',external:['electron'],outfile:'desktop-app/main.cjs'});
 const projectRoot=path.resolve(path.dirname(fileURLToPath(import.meta.url)),'..');
 const destination=path.resolve('desktop-app/frontend-dist');

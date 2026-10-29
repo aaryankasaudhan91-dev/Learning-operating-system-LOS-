@@ -1,0 +1,19 @@
+{
+  "modelRepository": "Cactus-Compute/needle3",
+  "revision": "d6c7d6a2e9655505e0f8e23339356dd1705900eb",
+  "engineVersion": "3.3.1",
+  "packageVersion": "3.2.1",
+  "artifacts": [
+    {
+      "name": "cactus_needle-3.3.1-py3-none-win_amd64.whl",
+      "url": "https://huggingface.co/Cactus-Compute/needle3/resolve/d6c7d6a2e9655505e0f8e23339356dd1705900eb/python/cactus_needle-3.3.1-py3-none-win_amd64.whl",
+      "sha256": "4e50c5fa983c8737de200d9e96af937dd8135371ca557fe8c7c9eb1adba39f5a",
+      "member": "needle/libneedle3.dll"
+    },
+    {
+      "name": "needle3.cact",
+      "url": "https://huggingface.co/Cactus-Compute/needle3/resolve/d6c7d6a2e9655505e0f8e23339356dd1705900eb/needle3.cact",
+      "sha256": "c9d915eca282ed42d1a09b143b592adb4cc6744ffe2d294adf5cfc5548170c38"
+    }
+  ]
+}
