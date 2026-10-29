@@ -9,6 +9,8 @@ export default function AssistantPanel({account, onApply}: Props) {
   const context=privacy.account===(account??null) && !privacy.binding ? privacy.context : null;
   const [open, setOpen] = useState(false), [text, setText] = useState('');
   const [status, setStatus] = useState<AssistantStatus | null>(null);
+  const owner=context?context.token+':'+privacy.clearEpoch:null;
+  const [textOwner,setTextOwner]=useState<string|null>(null),[proposalOwner,setProposalOwner]=useState<string|null>(null);
   const [proposal, setProposal] = useState<AssistantProposal | null>(null);
   const [error, setError] = useState(''), [busy, setBusy] = useState(false);
   const active = useRef<string | null>(null), epoch = useRef(0);
@@ -30,16 +32,18 @@ export default function AssistantPanel({account, onApply}: Props) {
   useEffect(() => {if (open) input.current?.focus()}, [open]);
   useEffect(() => {if (proposal?.kind === 'proposal') applyButton.current?.focus()}, [proposal]);
   async function submit(event: FormEvent) {
-    event.preventDefault(); if (busy || !text.trim() || !context || !context.preferences.localCommandsEnabled) return;
+    event.preventDefault(); if (busy || !text.trim() || textOwner!==owner || !context || !context.preferences.localCommandsEnabled) return;
     const bridge = desktopAssistant(); if (!bridge) return;
     const id = crypto.randomUUID(), version = ++epoch.current;
     active.current = id; setBusy(true); setProposal(null); setError('');
     try {
       const result = assistantValue(await bridge.propose(text.trim(), id, context.token));
-      if (version === epoch.current && active.current === id) setProposal(result);
+      if (version === epoch.current && active.current === id) {setProposal(result);setProposalOwner(owner)}
     } catch (reason) {if (version === epoch.current) setError(reason instanceof Error ? reason.message : 'Local command failed.')}
     finally {if (version === epoch.current) {setBusy(false); active.current = null}}
   }
+  const visibleText=owner && textOwner===owner?text:'';
+  const visibleProposal=owner && proposalOwner===owner?proposal:null;
   const ready = status?.local === 'ready' && context?.storage==='ready' && context.preferences.localCommandsEnabled;
   return <>
     <button ref={trigger} className="assistant-trigger" onClick={() => {if (open) close(); else setOpen(true)}} aria-expanded={open} aria-controls="local-assistant-panel"><MessageSquare size={19} aria-hidden="true"/><span>Local assistant</span></button>
@@ -49,14 +53,14 @@ export default function AssistantPanel({account, onApply}: Props) {
       <button className="text-button" onClick={()=>{onApply({name:'open_view',arguments:{view:'settings'}});close()}}>Privacy settings</button>
       <p className="assistant-note">Commands create proposals. Web reading and cloud explanations are not enabled here.</p>
       {!ready && context?.preferences.localCommandsEnabled && <p role="status">{status?.local === 'unsupported-platform' ? 'Local commands currently support Windows x64.' : 'Run the local assistant setup and restart Synapse to enable commands.'}</p>}
-      <form onSubmit={submit}><label htmlFor="local-command">Your command</label><input ref={input} id="local-command" value={text} maxLength={2000} onChange={event => setText(event.target.value)} disabled={busy || !ready} autoComplete="off"/>
-        <div className="assistant-actions"><button className="ink-button" disabled={!ready || busy || !text.trim()}>{busy ? 'Reading locally…' : 'Prepare action'}</button>{busy && <button type="button" className="text-button" onClick={cancel}>Cancel</button>}</div>
+      <form onSubmit={submit}><label htmlFor="local-command">Your command</label><input ref={input} id="local-command" value={visibleText} maxLength={2000} onChange={event => {setText(event.target.value);setTextOwner(owner)}} disabled={busy || !ready} autoComplete="off"/>
+        <div className="assistant-actions"><button className="ink-button" disabled={!ready || busy || !visibleText.trim()}>{busy ? 'Reading locally…' : 'Prepare action'}</button>{busy && <button type="button" className="text-button" onClick={cancel}>Cancel</button>}</div>
       </form>
       {error && <p role="alert">{error}</p>}
-      {proposal?.kind === 'unsupported' && <p role="status">I could not match that to an app command. Try naming the screen, or a focus topic and duration. Nothing was changed.</p>}
-      {proposal?.kind === 'proposal' && <div className="assistant-proposal" role="status"><strong>{proposal.action.name === 'open_view' ? 'Open ' + ({map:'My adventure', courses:'Courses', chamber:'Focus zone', profile:'Profile', settings:'Settings', help:'Help & support'}[proposal.action.arguments.view]) : `Prepare ${proposal.action.arguments.minutes} minutes: ${proposal.action.arguments.topic}`}</strong>
-        <p>{proposal.action.name === 'prepare_focus' ? 'This fills the focus form. Review it and press Start there to record a session.' : 'Review this suggestion before opening the screen.'}</p>
-        <button ref={applyButton} className="ink-button" onClick={() => {if (proposal.kind === 'proposal') {onApply(proposal.action); close()}}}>Use this action</button><button className="text-button" onClick={() => setProposal(null)}>Dismiss</button>
+      {visibleProposal?.kind === 'unsupported' && <p role="status">I could not match that to an app command. Try naming the screen, or a focus topic and duration. Nothing was changed.</p>}
+      {visibleProposal?.kind === 'proposal' && <div className="assistant-proposal" role="status"><strong>{visibleProposal.action.name === 'open_view' ? 'Open ' + ({map:'My adventure', courses:'Courses', chamber:'Focus zone', profile:'Profile', settings:'Settings', help:'Help & support'}[visibleProposal.action.arguments.view]) : `Prepare ${visibleProposal.action.arguments.minutes} minutes: ${visibleProposal.action.arguments.topic}`}</strong>
+        <p>{visibleProposal.action.name === 'prepare_focus' ? 'This fills the focus form. Review it and press Start there to record a session.' : 'Review this suggestion before opening the screen.'}</p>
+        <button ref={applyButton} className="ink-button" onClick={() => {if (visibleProposal.kind === 'proposal') {onApply(visibleProposal.action); close()}}}>Use this action</button><button className="text-button" onClick={() => setProposal(null)}>Dismiss</button>
       </div>}
     </section>}
   </>;

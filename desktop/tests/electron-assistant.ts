@@ -93,6 +93,7 @@ app.whenReady().then(async()=>{
   const focus=new BrowserWindow({show:false,webPreferences:{contextIsolation:true,nodeIntegration:false,sandbox:true}});windows.push(focus);
   await focus.loadFile(path.join(root,'build/assistant-ui-test/index.html'));
   await waitFor(focus,"document.querySelector('#focus-topic')?.value==='algebra'");
+  assert.deepEqual(await focus.webContents.executeJavaScript('window.testBlockedCloud()'),{status:403,calls:0});
   assert.equal(await focus.webContents.executeJavaScript('window.focusWrites'),0);
   await focus.webContents.executeJavaScript('window.clearAssistantFixture()');
   await waitFor(focus,"document.querySelector('#focus-topic').value===''");

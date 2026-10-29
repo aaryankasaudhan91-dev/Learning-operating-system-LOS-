@@ -48,7 +48,7 @@ function ViewLoadingFallback(){return <AppLoading label="Opening your next viewâ
 export default function App() {
   const assistantPrivacy=useAssistantPrivacy();
   const [currentView, setView] = useState<AppView>('landing');
-  const [focusDraft, setFocusDraft] = useState<FocusDraft | null>(null);
+  const [focusDraft, setFocusDraft] = useState<(FocusDraft & {account:string;context:string;privacyEpoch:number}) | null>(null);
   const [userRole, setUserRole] = useState<'student' | 'mentor'>('student');
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [userProfile, setUserProfile] = useState<any>(null);
@@ -229,7 +229,8 @@ export default function App() {
   function applyAssistantAction(action: AssistantAction) {
     if (action.name === 'open_view') {setView(action.arguments.view); return}
     if (!currentUser) {setView('login'); return}
-    setFocusDraft({id: crypto.randomUUID(), ...action.arguments}); setView('chamber');
+    if(!assistantPrivacy.context || assistantPrivacy.account!==currentUser.uid)return;
+    setFocusDraft({id: crypto.randomUUID(), ...action.arguments,account:currentUser.uid,context:assistantPrivacy.context.token,privacyEpoch:assistantPrivacy.clearEpoch}); setView('chamber');
   }
   const handleLogout = async () => {
     setFocusDraft(null);
@@ -346,7 +347,7 @@ export default function App() {
               <FocusChamber 
                 key={currentUser?.uid}
                 setView={setView}
-                draft={focusDraft}
+                draft={focusDraft?.account===currentUser?.uid && focusDraft?.context===assistantPrivacy.context?.token && focusDraft?.privacyEpoch===assistantPrivacy.clearEpoch?focusDraft:null}
                 onDraftConsumed={() => setFocusDraft(null)}
               />
             )}
