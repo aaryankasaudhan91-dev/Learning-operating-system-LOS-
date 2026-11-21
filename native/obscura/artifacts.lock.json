@@ -1,0 +1,15 @@
+{
+  "version": "0.2.5",
+  "commit": "bd9529418b7fa975b50eabeac415cfaaa865a588",
+  "archive": {
+    "url": "https://github.com/h4ckf0r0day/obscura/releases/download/v0.2.5/obscura-x86_64-windows-no-render.zip",
+    "sha256": "cb3ba733017637341256adc6eb52f9caaf85423535092bdd31b4a90abc710348",
+    "member": "obscura.exe"
+  },
+  "license": {
+    "url": "https://raw.githubusercontent.com/h4ckf0r0day/obscura/bd9529418b7fa975b50eabeac415cfaaa865a588/LICENSE",
+    "sha256": "50e6751797c50dedd75ef1b8a0d9e42f5f8472e9fbce91f34718e9f97b0c780a"
+  },
+  "compiler": "gcc 15.2.0, x86_64-w64-mingw32, static runtime",
+  "mode": "offline-document-no-network-capabilities"
+}

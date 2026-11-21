@@ -1,0 +1,22 @@
+/** Optional packaged Windows + live public-site smoke check. */
+import path from 'node:path';
+import {readFile,writeFile,readdir} from 'node:fs/promises';
+import {createRequire} from 'node:module';
+import assert from 'node:assert/strict';
+import {createLocalRuntime} from '../desktop/assistant/runtime';
+import {verifyArtifacts} from '../desktop/assistant/native';
+const require=createRequire(import.meta.url),asar=require('@electron/asar');
+const packageRoot=path.resolve('build/assistant-package-phase3/win-unpacked/resources');
+const archive=path.join(packageRoot,'app.asar');
+const manifest=JSON.parse(asar.extractFile(archive,'native-manifest.json').toString('utf8'));
+assert.deepEqual(manifest,JSON.parse(await readFile('desktop-app/native-manifest.json','utf8')));
+const files=await verifyArtifacts(path.join(packageRoot,'native/win32-x64'),manifest);
+assert.equal(files.has('obscura/obscura.exe'),true);assert.equal(files.has('obscura/los-reader-host.exe'),true);
+assert.equal(files.has('obscura/obscura-worker.exe'),false);
+assert.equal(asar.listPackage(archive).some((file:string)=>file.endsWith('reader-host.c')),false);
+const manifestPath=path.resolve('build/reader-package-manifest.json');await writeFile(manifestPath,JSON.stringify(manifest));
+const runtime=createLocalRuntime(path.join(packageRoot,'native/win32-x64'),manifestPath,path.resolve('build/reader-package-work'));
+assert.deepEqual(await runtime.status(),{local:'ready',web:'ready',cloud:'disabled'});
+const page=await runtime.readPage('https://developer.mozilla.org/en-US/docs/Web/JavaScript',new AbortController().signal);
+assert.match(page.text,/JavaScript/);assert.equal(page.status,200);assert.deepEqual(await readdir('build/reader-package-work'),[]);
+console.log(JSON.stringify({verifiedNativeFiles:files.size,packagedReader:'ready',liveStatus:page.status,characters:page.text.length,temporaryDirectoryEmpty:true}));

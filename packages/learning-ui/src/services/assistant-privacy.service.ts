@@ -1,7 +1,7 @@
 import {useSyncExternalStore} from 'react';
 import {desktopAssistant, assistantValue} from './assistant.service';
 import type {AssistantContext, AssistantChange, AssistantConsent} from './assistant.types';
-import {ASSISTANT_PRIVACY_NOTICE} from './assistant.types';
+import {CLOUD_AI_NOTICE} from './assistant.types';
 import {apiFetch} from './http';
 import {auth} from '../lib/firebase';
 
@@ -19,8 +19,12 @@ function listen() {
   listening=true;
   desktopAssistant()!.onChanged((change:AssistantChange)=>{
     const context=change.context;
-    // Ignore a different account's late event. A forget/bind response installs its new token.
-    publish({clearEpoch:state.clearEpoch+1,...(!state.binding && (!context || context.token===state.context?.token)?{context}:{} )});
+    // Invoke replies and change notifications use separate Electron channels.
+    // A late invalidation for the previous binding must not erase a fresh token.
+    // A forget/bind response installs its new token; revisions reject stale saves.
+    const matches=context ? !!state.context && context.token===state.context.token && context.preferences.revision>=state.context.preferences.revision
+      : !!state.context && change.invalidatedToken===state.context.token;
+    publish({clearEpoch:state.clearEpoch+1,...(!state.binding && matches?{context}:{})});
   });
 }
 export function bindAssistantAccount(account?:string):Promise<void> {
@@ -63,6 +67,12 @@ async function consentRequest(account:string,method='GET',body?:unknown):Promise
 }
 export const assistantConsent={
   read:(account:string)=>consentRequest(account),
-  saveOff:(account:string,revision:number)=>consentRequest(account,'PUT',{revision,noticeVersion:ASSISTANT_PRIVACY_NOTICE,cloudConsent:false,webConsent:false}),
-  remove:(account:string,revision:number)=>consentRequest(account,'DELETE',{revision})
+  saveOff:(account:string,revision:number)=>saveCloudConsent(account,revision,false),
+  saveCloud:(account:string,revision:number,enabled:boolean)=>saveCloudConsent(account,revision,enabled),
+  remove:async(account:string,revision:number)=>{await clearAssistantContent();const result=await consentRequest(account,'DELETE',{revision});publish({clearEpoch:state.clearEpoch+1});return result}
 };
+async function saveCloudConsent(account:string,revision:number,enabled:boolean){
+  await clearAssistantContent();
+  const result=await consentRequest(account,'PUT',{revision,noticeVersion:CLOUD_AI_NOTICE,cloudConsent:enabled,webConsent:false});
+  publish({clearEpoch:state.clearEpoch+1});return result;
+}

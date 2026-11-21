@@ -1,5 +1,5 @@
 /** Real Electron/preload/privacy/UI checks; no real account or cloud provider. */
-import {app,BrowserWindow} from 'electron';
+import {app,BrowserWindow,dialog} from 'electron';
 import assert from 'node:assert/strict';
 import path from 'node:path';
 import {mkdtemp,writeFile,rm,readdir} from 'node:fs/promises';
@@ -24,7 +24,7 @@ app.whenReady().then(async()=>{
   await main.loadFile(doc);
   const evaluate=(script:string)=>main.webContents.executeJavaScript(script);
   assert.equal((await evaluate('window.losAssistant.status()')).value.local,'ready');
-  assert.deepEqual(await evaluate('Object.keys(window.losAssistant).sort()'),['bindAccount','cancel','forgetPreferences','onChanged','preferences','propose','reset','status']);
+  assert.deepEqual(await evaluate('Object.keys(window.losAssistant).sort()'),['bindAccount','cancel','forgetPreferences','onChanged','preferences','propose','readPage','reset','status']);
   await evaluate('window.losAssistant.bindAccount(null).then(result=>window.testContext=result.value)');
   const proposed=await evaluate("window.losAssistant.propose('open courses',crypto.randomUUID(),window.testContext.token)");
   assert.equal(proposed.ok,true);assert.deepEqual(proposed.value.action,{name:'open_view',arguments:{view:'courses'}});
@@ -42,11 +42,31 @@ app.whenReady().then(async()=>{
   await evaluate("window.losAssistant.bindAccount('clean-test-account').then(result=>window.testContext=result.value)");
   const cancellation=await evaluate("Promise.all([window.losAssistant.propose('open courses',crypto.randomUUID(),window.testContext.token),window.losAssistant.reset()])");
   assert.equal(cancellation[0].code,'CANCELLED');
+  // Deterministic main-side confirmation tests: production still uses Electron's
+  // own modal. Renderer cannot supply the response or override this function.
+  const originalMessageBox=dialog.showMessageBox;
+  let approvals=0,reads=0,decision=0;
+  dialog.showMessageBox=(async(_window:BrowserWindow,options:Electron.MessageBoxOptions)=>{
+    approvals++;assert.equal(options.defaultId,0);assert.equal(options.cancelId,0);
+    assert.ok(options.signal);return {response:decision,checkboxChecked:false};
+  }) as typeof dialog.showMessageBox;
+  const webRuntime={...runtime,readPage:async(url:string,_signal:AbortSignal)=>{
+    reads++;return {requestedUrl:url,finalUrl:url,status:200,text:'Untrusted <img src=x onerror=alert(1)> page text',truncated:false,fetchedAt:new Date().toISOString(),mode:'offline-document' as const,untrusted:true as const};
+  }};
+  dispose();dispose=attachAssistant(main,pathToFileURL(doc).href,webRuntime,new PrivacyStore(path.join(temporary,'web-flags')));
+  await evaluate('window.losAssistant.bindAccount(null).then(result=>window.testContext=result.value)');
+  assert.equal((await evaluate("window.losAssistant.readPage('http://127.0.0.1/',crypto.randomUUID(),window.testContext.token)")).code,'URL_DENIED');
+  assert.equal(approvals,0);
+  assert.equal((await evaluate("window.losAssistant.readPage('https://en.wikipedia.org/wiki/Physics',crypto.randomUUID(),window.testContext.token)")).code,'CANCELLED');
+  assert.equal(reads,0);decision=1;
+  assert.equal((await evaluate("window.losAssistant.readPage('https://en.wikipedia.org/wiki/Physics',crypto.randomUUID(),window.testContext.token)")).value.untrusted,true);
+  assert.equal(reads,1);
+  assert.equal((await wrong.webContents.executeJavaScript("window.losAssistant.readPage('https://en.wikipedia.org/wiki/Physics',crypto.randomUUID(),'anything')")).code,'DENIED');
   // Exercise the real React UI with external network requests blocked.
   const ui=new BrowserWindow(options);windows.push(ui);
   const uiFile=path.join(root,'desktop-app/frontend-dist/index.html');
   const uiFlags=path.join(temporary,'ui-flags');
-  dispose();dispose=attachAssistant(ui,pathToFileURL(uiFile).href,runtime,new PrivacyStore(uiFlags));
+  dispose();dispose=attachAssistant(ui,pathToFileURL(uiFile).href,webRuntime,new PrivacyStore(uiFlags));
   ui.webContents.session.webRequest.onBeforeRequest({urls:['https://*/*','http://*/*']},(_details,callback)=>callback({cancel:true}));
   const waitFor=async(window:BrowserWindow,expression:string)=>{
    const end=Date.now()+15000;
@@ -65,6 +85,10 @@ app.whenReady().then(async()=>{
   }
   await ui.loadFile(uiFile);await settings();
   await waitFor(ui,"document.querySelector('.assistant-privacy-toggle input').checked");
+  ui.webContents.send('los-assistant:changed',{context:null,clearContent:true,invalidatedToken:'old-binding-token'});
+  await new Promise(resolve=>setTimeout(resolve,100));
+  assert.equal(await ui.webContents.executeJavaScript("document.querySelector('.assistant-privacy-toggle input').checked"),true);
+
   await ui.webContents.executeJavaScript("document.querySelector('.assistant-privacy-toggle input').click()");
   await waitFor(ui,"document.querySelector('.assistant-privacy-settings').textContent.includes('Local command preference saved')");
   await openPanel();await waitFor(ui,"document.querySelector('.assistant-panel').textContent.includes('Paused in Settings')");
@@ -80,6 +104,15 @@ app.whenReady().then(async()=>{
   await waitFor(ui,"!!document.querySelector('.assistant-proposal')");
   await ui.webContents.executeJavaScript("Array.from(document.querySelectorAll('.assistant-privacy-settings button')).find(button=>button.textContent==='Clear current assistant data').click()");
   await waitFor(ui,"document.querySelector('#local-command').value==='' && !document.querySelector('.assistant-proposal')");
+  await ui.webContents.executeJavaScript("{const input=document.querySelector('#public-page-url');Object.getOwnPropertyDescriptor(HTMLInputElement.prototype,'value').set.call(input,'https://en.wikipedia.org/wiki/Physics');input.dispatchEvent(new Event('input',{bubbles:true}));}");
+  await waitFor(ui,"!document.querySelector('.assistant-web-reader button.ink-button').disabled");
+  await ui.webContents.executeJavaScript("document.querySelector('.assistant-web-reader form').requestSubmit()");
+  await waitFor(ui,"!!document.querySelector('.assistant-web-result pre')");
+  assert.match(await ui.webContents.executeJavaScript("document.querySelector('.assistant-web-result pre').textContent"),/<img src=x/);
+  assert.equal(await ui.webContents.executeJavaScript("document.querySelectorAll('.assistant-web-result img').length"),0);
+  await ui.webContents.executeJavaScript("Array.from(document.querySelectorAll('.assistant-privacy-settings button')).find(button=>button.textContent==='Clear current assistant data').click()");
+  await waitFor(ui,"!document.querySelector('.assistant-web-result') && document.querySelector('#public-page-url').value===''");
+  dialog.showMessageBox=originalMessageBox;
   assert.equal(await ui.webContents.executeJavaScript("document.querySelector('.assistant-privacy-toggle input').checked"),true);
   await ui.webContents.executeJavaScript("Array.from(document.querySelectorAll('.assistant-privacy-settings button')).find(button=>button.textContent==='Reset saved local choices').click()");
   await waitFor(ui,"document.querySelector('.assistant-privacy-settings').textContent.includes('Saved local choices removed')");
@@ -100,8 +133,32 @@ app.whenReady().then(async()=>{
   assert.equal(await focus.webContents.executeJavaScript('window.focusWrites'),0);
   await focus.webContents.executeJavaScript("Array.from(document.querySelectorAll('button')).find(button=>button.textContent.includes('Start session')).click()");
   await waitFor(focus,'window.focusWrites===1');
-  console.log('Electron/privacy/UI checks passed: isolated accounts, saved opt-out, wrong window/document, cancellation, reload, settings recovery, content clearing, preference removal, and explicit focus Start.');
+  // Real React cloud controls, with fixture-only authenticated HTTP responses.
+  const cloud=new BrowserWindow({show:false,webPreferences:{contextIsolation:true,nodeIntegration:false,sandbox:true}});windows.push(cloud);
+  await cloud.loadFile(path.join(root,'build/assistant-ui-test/cloud.html'));
+  await waitFor(cloud,"!!document.querySelector('#cloud-question')");
+  assert.equal(await cloud.webContents.executeJavaScript('window.cloudUploads.length'),0);
+  assert.equal(await cloud.webContents.executeJavaScript('window.cloudFixtureAuthRace()'),true);
+  assert.equal(await cloud.webContents.executeJavaScript('window.cloudUploads.length'),0);
+  assert.equal(await cloud.webContents.executeJavaScript("document.querySelector('.assistant-cloud fieldset').disabled"),true);
+  await cloud.webContents.executeJavaScript("Array.from(document.querySelectorAll('.assistant-privacy-settings input')).find(input=>input.type==='checkbox').click()");
+  await cloud.webContents.executeJavaScript("Array.from(document.querySelectorAll('button')).find(button=>button.textContent==='Enable reviewed cloud questions').click()");
+  await waitFor(cloud,"!document.querySelector('.assistant-cloud fieldset').disabled");
+  await cloud.webContents.executeJavaScript("{const input=document.querySelector('#cloud-question');Object.getOwnPropertyDescriptor(HTMLTextAreaElement.prototype,'value').set.call(input,'Explain fractions');input.dispatchEvent(new Event('input',{bubbles:true}));}");
+  await waitFor(cloud,"document.querySelector('#cloud-question').value==='Explain fractions'");
+  assert.equal(await cloud.webContents.executeJavaScript("document.querySelector('.assistant-cloud .ink-button').disabled"),true);
+  await cloud.webContents.executeJavaScript("document.querySelector('.assistant-cloud input[type=checkbox]').click()");
+  await cloud.webContents.executeJavaScript("document.querySelector('.assistant-cloud form').requestSubmit()");
+  await waitFor(cloud,"!!document.querySelector('.assistant-cloud-answer')");
+  assert.equal(await cloud.webContents.executeJavaScript('window.cloudUploads.length'),1);
+  assert.equal(await cloud.webContents.executeJavaScript("document.querySelectorAll('.assistant-cloud-answer img').length"),0);
+  await cloud.webContents.executeJavaScript("Array.from(document.querySelectorAll('button')).find(button=>button.textContent==='Turn cloud AI off').click()");
+  await waitFor(cloud,"!document.querySelector('.assistant-cloud-answer') && document.querySelector('.assistant-cloud fieldset').disabled");
+  await cloud.webContents.executeJavaScript('window.cloudFixtureLegacy()');
+  await waitFor(cloud,"document.querySelector('.assistant-cloud fieldset').disabled");
+  assert.equal(await cloud.webContents.executeJavaScript('window.cloudUploads.length'),1);
+  console.log('Electron/privacy/UI checks passed, including explicit cloud consent, per-question review, safe text display, revocation clearing and old-backend refusal.');
   result=0;
- }catch(error){console.error(error);const last=windows[windows.length-1];if(last && !last.isDestroyed())console.error(await last.webContents.executeJavaScript("({privacy:document.querySelector('.assistant-privacy-settings')?.textContent,checkbox:document.querySelector('.assistant-privacy-toggle input')?.checked})"))}
+ }catch(error){console.error(error);const last=windows[windows.length-1];if(last && !last.isDestroyed())console.error(await last.webContents.executeJavaScript("(async()=>({privacy:document.querySelector('.assistant-privacy-settings')?.textContent,checkbox:document.querySelector('.assistant-privacy-toggle input')?.checked,disabled:document.querySelector('.assistant-privacy-toggle input')?.disabled,panel:document.querySelector('.assistant-panel')?.textContent,url:location.href,status:await window.losAssistant?.status()}))()"))}
  finally{if(process.env.SYNAPSE_ASSISTANT_RESULT)await writeFile(process.env.SYNAPSE_ASSISTANT_RESULT,JSON.stringify({ok:result===0}));dispose?.();for(const window of windows)if(!window.isDestroyed())window.destroy();await rm(temporary,{recursive:true,force:true});app.exit(result)}
 });

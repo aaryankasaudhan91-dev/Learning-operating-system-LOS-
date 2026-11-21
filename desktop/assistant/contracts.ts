@@ -49,7 +49,8 @@ export function proposal(value: unknown): Proposal {
   return {kind: 'proposal', action: action(data.action), confidence: data.confidence as number | null};
 }
 export function approvedUrl(value: unknown): string {
-  const url = new URL(boundedText(value, 2048));
+  let url:URL;
+  try {url=new URL(boundedText(value,2048))}catch{throw new Error('URL_DENIED')}
   // This is a TOP-LEVEL allowlist, not a subresource/redirect firewall.
   const hosts = new Set(['en.wikipedia.org', 'developer.mozilla.org', 'www.khanacademy.org']);
   if (url.protocol !== 'https:' || !hosts.has(url.hostname) || url.username || url.password ||

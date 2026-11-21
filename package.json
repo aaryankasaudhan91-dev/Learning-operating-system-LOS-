@@ -16,7 +16,7 @@
     "typecheck": "npm run typecheck -w frontend && npm run typecheck -w @synapse/website && npm run typecheck -w @synapse/mobile && tsc -p backend/tsconfig.json --noEmit && tsc -p desktop/tsconfig.json",
     "desktop": "npm run build && electron .",
     "desktop:package": "npm run build && electron-builder --dir",
-    "desktop:installer": "npm run build && electron-builder",
+    "desktop:installer": "npm run release:windows",
     "mobile:sync": "npm run build -w @synapse/mobile && npm exec -w @synapse/mobile -- cap sync android",
     "web:dev": "npm run dev -w @synapse/website",
     "web:build": "npm run build -w @synapse/website",
@@ -30,13 +30,27 @@
     "assistant:setup": "python scripts/setup-assistant.py",
     "test:assistant:electron": "node desktop/test-assistant.mjs",
     "test:assistant:native": "python scripts/test-assistant-native.py",
-    "test:assistant:python": "python -m unittest discover -s native/needle -p test_worker.py"
+    "test:assistant:python": "python -m unittest discover -s native/needle -p test_worker.py",
+    "assistant:setup:web": "python scripts/setup-obscura.py",
+    "test:assistant:web": "tsx --test backend/tests/assistant-web.test.ts",
+    "test:assistant:containment": "node scripts/test-reader-containment.mjs",
+    "test:assistant:package": "tsx scripts/test-reader-package.mts",
+    "test:assistant:cloud": "tsx --test backend/tests/assistant-cloud.test.ts",
+    "release:review": "node scripts/release/windows.mjs --review",
+    "release:windows": "node scripts/release/windows.mjs",
+    "release:preflight": "node scripts/release/windows.mjs --preflight",
+    "release:notices": "node scripts/release/license-inventory.mjs",
+    "release:verify": "node scripts/release/verify-package.mjs",
+    "release:test-install": "node scripts/release/test-install.mjs",
+    "test:release": "node --test scripts/release/tests.test.mjs"
   },
   "devDependencies": {
     "concurrently": "^8.2.2",
-    "electron": "^42.0.0",
-    "electron-builder": "^26.0.0",
-    "esbuild": "^0.25.0"
+    "electron": "42.11.18",
+    "electron-builder": "26.15.3",
+    "esbuild": "0.25.12",
+    "@electron/fuses": "1.8.0",
+    "@electron/asar": "3.4.1"
   },
   "dependencies": {
     "animejs": "^4.5.0"
@@ -77,7 +91,8 @@
         "to": "native/win32-x64",
         "filter": [
           "needle/**",
-          "licenses/**"
+          "licenses/**",
+          "obscura/**"
         ]
       }
     ]

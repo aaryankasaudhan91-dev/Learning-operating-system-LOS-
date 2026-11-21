@@ -1,0 +1,111 @@
+name: Windows release verification
+on:
+  workflow_dispatch:
+    inputs:
+      mode:
+        description: Unsigned review build or protected signed candidate
+        type: choice
+        options: [review, signed]
+        default: review
+permissions:
+  contents: read
+concurrency:
+  group: windows-release-${{ github.ref }}-${{ inputs.mode }}
+  cancel-in-progress: false
+jobs:
+  review:
+    if: inputs.mode == 'review'
+    runs-on: windows-2025
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.14.3'
+      - run: npm ci
+      - name: Verify pinned GCC before executing it
+        run: ./scripts/release/setup-toolchain.ps1
+      - run: npm run typecheck
+      - run: npm run test:backend
+      - run: npm run test:release
+      - run: npm run assistant:setup
+      - run: npm run assistant:setup:web
+      - run: npm run test:assistant:native
+      - run: npm run test:assistant:containment
+      - name: Build first review installer
+        run: npm run release:review
+        env:
+          LOS_RELEASE_BACKEND_ORIGIN: ${{ vars.LOS_RELEASE_BACKEND_ORIGIN }}
+      - run: npm run test:assistant:electron
+      - name: Build distinct upgrade version and test actual installation
+        shell: pwsh
+        run: |
+          $old = node -p "require('./package.json').version"
+          $next = node -p "let p=require('./package.json').version.split('-')[0].split('.').map(Number);p[2]++;p.join('.')"
+          $env:LOS_REVIEW_VERSION = $next
+          npm run release:review
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+          npm run release:test-install -- "build/windows-review-$old" "build/windows-review-$next"
+        env:
+          LOS_RELEASE_BACKEND_ORIGIN: ${{ vars.LOS_RELEASE_BACKEND_ORIGIN }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: unsigned-windows-review-${{ github.sha }}
+          path: |
+            build/windows-review-*/artifacts/*
+            build/windows-review-*/release-evidence.json
+            build/windows-review-*/package-verification.json
+            build/windows-review-*/installer-verification.json
+            build/release-notices/**
+          retention-days: 14
+  signed:
+    if: inputs.mode == 'signed'
+    # A dedicated clean Windows signing VM/HSM is required; never use a PR runner.
+    runs-on: [self-hosted, Windows, X64, los-signing]
+    environment: windows-production-signing
+    timeout-minutes: 60
+    env:
+      LOS_SIGNING_THUMBPRINT: ${{ vars.LOS_SIGNING_THUMBPRINT }}
+      LOS_SIGNTOOL_PATH: ${{ vars.LOS_SIGNTOOL_PATH }}
+      LOS_RELEASE_BACKEND_ORIGIN: ${{ vars.LOS_RELEASE_BACKEND_ORIGIN }}
+      LOS_APPROVED_NATIVE_ROOT: ${{ vars.LOS_APPROVED_NATIVE_ROOT }}
+      LOS_LICENSE_REVIEW_FILE: ${{ vars.LOS_LICENSE_REVIEW_FILE }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Require version tag and approved immutable inputs
+        shell: pwsh
+        run: |
+          $version = (Get-Content -LiteralPath package.json -Raw | ConvertFrom-Json).version
+          if ($env:GITHUB_REF -ne "refs/tags/v$version") { throw 'Dispatch signing from the matching version tag.' }
+          if (-not $env:LOS_APPROVED_NATIVE_ROOT -or -not $env:LOS_LICENSE_REVIEW_FILE) { throw 'Stage reviewed native binaries and the matching rights review first.' }
+          New-Item -ItemType Directory -Force resources/native | Out-Null
+          Copy-Item -LiteralPath $env:LOS_APPROVED_NATIVE_ROOT -Destination resources/native/win32-x64 -Recurse
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+          cache: npm
+      - run: npm ci
+      - run: npm run release:preflight
+      - run: npm run typecheck
+      - run: npm run test:backend
+      - run: npm run test:release
+      - run: npm run release:windows
+      - name: Validate signed candidate
+        shell: pwsh
+        run: |
+          $version = node -p "require('./package.json').version"
+          npm run release:verify -- "build/windows-signed-$version"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: signed-candidate-${{ github.sha }}
+          path: |
+            build/windows-signed-*/artifacts/*
+            build/windows-signed-*/release-evidence.json
+            build/windows-signed-*/package-verification.json
+          retention-days: 14
+      # No GitHub Release, upload to the website, or automatic publication.

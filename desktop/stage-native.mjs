@@ -15,10 +15,12 @@ export async function stageNative() {
       else if (entry.isFile()) manifest[path.relative(native, file).split(path.sep).join('/')] = createHash('sha256').update(await readFile(file)).digest('hex');
     }
   }
-  for (const name of ['needle', 'licenses']) {
+  for (const name of ['needle', 'licenses','obscura']) {
     try {await visit(path.join(native, name))} catch (error) {if (error.code !== 'ENOENT') throw error}
   }
   if (Object.keys(manifest).length && !['needle/los-needle.exe','needle/libneedle.dll','needle/needle3.cact','needle/tools.json'].every(file => manifest[file])) throw new Error('Incomplete local assistant artifacts. Run npm run assistant:setup.');
+  if(Object.keys(manifest).some(file=>file.startsWith('obscura/')) &&
+    !['obscura/obscura.exe','obscura/los-reader-host.exe'].every(file=>manifest[file]))throw new Error('Incomplete public reader artifacts. Run npm run assistant:setup:web.');
   await mkdir(path.join(root, 'desktop-app'), {recursive: true});
   await writeFile(path.join(root, 'desktop-app/native-manifest.json'), JSON.stringify(manifest, null, 2));
   return Object.keys(manifest).length;

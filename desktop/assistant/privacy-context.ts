@@ -9,9 +9,9 @@ export class PrivacyContext {
   private current: {scope:string; value:AssistantContext} | null = null;
   private epoch = 0;
   private updating = false;
-  constructor(private readonly store: PrivacyStore, private readonly changed: (context:AssistantContext|null)=>void) {}
+  constructor(private readonly store: PrivacyStore, private readonly changed: (context:AssistantContext|null,invalidatedToken?:string|null)=>void) {}
   resetContent() {this.session.reset();this.changed(this.current?.value ?? null)}
-  invalidate() {this.epoch++;this.current=null;this.session.reset();this.changed(null)}
+  invalidate() {const token=this.current?.value.token??null;this.epoch++;this.current=null;this.session.reset();this.changed(null,token)}
   async bind(account: unknown): Promise<AssistantContext> {
     const scope=accountScope(account);
     this.invalidate(); const epoch=this.epoch;

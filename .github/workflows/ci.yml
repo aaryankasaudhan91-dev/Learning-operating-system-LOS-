@@ -50,6 +50,9 @@ jobs:
         env:
           NODE_ENV: test
 
+      - name: Verify release admission and license-review guards
+        run: npm run test:release
+
   desktop-check:
     name: Verify Desktop Packaging
     runs-on: ubuntu-latest

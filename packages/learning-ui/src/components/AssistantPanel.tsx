@@ -1,4 +1,6 @@
 import {useAssistantPrivacy} from '../services/assistant-privacy.service';
+import AssistantWebReader from './AssistantWebReader';
+import AssistantCloud from './AssistantCloud';
 import {useEffect, useRef, useState, type FormEvent} from 'react';
 import {MessageSquare, X} from 'lucide-react';
 import {assistantValue, desktopAssistant} from '../services/assistant.service';
@@ -51,7 +53,7 @@ export default function AssistantPanel({account, onApply}: Props) {
       <div className="assistant-panel-header"><div><h2 id="local-assistant-heading">Local assistant</h2><p>{!context ? 'Checking privacy choices…' : context.storage!=='ready' ? 'Privacy choices need repair' : !context.preferences.localCommandsEnabled ? 'Paused in Settings' : ready ? 'Ready on this device' : status?.local === 'invalid' ? 'Local files need repair' : 'Local model not ready'}</p></div><button className="text-button" onClick={close} aria-label="Close local assistant"><X size={20}/></button></div>
       <p>Your command stays on this device. Try “open courses” or “prepare a 20 minute focus session on algebra”.</p>
       <button className="text-button" onClick={()=>{onApply({name:'open_view',arguments:{view:'settings'}});close()}}>Privacy settings</button>
-      <p className="assistant-note">Commands create proposals. Web reading and cloud explanations are not enabled here.</p>
+      <p className="assistant-note">Commands create proposals. Cloud explanations require separate consent and a reviewed question.</p>
       {!ready && context?.preferences.localCommandsEnabled && <p role="status">{status?.local === 'unsupported-platform' ? 'Local commands currently support Windows x64.' : 'Run the local assistant setup and restart Synapse to enable commands.'}</p>}
       <form onSubmit={submit}><label htmlFor="local-command">Your command</label><input ref={input} id="local-command" value={visibleText} maxLength={2000} onChange={event => {setText(event.target.value);setTextOwner(owner)}} disabled={busy || !ready} autoComplete="off"/>
         <div className="assistant-actions"><button className="ink-button" disabled={!ready || busy || !visibleText.trim()}>{busy ? 'Reading locally…' : 'Prepare action'}</button>{busy && <button type="button" className="text-button" onClick={cancel}>Cancel</button>}</div>
@@ -62,6 +64,8 @@ export default function AssistantPanel({account, onApply}: Props) {
         <p>{visibleProposal.action.name === 'prepare_focus' ? 'This fills the focus form. Review it and press Start there to record a session.' : 'Review this suggestion before opening the screen.'}</p>
         <button ref={applyButton} className="ink-button" onClick={() => {if (visibleProposal.kind === 'proposal') {onApply(visibleProposal.action); close()}}}>Use this action</button><button className="text-button" onClick={() => setProposal(null)}>Dismiss</button>
       </div>}
+      <AssistantWebReader context={context} owner={owner} available={status?.web==='ready'}/>
+      <AssistantCloud account={account} owner={owner}/>
     </section>}
   </>;
 }

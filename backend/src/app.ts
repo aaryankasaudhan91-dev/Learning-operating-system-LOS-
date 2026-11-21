@@ -1,4 +1,5 @@
 import {setupAssistantPrivacyRoutes} from './assistant-privacy';
+import {setupCloudRoutes} from './cloud/routes';
 import {setupFocusRoutes} from './focus';
 import {QuestModel as Quest} from './models';
 import {setupAuthRoutes} from './auth';
@@ -11,7 +12,6 @@ import { randomUUID } from 'node:crypto';
 import { UserProfileModel as User, CourseModel as Course, ModuleModel as Module, LessonModel as Lesson, TaskModel as Task, RelationshipModel as Link, SubmissionModel as Submission, ProgressModel as Progress, PromptModel as Prompt, TicketModel as Ticket, FocusSessionModel as Focus, EnrollmentModel as Enrollment } from './models';
 import { ApiError, authentication, verifyIdentity, type VerifyIdentity, check, body, text, fields, ids, limitedNumber, rateLimit } from './security';
 import { setupAgentRoutes } from './agents';
-import { GoogleGenAI } from '@google/genai';
 export interface AppOptions {verify?:VerifyIdentity;ready?:()=>boolean;beforeRoutes?:(app:express.Express)=>void}
 const wrap=(fn:(req:Request,res:Response)=>Promise<any>)=>(req:Request,res:Response,next:NextFunction)=>{void fn(req,res).catch(next)};
 const plain=(doc:any)=>doc?.toObject?doc.toObject():doc;
@@ -29,6 +29,7 @@ export function createApp(options:AppOptions={}){
  setupPublicRoutes(app,ready);
  app.use('/api',rateLimit(600,60000),(_req,res,next)=>{if(!ready()){res.status(503).json({error:'Database is temporarily unavailable',code:'DATABASE_UNAVAILABLE'});return}next()},authentication(options.verify || verifyIdentity),rateLimit(180,60000),(req,res,next)=>{if(!ready()){res.status(503).json({error:'Database is temporarily unavailable',code:'DATABASE_UNAVAILABLE'});return}try{if(['POST','PUT','PATCH'].includes(req.method))body(req.body);next()}catch(error){next(error)}});
  setupAssistantPrivacyRoutes(app);
+ setupCloudRoutes(app);
  const uid=(res:Response)=>res.locals.identity.uid as string;
  async function profile(res:Response){const user=await User.findOne({uid:uid(res)});check(user,403,'Complete your profile first');return user}
  async function mentor(res:Response){const user=await profile(res);check(user.role==='mentor',403,'Teacher account required');return user}
@@ -92,7 +93,7 @@ export function createApp(options:AppOptions={}){
  app.get('/api/db/telemetry',wrap(async(_req,res)=>{await mentor(res);res.json({status:'Connected',counts:{students:await Link.countDocuments({mentorId:uid(res),status:'active'}),courses:await Course.countDocuments({ownerId:uid(res)}),tasks:await Task.countDocuments({teacherId:uid(res)})}})}));
  app.use('/api/agent',rateLimit(12,60000),(req,res,next)=>{void profile(res).then(()=>next()).catch(next)});
  // Agent routers are protected by the /api identity gate above.
- setupAgentRoutes(app,process.env.GEMINI_API_KEY?new GoogleGenAI({apiKey:process.env.GEMINI_API_KEY}):null);
+ setupAgentRoutes(app);
  app.use('/api',(_req,res)=>res.status(404).json({error:'API route not found'}));
  app.use((error:any,_req:Request,res:Response,_next:NextFunction)=>{if(res.headersSent){res.end();return}const status=error instanceof ApiError?error.status:error?.code===11000?409:error?.name==='ValidationError'||error?.name==='CastError'||error?.type==='entity.parse.failed'?400:error?.type==='entity.too.large'?413:500;res.status(status).json({error:status<500?error.message:'Service temporarily unavailable',code:status===500?'INTERNAL_ERROR':undefined})});
  return app;

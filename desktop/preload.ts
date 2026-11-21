@@ -4,6 +4,7 @@ const bridge:AssistantBridge={
  status:()=>ipcRenderer.invoke('los-assistant:status'),
  bindAccount:account=>ipcRenderer.invoke('los-assistant:bind',{account}),
  propose:(text,id,context)=>ipcRenderer.invoke('los-assistant:propose',{text,id,context}),
+ readPage:(url,id,context)=>ipcRenderer.invoke('los-assistant:read-page',{url,id,context}),
  preferences:(context,revision,localCommandsEnabled)=>ipcRenderer.invoke('los-assistant:preferences',{context,revision,localCommandsEnabled}),
  forgetPreferences:context=>ipcRenderer.invoke('los-assistant:forget',{context}),
  cancel:id=>ipcRenderer.invoke('los-assistant:cancel',{id}),
